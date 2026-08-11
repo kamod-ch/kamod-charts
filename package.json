@@ -1,0 +1,31 @@
+{
+  "name": "kamod-charts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Preact-native SVG chart library workspace for @kamod-ch/charts.",
+  "license": "MIT",
+  "author": "Klaus Zahiragic <watzak>",
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "test": "pnpm -r test",
+    "test:exports": "pnpm build && node scripts/test-package-exports.mjs",
+    "size:report": "pnpm build && node scripts/bundle-size-report.mjs",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "oxfmt": "^0.54.0",
+    "oxlint": "^1.69.0",
+    "typescript": "^6.0.3"
+  },
+  "packageManager": "pnpm@11.17.0"
+}

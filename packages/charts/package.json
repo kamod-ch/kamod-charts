@@ -1,0 +1,131 @@
+{
+  "name": "@kamod-ch/charts",
+  "version": "0.1.0-alpha.0",
+  "description": "Preact-native, SVG-first chart components for Kamod applications.",
+  "keywords": [
+    "charts",
+    "data-visualization",
+    "preact",
+    "svg",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "Klaus Zahiragic <watzak>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamod-ch/charts.git",
+    "directory": "packages/charts"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./accessibility": {
+      "types": "./dist/accessibility/index.d.ts",
+      "import": "./dist/accessibility/index.js"
+    },
+    "./animation": {
+      "types": "./dist/animation/index.d.ts",
+      "import": "./dist/animation/index.js"
+    },
+    "./area": {
+      "types": "./dist/charts/area-chart.d.ts",
+      "import": "./dist/charts/area-chart.js"
+    },
+    "./axes": {
+      "types": "./dist/axes/index.d.ts",
+      "import": "./dist/axes/index.js"
+    },
+    "./bar": {
+      "types": "./dist/charts/bar-chart.d.ts",
+      "import": "./dist/charts/bar-chart.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    },
+    "./interaction": {
+      "types": "./dist/interaction/index.d.ts",
+      "import": "./dist/interaction/index.js"
+    },
+    "./line": {
+      "types": "./dist/charts/line-chart.d.ts",
+      "import": "./dist/charts/line-chart.js"
+    },
+    "./performance": {
+      "types": "./dist/performance/index.d.ts",
+      "import": "./dist/performance/index.js"
+    },
+    "./pie": {
+      "types": "./dist/charts/pie-chart.d.ts",
+      "import": "./dist/charts/pie-chart.js"
+    },
+    "./primitives": {
+      "types": "./dist/primitives/index.d.ts",
+      "import": "./dist/primitives/index.js"
+    },
+    "./scales": {
+      "types": "./dist/scales/index.d.ts",
+      "import": "./dist/scales/index.js"
+    },
+    "./scatter": {
+      "types": "./dist/charts/scatter-chart.d.ts",
+      "import": "./dist/charts/scatter-chart.js"
+    },
+    "./series": {
+      "types": "./dist/series/index.d.ts",
+      "import": "./dist/series/index.js"
+    },
+    "./theme.css": "./dist/theme/tokens.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup && mkdir -p dist/theme && cp src/theme/tokens.css dist/theme/tokens.css",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "d3-array": "^3.2.4",
+    "d3-format": "^3.1.2",
+    "d3-interpolate": "^3.0.1",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0",
+    "d3-time-format": "^4.1.0"
+  },
+  "devDependencies": {
+    "@testing-library/preact": "^3.2.4",
+    "@types/d3-array": "^3.2.2",
+    "@types/d3-format": "^3.0.4",
+    "@types/d3-interpolate": "^3.0.4",
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-shape": "^3.1.8",
+    "@types/d3-time-format": "^4.0.3",
+    "jsdom": "^29.1.1",
+    "preact": "^10.29.2",
+    "preact-render-to-string": "^6.6.4",
+    "tsup": "^8.5.1",
+    "vitest": "^4.1.8"
+  },
+  "peerDependencies": {
+    "preact": "^10.29.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,51 @@
+:root {
+  --chart-1: var(--primary);
+  --chart-2: var(--color-blue-500);
+  --chart-3: var(--color-emerald-500);
+  --chart-4: var(--color-violet-500);
+  --chart-axis: var(--muted-foreground);
+  --chart-grid: color-mix(in oklab, var(--border) 70%, transparent);
+  --chart-tooltip-background: var(--popover);
+  --chart-tooltip-foreground: var(--popover-foreground);
+  --chart-tooltip-border: var(--border);
+  --chart-empty-foreground: var(--muted-foreground);
+  --chart-focus-ring: var(--ring);
+  --chart-reference-line: var(--chart-axis);
+}
+
+.dark {
+  --chart-grid: color-mix(in oklab, var(--border) 65%, transparent);
+}
+
+[data-kamod-chart-surface] {
+  color: var(--chart-axis);
+}
+
+[data-kamod-chart-surface] text {
+  fill: currentColor;
+}
+
+[data-kamod-chart-plot] > text {
+  fill: var(--chart-empty-foreground);
+}
+
+[data-kamod-chart-surface]:focus-visible {
+  outline: 2px solid var(--chart-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-contrast: more) {
+  [data-kamod-chart-surface] path,
+  [data-kamod-chart-surface] line,
+  [data-kamod-chart-surface] circle {
+    stroke-width: max(2px, var(--chart-stroke-width, 1px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-kamod-chart-surface] *,
+  [data-kamod-chart-tooltip] {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
