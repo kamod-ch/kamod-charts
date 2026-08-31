@@ -1,0 +1,57 @@
+---
+title: Accessibility
+description: Titles, keyboard navigation, contrast, and reduced motion.
+---
+
+import { LineChart } from "@kamod-ch/charts/line";
+import { DataTable } from "@kamod-ch/charts/accessibility";
+import { chartColors, halfYearMetrics } from "../data/datasets";
+import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
+
+## Built-in chart a11y
+
+All high-level charts accept `title` and `description`. Line, scatter, and pie charts are keyboard-focusable.
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <LineChart
+    data={halfYearMetrics}
+    xKey="month"
+    xScale="point"
+    series={[{ key: "revenue", label: "Revenue", color: chartColors.primary }]}
+    height={220}
+    initialWidth={640}
+    responsive
+    showGrid
+    tooltip
+    title="Accessible revenue chart"
+    description="Monthly revenue for the first half of 2024."
+  />
+</div>
+
+## Checklist
+
+<AccessibilityNotes
+  items={[
+    "Always set title and description for production charts.",
+    "Ensure focus rings remain visible against light and dark backgrounds.",
+    "Provide a textual summary or DataTable for critical metrics.",
+    'Respect prefers-reduced-motion — MotionConfig reducedMotion="user" follows the OS setting; axes and grid never animate.',
+    "Do not rely on color alone; pair series with labels/legend text.",
+  ]}
+/>
+
+## Data table alternative
+
+`@kamod-ch/charts/accessibility` exports `DataTable` and `buildChartDescription`.
+
+<div class="not-prose my-6 overflow-x-auto rounded-xl border border-border p-4">
+  <DataTable
+    caption="Monthly revenue sample"
+    columns={[
+      { id: "month", header: "Month", accessor: "month" },
+      { id: "revenue", header: "Revenue", accessor: "revenue" },
+      { id: "customers", header: "Customers", accessor: "customers" },
+    ]}
+    data={halfYearMetrics}
+  />
+</div>

@@ -1,6 +1,7 @@
 import { useState } from "preact/hooks";
+import { useChartMotionContext } from "../animation/slots";
 import { Chart, normalizeAccessor } from "../core";
-import { PieSeries } from "../series";
+import { PieSeries as StaticPieSeries } from "../series";
 import type { PieChartProps } from "./types";
 
 export const PieChart = <TDatum,>({
@@ -23,7 +24,10 @@ export const PieChart = <TDatum,>({
   colors,
   centerContent,
   onSegmentClick,
+  animate,
 }: PieChartProps<TDatum>) => {
+  const motion = useChartMotionContext();
+  const PieSeries = (motion.slots.PieSeries ?? StaticPieSeries) as typeof StaticPieSeries;
   const [activeIndex, setActiveIndex] = useState(0);
   const pointCount = data.length;
   const readValue = normalizeAccessor(valueKey);
@@ -83,6 +87,7 @@ export const PieChart = <TDatum,>({
         labelPosition={labels}
         centerContent={centerContent}
         onSegmentClick={onSegmentClick}
+        {...(animate === undefined ? {} : { animate })}
       />
     </Chart>
   );

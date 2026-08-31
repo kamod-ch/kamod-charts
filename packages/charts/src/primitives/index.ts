@@ -10,3 +10,14 @@ export { ReferenceLine } from "./reference-line";
 export type { ReferenceLineProps } from "./reference-line";
 export { Tooltip } from "./tooltip";
 export type { TooltipProps } from "./tooltip";
+export {
+  calculateTooltipPlacement,
+  clampTooltipPosition,
+  viewBoxToContainerPixels,
+} from "./tooltip-placement";
+export type {
+  ResolvedTooltipPlacement,
+  TooltipPlacement,
+  TooltipPlacementInput,
+  TooltipPlacementResult,
+} from "./tooltip-placement";

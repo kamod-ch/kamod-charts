@@ -48,6 +48,8 @@ export interface ChartInteraction<TDatum> {
   value: number | null;
   x: number;
   y: number;
+  /** Optional human-readable series label for tooltips / live regions. */
+  label?: string;
   nativeEvent?: PointerEvent | KeyboardEvent;
 }
 

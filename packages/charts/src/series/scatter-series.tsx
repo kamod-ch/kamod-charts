@@ -1,4 +1,5 @@
 import { useMemo } from "preact/hooks";
+import { pointKey, uniquifyKeys } from "../animation/keys";
 import { useChartContext, type DataAccessor } from "../core";
 import type { ScaleKind } from "../scales";
 import { getCartesianPoints, useCartesianScales } from "./cartesian";
@@ -36,32 +37,44 @@ export const ScatterSeries = <TDatum,>({
     xScale,
     xDomain,
     yDomain,
-    nice: true,
   });
   const points = useMemo(
     () => getCartesianPoints(data, scales.xScale, scales.yScale, resolvedXKey, yKey),
     [data, resolvedXKey, scales.xScale, scales.yScale, yKey],
   );
+  const seriesId = id ?? "series";
+  const keys = uniquifyKeys(
+    points.map((point) =>
+      pointKey(
+        seriesId,
+        point.xValue,
+        point.index,
+        typeof point.yValue === "number" ? point.yValue : null,
+      ),
+    ),
+  );
 
   return (
     <g class={className} data-kamod-chart-scatter-series="" data-kamod-chart-series-id={id}>
-      {points.map((point) => {
+      {points.map((point, pointIndex) => {
         if (!point.defined) {
           return null;
         }
 
         const fill = typeof color === "function" ? color(point.datum, point.index) : color;
         const radius = typeof size === "function" ? size(point.datum, point.index) : size;
+        const key = keys[pointIndex] ?? pointKey(seriesId, point.xValue, point.index);
 
         return (
           <circle
-            key={point.index}
+            key={key}
             cx={point.x ?? 0}
             cy={point.y ?? 0}
             r={activeIndex === point.index ? radius + 2 : radius}
             fill={fill}
             stroke="var(--chart-tooltip-background)"
             stroke-width={activeIndex === point.index ? 2 : 1}
+            data-kamod-chart-key={key}
             data-kamod-chart-active={activeIndex === point.index ? "true" : undefined}
           />
         );

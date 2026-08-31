@@ -1,0 +1,109 @@
+export type ChartKind = "line" | "area" | "bar" | "pie" | "scatter";
+
+export type GalleryExample = {
+  id: string;
+  title: string;
+  description: string;
+  kind: ChartKind;
+  href: string;
+  tags: Array<"basic" | "series" | "colors" | "responsive" | "tooltip" | "legend" | "empty">;
+};
+
+export const galleryExamples: GalleryExample[] = [
+  {
+    id: "line-basic",
+    title: "Revenue over time",
+    description: "Single-series line for monthly revenue.",
+    kind: "line",
+    href: "/charts/line#basic",
+    tags: ["basic", "tooltip"],
+  },
+  {
+    id: "line-multi",
+    title: "Revenue vs customers",
+    description: "Multiple series with legend and tooltip.",
+    kind: "line",
+    href: "/charts/line#multiple-series",
+    tags: ["series", "legend", "tooltip"],
+  },
+  {
+    id: "area-basic",
+    title: "Usage area",
+    description: "Filled area showing growth over months.",
+    kind: "area",
+    href: "/charts/area#basic",
+    tags: ["basic"],
+  },
+  {
+    id: "area-stacked",
+    title: "Stacked costs",
+    description: "Stacked areas for revenue and costs.",
+    kind: "area",
+    href: "/charts/area#stacked",
+    tags: ["series"],
+  },
+  {
+    id: "bar-basic",
+    title: "Weekly deploys",
+    description: "Compare deploys across weekdays.",
+    kind: "bar",
+    href: "/charts/bar#basic",
+    tags: ["basic"],
+  },
+  {
+    id: "bar-grouped",
+    title: "Deploys vs failures",
+    description: "Grouped bars for two related metrics.",
+    kind: "bar",
+    href: "/charts/bar#grouped",
+    tags: ["series"],
+  },
+  {
+    id: "pie-basic",
+    title: "Traffic sources",
+    description: "Parts of a whole for acquisition mix.",
+    kind: "pie",
+    href: "/charts/pie#basic",
+    tags: ["basic", "colors"],
+  },
+  {
+    id: "pie-donut",
+    title: "Donut summary",
+    description: "Inner radius with center content.",
+    kind: "pie",
+    href: "/charts/pie#donut",
+    tags: ["colors"],
+  },
+  {
+    id: "scatter-basic",
+    title: "Conversion scatter",
+    description: "Relationship between visitors and conversion.",
+    kind: "scatter",
+    href: "/charts/scatter#basic",
+    tags: ["basic"],
+  },
+  {
+    id: "line-empty",
+    title: "Empty state",
+    description: "Default empty rendering when data is missing.",
+    kind: "line",
+    href: "/charts/line#empty-state",
+    tags: ["empty"],
+  },
+  {
+    id: "line-responsive",
+    title: "Responsive line",
+    description: "Charts that follow container width.",
+    kind: "line",
+    href: "/foundations/responsive-charts",
+    tags: ["responsive"],
+  },
+  {
+    id: "bar-colors",
+    title: "Custom palette",
+    description: "Series colors via CSS chart tokens.",
+    kind: "bar",
+    href: "/foundations/colors-and-themes",
+    tags: ["colors"],
+  },
+];

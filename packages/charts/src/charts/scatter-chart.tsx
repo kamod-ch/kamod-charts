@@ -1,9 +1,13 @@
 import { useMemo, useState } from "preact/hooks";
 import { XAxis, YAxis } from "../axes";
-import { Chart, normalizeAccessor, type ChartInteraction } from "../core";
-import { createChartKeyboardHandler, getNearestIndexByX, getPointerPosition } from "../interaction";
-import { Crosshair, Grid, Legend, LiveRegion, ReferenceLine, Tooltip } from "../primitives";
-import { inferCombinedNumericDomain, ScatterSeries } from "../series";
+import { Chart } from "../core";
+import { createChartKeyboardHandler, getPointerPosition } from "../interaction";
+import { Grid, Legend, ReferenceLine } from "../primitives";
+import { useChartMotionContext } from "../animation/slots";
+import { inferCombinedNumericDomain, ScatterSeries as StaticScatterSeries } from "../series";
+import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
+import { findNearestCartesianPoint, resolvePlotAreaFromSize } from "./cartesian-interaction";
+import { isTooltipEnabled } from "./tooltip-options";
 import type { ScatterChartProps } from "./types";
 
 export const ScatterChart = <TDatum,>({
@@ -23,12 +27,16 @@ export const ScatterChart = <TDatum,>({
   tooltip = false,
   pointSize = 4,
   referenceLines = [],
+  animate,
 }: ScatterChartProps<TDatum>) => {
+  const motion = useChartMotionContext();
+  const ScatterSeries = (motion.slots.ScatterSeries ??
+    StaticScatterSeries) as typeof StaticScatterSeries;
   const [hiddenSeries, setHiddenSeries] = useState<readonly string[]>([]);
   const visibleSeries = series.filter(
     (entry) => !entry.hidden && !hiddenSeries.includes(entry.id ?? String(entry.key)),
   );
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
   const yDomain = useMemo(
     () =>
@@ -38,24 +46,11 @@ export const ScatterChart = <TDatum,>({
       ),
     [data, visibleSeries],
   );
-  const activeSeries = visibleSeries[activeSeriesIndex];
-  const activeDatum = data[activeIndex];
-  const activeValue =
-    activeDatum && activeSeries
-      ? normalizeAccessor(activeSeries.key)(activeDatum, activeIndex)
-      : null;
-  const interaction: ChartInteraction<TDatum> | null =
-    activeDatum && activeSeries
-      ? {
-          datum: activeDatum,
-          seriesId: activeSeries.id ?? String(activeSeries.key),
-          index: activeIndex,
-          value: typeof activeValue === "number" ? activeValue : null,
-          x: 40 + activeIndex * 24,
-          y: 24,
-        }
-      : null;
-  const plotWidth = Math.max((width ?? initialWidth ?? 640) - 56, 1);
+  const resolvedSeriesIndex =
+    visibleSeries.length === 0 ? 0 : Math.min(activeSeriesIndex, visibleSeries.length - 1);
+  const activeSeries = visibleSeries[resolvedSeriesIndex];
+  const tooltipEnabled = isTooltipEnabled(tooltip);
+  const fallbackWidth = width ?? initialWidth ?? 640;
 
   return (
     <Chart
@@ -70,26 +65,47 @@ export const ScatterChart = <TDatum,>({
       description={description}
       id={id}
       tabIndex={0}
-      onPointerMove={(event) => {
-        const position = getPointerPosition(event, {
-          x: 40,
-          y: 16,
-          width: plotWidth,
-          height: Math.max(height - 48, 1),
-        });
-        setActiveIndex(getNearestIndexByX(position.plotX, plotWidth, data.length));
-      }}
-      onPointerLeave={() => setActiveIndex(0)}
+      style={tooltipEnabled ? { cursor: "crosshair" } : undefined}
+      onPointerMove={
+        tooltipEnabled
+          ? (event) => {
+              const size = {
+                width: event.currentTarget.viewBox.baseVal.width || fallbackWidth,
+                height: event.currentTarget.viewBox.baseVal.height || height,
+              };
+              const nextPlot = resolvePlotAreaFromSize(size.width, size.height);
+              const position = getPointerPosition(event, nextPlot);
+              const hit = findNearestCartesianPoint({
+                data,
+                series: visibleSeries,
+                xKey,
+                xScale,
+                yDomain,
+                plotWidth: nextPlot.width,
+                plotHeight: nextPlot.height,
+                plotX: position.plotX,
+                plotY: position.plotY,
+              });
+              if (!hit) {
+                setActiveIndex(null);
+                return;
+              }
+              setActiveIndex(hit.index);
+              setActiveSeriesIndex(hit.seriesIndex);
+            }
+          : undefined
+      }
+      onPointerLeave={tooltipEnabled ? () => setActiveIndex(null) : undefined}
       onKeyDown={createChartKeyboardHandler({
         pointCount: data.length,
-        seriesCount: visibleSeries.length,
-        activeIndex,
-        activeSeriesIndex,
+        seriesCount: Math.max(visibleSeries.length, 1),
+        activeIndex: activeIndex ?? 0,
+        activeSeriesIndex: resolvedSeriesIndex,
         onChange: (state) => {
           setActiveIndex(state.activeIndex);
           setActiveSeriesIndex(state.activeSeriesIndex);
         },
-        onEscape: () => setActiveIndex(0),
+        onEscape: () => setActiveIndex(null),
       })}
       overlay={
         <>
@@ -110,15 +126,30 @@ export const ScatterChart = <TDatum,>({
               }
             />
           ) : null}
-          {tooltip ? <Tooltip interaction={interaction} /> : null}
-          <LiveRegion interaction={interaction} />
+          <CartesianActiveOverlay
+            activeIndex={activeIndex}
+            activeSeries={activeSeries}
+            visibleSeries={visibleSeries}
+            xKey={xKey}
+            xScale={xScale}
+            yDomain={yDomain}
+            tooltip={tooltip}
+            defaultMode="nearest"
+          />
         </>
       }
     >
       {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
-      {tooltip ? (
-        <Crosshair interaction={interaction} width={plotWidth} height={Math.max(height - 48, 1)} />
-      ) : null}
+      <CartesianActiveCrosshair
+        activeIndex={activeIndex}
+        activeSeries={activeSeries}
+        visibleSeries={visibleSeries}
+        xKey={xKey}
+        xScale={xScale}
+        yDomain={yDomain}
+        tooltip={tooltip}
+        defaultMode="nearest"
+      />
       <XAxis dataKey={xKey} scale={xScale} />
       <YAxis domain={yDomain} />
       {referenceLines.map((line, index) => (
@@ -143,6 +174,7 @@ export const ScatterChart = <TDatum,>({
           color={entry.color ?? `var(--chart-${(index % 4) + 1})`}
           size={pointSize}
           activeIndex={entry === activeSeries ? activeIndex : null}
+          {...(animate === undefined ? {} : { animate })}
         />
       ))}
     </Chart>

@@ -1,5 +1,7 @@
 import type { ComponentChildren } from "preact";
+import type { ChartAnimate } from "../animation";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
+import type { TooltipPlacement } from "../primitives/tooltip-placement";
 import type { LineCurve } from "../series";
 
 export interface CartesianSeriesConfig<TDatum> {
@@ -11,11 +13,49 @@ export interface CartesianSeriesConfig<TDatum> {
 }
 
 export interface CartesianReferenceLine<TDatum> {
-  y?: number;
+  y?: number | Date | string;
   x?: string | number | Date;
   label?: string;
   color?: string;
-  yKey?: DataAccessor<TDatum, number | Date | null | undefined>;
+  yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+}
+
+export type CartesianTooltipMode = "axis" | "nearest";
+export type { TooltipPlacement };
+
+export interface CartesianTooltipSeriesValue<TDatum> {
+  id: string;
+  label: string;
+  color?: string;
+  value: number | null;
+  series: CartesianSeriesConfig<TDatum>;
+}
+
+export interface CartesianTooltipContext<TDatum> {
+  datum: TDatum;
+  index: number;
+  xValue: string | number | Date | null;
+  xLabel: string | null;
+  seriesId: string;
+  seriesLabel?: string;
+  seriesValues: readonly CartesianTooltipSeriesValue<TDatum>[];
+  x: number;
+  y: number;
+}
+
+export interface CartesianTooltipOptions<TDatum> {
+  mode?: CartesianTooltipMode;
+  placement?: TooltipPlacement;
+  offset?: number;
+  render?: (context: CartesianTooltipContext<TDatum>) => ComponentChildren;
+  formatValue?: (
+    value: number | null,
+    context: CartesianTooltipContext<TDatum>,
+  ) => ComponentChildren | null | undefined;
+  formatLabel?: (
+    xValue: string | number | Date | null,
+    context: CartesianTooltipContext<TDatum>,
+  ) => ComponentChildren | null | undefined;
 }
 
 export interface CommonCartesianChartProps<TDatum> {
@@ -31,7 +71,8 @@ export interface CommonCartesianChartProps<TDatum> {
   id?: string;
   showGrid?: boolean;
   showLegend?: boolean;
-  tooltip?: boolean;
+  tooltip?: boolean | CartesianTooltipOptions<TDatum>;
+  animate?: ChartAnimate;
 }
 
 export interface LineChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {
@@ -84,6 +125,7 @@ export interface PieChartProps<TDatum> {
   colors?: readonly string[];
   centerContent?: ComponentChildren;
   onSegmentClick?: (datum: TDatum, index: number, value: number) => void;
+  animate?: ChartAnimate;
 }
 
 export interface ScatterChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {

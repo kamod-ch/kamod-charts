@@ -1,0 +1,49 @@
+---
+title: Scatter Chart
+description: Discover relationships between numeric variables.
+---
+
+import { Badge } from "@kamod-ch/ui";
+import { ScatterExamples, ScatterHeroDemo } from "../components/examples/ScatterExamples";
+import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
+import { PropsTable } from "../components/shared/PropsTable";
+import { commonCartesianProps, scatterSpecificProps } from "../data/props";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Scatter Chart</p>
+
+<div class="not-prose mb-6 flex flex-wrap gap-2">
+  <Badge variant="outline">Linear scales</Badge>
+  <Badge variant="outline">Reference lines</Badge>
+  <Badge variant="outline">Keyboard accessible</Badge>
+</div>
+
+## Overview
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <ScatterHeroDemo />
+</div>
+
+```ts
+import { ScatterChart } from "@kamod-ch/charts/scatter";
+```
+
+## Variants
+
+<ScatterExamples />
+
+## Props
+
+<PropsTable
+  rows={[...commonCartesianProps, ...scatterSpecificProps]}
+  caption="ScatterChart props"
+/>
+
+## Accessibility
+
+<AccessibilityNotes
+  items={[
+    "Scatter charts support keyboard navigation across points.",
+    "Use reference lines to communicate thresholds in both visual and textual form.",
+    "Provide a data table when individual point values matter.",
+  ]}
+/>

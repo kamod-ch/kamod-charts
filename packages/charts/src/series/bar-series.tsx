@@ -1,4 +1,6 @@
 import { useMemo } from "preact/hooks";
+import { barKey } from "../animation/keys";
+import { roundedRectPath } from "../charts/bar-path";
 import { normalizeAccessor, useChartContext, type DataAccessor } from "../core";
 import {
   createBandScale,
@@ -31,24 +33,6 @@ const valueToCategory = (
   return value instanceof Date ? value.toISOString() : String(value);
 };
 
-const roundedRectPath = (
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-): string => {
-  const safeRadius = Math.max(0, Math.min(radius, Math.abs(width) / 2, Math.abs(height) / 2));
-  const right = x + width;
-  const bottom = y + height;
-
-  if (safeRadius === 0) {
-    return `M${x},${y}H${right}V${bottom}H${x}Z`;
-  }
-
-  return `M${x + safeRadius},${y}H${right - safeRadius}Q${right},${y} ${right},${y + safeRadius}V${bottom - safeRadius}Q${right},${bottom} ${right - safeRadius},${bottom}H${x + safeRadius}Q${x},${bottom} ${x},${bottom - safeRadius}V${y + safeRadius}Q${x},${y} ${x + safeRadius},${y}Z`;
-};
-
 export const BarSeries = <TDatum,>({
   dataKey,
   xKey,
@@ -79,7 +63,6 @@ export const BarSeries = <TDatum,>({
   const valueScale = createLinearScale({
     domain: valueDomain,
     range: horizontal ? [0, plotArea.width] : [plotArea.height, 0],
-    nice: true,
   });
   const zero = valueScale(0);
 
@@ -103,13 +86,15 @@ export const BarSeries = <TDatum,>({
         const y = horizontal ? categoryPosition : Math.min(zero, scaled);
         const width = horizontal ? Math.max(Math.abs(scaled - zero), minBarSize) : bandwidth;
         const height = horizontal ? bandwidth : Math.max(Math.abs(scaled - zero), minBarSize);
+        const key = barKey(id ?? "series", category);
 
         return (
           <path
-            key={index}
+            key={key}
             d={roundedRectPath(x, y, width, height, radius)}
             fill={color}
             data-kamod-chart-bar=""
+            data-kamod-chart-key={key}
             onClick={onBarClick ? () => onBarClick(datum, index, raw) : undefined}
           />
         );

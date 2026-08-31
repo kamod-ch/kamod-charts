@@ -1,9 +1,8 @@
-import { area, curveLinear, curveMonotoneX, type CurveFactory } from "d3-shape";
 import { useMemo } from "preact/hooks";
 import { useChartContext, type DataAccessor } from "../core";
 import type { ScaleKind } from "../scales";
 import { getCartesianPoints, useCartesianScales } from "./cartesian";
-import type { LineCurve } from "./line-series";
+import { buildAreaPath, type LineCurve } from "./paths";
 
 export interface AreaSeriesProps<TDatum> {
   dataKey: DataAccessor<TDatum, number | null | undefined>;
@@ -19,14 +18,6 @@ export interface AreaSeriesProps<TDatum> {
   outline?: boolean;
   class?: string;
 }
-
-const resolveCurve = (curve: LineCurve = "linear"): CurveFactory => {
-  if (typeof curve === "function") {
-    return curve;
-  }
-
-  return curve === "monotoneX" ? curveMonotoneX : curveLinear;
-};
 
 export const AreaSeries = <TDatum,>({
   dataKey,
@@ -50,23 +41,13 @@ export const AreaSeries = <TDatum,>({
     xScale,
     xDomain,
     yDomain,
-    nice: true,
   });
   const baselineY = scales.yScale(baseline as never) ?? 0;
   const points = useMemo(
     () => getCartesianPoints(data, scales.xScale, scales.yScale, resolvedXKey, dataKey),
     [data, dataKey, resolvedXKey, scales.xScale, scales.yScale],
   );
-  const path = useMemo(() => {
-    const generator = area<(typeof points)[number]>()
-      .defined((point) => point.defined)
-      .x((point) => point.x ?? 0)
-      .y0(baselineY)
-      .y1((point) => point.y ?? baselineY)
-      .curve(resolveCurve(curve));
-
-    return generator(points) ?? "";
-  }, [baselineY, curve, points]);
+  const path = useMemo(() => buildAreaPath(points, curve, baselineY), [baselineY, curve, points]);
 
   return (
     <g class={className} data-kamod-chart-area-series="" data-kamod-chart-series-id={id}>

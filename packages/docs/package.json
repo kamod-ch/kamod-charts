@@ -1,0 +1,39 @@
+{
+  "name": "@kamod-ch/charts-docs",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PreactPress documentation and kitchen sink for @kamod-ch/charts.",
+  "type": "module",
+  "scripts": {
+    "brand:sync": "kamod-brand-sync-docs --target public",
+    "predev": "pnpm run brand:sync",
+    "prebuild": "pnpm run brand:sync",
+    "dev": "preactpress dev",
+    "build": "preactpress build",
+    "preview": "preactpress preview",
+    "check": "preactpress check",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
+  },
+  "dependencies": {
+    "@kamod-ch/brand": "^0.1.0",
+    "@kamod-ch/charts": "workspace:*",
+    "@kamod-ch/icons": "^1.0.3",
+    "@kamod-ch/motion": "file:../../../kamod-motion/packages/core",
+    "@kamod-ch/themes": "^0.2.1",
+    "@kamod-ch/ui": "^1.1.0",
+    "@preact/signals": "^2.11.0",
+    "motion": "^13.1.1",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@kamod-ch/preactpress": "^2.2.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.1"
+  }
+}

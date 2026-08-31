@@ -1,36 +1,25 @@
-import { useMemo } from "preact/hooks";
+import { useMemo, useState } from "preact/hooks";
+import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
-import { Chart, normalizeAccessor, useChartContext } from "../core";
-import { Grid, ReferenceLine } from "../primitives";
-import { createBandScale, createLinearScale, inferCategoricalDomain } from "../scales";
-import { getStackedValues, inferGroupedDomain, inferStackedDomain } from "../series";
+import { Chart, useChartContext } from "../core";
+import { createChartKeyboardHandler } from "../interaction";
+import { Grid, Legend, ReferenceLine } from "../primitives";
+import { inferGroupedDomain, inferStackedDomain } from "../series";
+import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
+import type { CartesianActivePoint } from "./cartesian-interaction";
+import { resolvePlotAreaFromSize } from "./cartesian-interaction";
+import {
+  findDefinedBar,
+  hitTestBars,
+  resolveBarGeometry,
+  stepDefinedBar,
+  type BarGeometry,
+} from "./bar-geometry";
+import { BarMarks as StaticBarMarks } from "./bar-marks";
+import { resolvePointerPlot } from "./chart-pointer";
+import { getSeriesId } from "./series-identity";
+import { isTooltipEnabled, resolveTooltipOptions } from "./tooltip-options";
 import type { BarChartProps } from "./types";
-
-const categoryOf = (value: string | number | Date | null | undefined, index: number): string => {
-  if (value == null) {
-    return String(index);
-  }
-
-  return value instanceof Date ? value.toISOString() : String(value);
-};
-
-const roundedRectPath = (
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-): string => {
-  const safeRadius = Math.max(0, Math.min(radius, Math.abs(width) / 2, Math.abs(height) / 2));
-  const right = x + width;
-  const bottom = y + height;
-
-  if (safeRadius === 0) {
-    return `M${x},${y}H${right}V${bottom}H${x}Z`;
-  }
-
-  return `M${x + safeRadius},${y}H${right - safeRadius}Q${right},${y} ${right},${y + safeRadius}V${bottom - safeRadius}Q${right},${bottom} ${right - safeRadius},${bottom}H${x + safeRadius}Q${x},${bottom} ${x},${bottom - safeRadius}V${y + safeRadius}Q${x},${y} ${x + safeRadius},${y}Z`;
-};
 
 export const BarChart = <TDatum,>({
   data,
@@ -45,6 +34,8 @@ export const BarChart = <TDatum,>({
   description,
   id,
   showGrid = false,
+  showLegend = false,
+  tooltip = false,
   orientation = "vertical",
   stacked = false,
   grouped = true,
@@ -53,10 +44,18 @@ export const BarChart = <TDatum,>({
   valueLabels = false,
   referenceLines = [],
   onBarClick,
+  animate,
 }: BarChartProps<TDatum>) => {
-  const visibleSeries = series.filter((entry) => !entry.hidden);
-  const stackSeries = visibleSeries.map((entry) => ({
-    id: entry.id ?? String(entry.key),
+  const motion = useChartMotionContext();
+  const BarMarks = (motion.slots.BarMarks ?? StaticBarMarks) as typeof StaticBarMarks;
+  const [hiddenSeries, setHiddenSeries] = useState<readonly string[]>([]);
+  const visibleSeries = series.filter(
+    (entry, index) => !entry.hidden && !hiddenSeries.includes(getSeriesId(entry, index)),
+  );
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
+  const stackSeries = visibleSeries.map((entry, index) => ({
+    id: getSeriesId(entry, index),
     value: entry.key,
   }));
   const yDomain = useMemo(
@@ -64,6 +63,21 @@ export const BarChart = <TDatum,>({
     [data, stacked, stackSeries],
   );
   const isHorizontal = orientation === "horizontal";
+  const resolvedSeriesIndex =
+    visibleSeries.length === 0 ? 0 : Math.min(activeSeriesIndex, visibleSeries.length - 1);
+  const activeSeries = visibleSeries[resolvedSeriesIndex];
+  const tooltipEnabled = isTooltipEnabled(tooltip);
+  const tooltipOptions = resolveTooltipOptions(tooltip, "nearest");
+  const fallbackWidth = width ?? initialWidth ?? 640;
+
+  const activateBar = (bar: BarGeometry<TDatum> | null) => {
+    if (!bar) {
+      setActiveIndex(null);
+      return;
+    }
+    setActiveIndex(bar.index);
+    setActiveSeriesIndex(bar.seriesIndex);
+  };
 
   return (
     <Chart
@@ -77,11 +91,174 @@ export const BarChart = <TDatum,>({
       title={title}
       description={description}
       id={id}
+      tabIndex={0}
+      style={tooltipEnabled ? { cursor: "crosshair" } : undefined}
+      onPointerMove={
+        tooltipEnabled
+          ? (event) => {
+              const { plot, position } = resolvePointerPlot(event, fallbackWidth, height);
+              const bars = resolveBarGeometry({
+                data,
+                series: visibleSeries,
+                xKey,
+                yDomain,
+                stacked,
+                grouped,
+                horizontal: isHorizontal,
+                minBarSize,
+                plotWidth: plot.width,
+                plotHeight: plot.height,
+              });
+              activateBar(
+                hitTestBars(
+                  bars,
+                  position.plotX,
+                  position.plotY,
+                  tooltipOptions?.mode ?? "nearest",
+                  isHorizontal,
+                ),
+              );
+            }
+          : undefined
+      }
+      onPointerLeave={tooltipEnabled ? () => setActiveIndex(null) : undefined}
+      onKeyDown={createChartKeyboardHandler({
+        pointCount: data.length,
+        seriesCount: Math.max(visibleSeries.length, 1),
+        activeIndex: activeIndex ?? 0,
+        activeSeriesIndex: resolvedSeriesIndex,
+        onChange: (state) => {
+          const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
+          const bars = resolveBarGeometry({
+            data,
+            series: visibleSeries,
+            xKey,
+            yDomain,
+            stacked,
+            grouped,
+            horizontal: isHorizontal,
+            minBarSize,
+            plotWidth: plot.width,
+            plotHeight: plot.height,
+          });
+          const stepped = stepDefinedBar(
+            bars,
+            state.activeIndex,
+            state.activeSeriesIndex,
+            state.activeIndex - (activeIndex ?? 0),
+            state.activeSeriesIndex - resolvedSeriesIndex,
+            data.length,
+            visibleSeries.length,
+          );
+          if (!stepped) {
+            setActiveIndex(null);
+            return;
+          }
+          setActiveIndex(stepped.index);
+          setActiveSeriesIndex(stepped.seriesIndex);
+        },
+        onSelect: (state) => {
+          if (!onBarClick || !activeSeries) {
+            return;
+          }
+          const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
+          const bars = resolveBarGeometry({
+            data,
+            series: visibleSeries,
+            xKey,
+            yDomain,
+            stacked,
+            grouped,
+            horizontal: isHorizontal,
+            minBarSize,
+            plotWidth: plot.width,
+            plotHeight: plot.height,
+          });
+          const bar = findDefinedBar(bars, state.activeIndex, state.activeSeriesIndex);
+          if (bar && bar.value != null) {
+            onBarClick(bar.datum, bar.seriesId, bar.index, bar.value);
+          }
+        },
+        onEscape: () => setActiveIndex(null),
+      })}
+      overlay={
+        <>
+          {showLegend ? (
+            <Legend
+              items={series.map((entry, index) => {
+                const seriesId = getSeriesId(entry, index);
+                return {
+                  id: seriesId,
+                  label: entry.label,
+                  color: entry.color ?? `var(--chart-${(index % 4) + 1})`,
+                  hidden: hiddenSeries.includes(seriesId),
+                };
+              })}
+              onToggle={(seriesId) => {
+                const activeId = activeSeries
+                  ? getSeriesId(activeSeries, resolvedSeriesIndex)
+                  : null;
+                setHiddenSeries((current) =>
+                  current.includes(seriesId)
+                    ? current.filter((entry) => entry !== seriesId)
+                    : [...current, seriesId],
+                );
+                if (activeId === seriesId) {
+                  setActiveIndex(null);
+                }
+              }}
+            />
+          ) : null}
+          <BarActiveLayers
+            data={data}
+            xKey={xKey}
+            visibleSeries={visibleSeries}
+            yDomain={yDomain}
+            stacked={stacked}
+            grouped={grouped}
+            horizontal={isHorizontal}
+            minBarSize={minBarSize}
+            activeIndex={activeIndex}
+            activeSeries={activeSeries}
+            resolvedSeriesIndex={resolvedSeriesIndex}
+            tooltip={tooltip}
+          />
+        </>
+      }
     >
-      {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
-      <XAxis dataKey={xKey} scale={xScale} />
-      <YAxis domain={yDomain} />
-      <Bars
+      {showGrid ? (
+        isHorizontal ? (
+          <Grid xScale="linear" xDomain={yDomain} yKey={xKey} yScale={xScale} />
+        ) : (
+          <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} />
+        )
+      ) : null}
+      <BarActiveCrosshair
+        data={data}
+        xKey={xKey}
+        visibleSeries={visibleSeries}
+        yDomain={yDomain}
+        stacked={stacked}
+        grouped={grouped}
+        horizontal={isHorizontal}
+        minBarSize={minBarSize}
+        activeIndex={activeIndex}
+        activeSeries={activeSeries}
+        resolvedSeriesIndex={resolvedSeriesIndex}
+        tooltip={tooltip}
+      />
+      {isHorizontal ? (
+        <>
+          <XAxis scale="linear" domain={yDomain} />
+          <YAxis dataKey={xKey} scale={xScale} />
+        </>
+      ) : (
+        <>
+          <XAxis dataKey={xKey} scale={xScale} />
+          <YAxis domain={yDomain} />
+        </>
+      )}
+      <BarMarks
         data={data}
         xKey={xKey}
         series={visibleSeries}
@@ -92,132 +269,106 @@ export const BarChart = <TDatum,>({
         radius={radius}
         minBarSize={minBarSize}
         valueLabels={valueLabels}
+        activeIndex={activeIndex}
+        activeSeriesIndex={resolvedSeriesIndex}
         onBarClick={onBarClick}
+        {...(animate === undefined ? {} : { animate })}
       />
       {referenceLines.map((line, index) => (
         <ReferenceLine
           key={index}
           x={line.x}
           y={line.y}
-          yDomain={yDomain}
           label={line.label}
           color={line.color}
           yKey={line.yKey}
           xKey={xKey}
-          xScale={xScale}
+          xScale={isHorizontal ? "linear" : xScale}
+          xDomain={isHorizontal ? yDomain : undefined}
+          yScale={isHorizontal ? xScale : "linear"}
+          yDomain={isHorizontal ? undefined : yDomain}
         />
       ))}
     </Chart>
   );
 };
 
-interface BarsProps<TDatum> {
+type BarActiveProps<TDatum> = {
   data: readonly TDatum[];
   xKey?: BarChartProps<TDatum>["xKey"];
-  series: readonly BarChartProps<TDatum>["series"][number][];
+  visibleSeries: readonly BarChartProps<TDatum>["series"][number][];
   yDomain: readonly [number, number];
   stacked: boolean;
   grouped: boolean;
   horizontal: boolean;
-  radius: number;
   minBarSize: number;
-  valueLabels: boolean;
-  onBarClick?: BarChartProps<TDatum>["onBarClick"];
-}
+  activeIndex: number | null;
+  activeSeries?: BarChartProps<TDatum>["series"][number];
+  resolvedSeriesIndex: number;
+  tooltip: BarChartProps<TDatum>["tooltip"];
+};
 
-const Bars = <TDatum,>({
-  data,
-  xKey,
-  series,
-  yDomain,
-  stacked,
-  grouped,
-  horizontal,
-  radius,
-  minBarSize,
-  valueLabels,
-  onBarClick,
-}: BarsProps<TDatum>) => {
+const useBarActivePoint = <TDatum,>(props: BarActiveProps<TDatum>): CartesianActivePoint | null => {
   const { plotArea } = useChartContext<TDatum>();
-  const readX = normalizeAccessor(xKey ?? ((_datum: TDatum, index: number) => index));
-  const domain = inferCategoricalDomain(data, xKey ?? ((_datum, index) => index));
-  const categoryScale = createBandScale({
-    domain,
-    range: horizontal ? [0, plotArea.height] : [0, plotArea.width],
-    paddingInner: 0.2,
-  });
-  const innerScale = createBandScale({
-    domain: series.map((entry) => entry.id ?? String(entry.key)),
-    range: [0, categoryScale.bandwidth()],
-    paddingInner: grouped ? 0.1 : 0,
-    paddingOuter: 0,
-  });
-  const valueScale = createLinearScale({
-    domain: yDomain,
-    range: horizontal ? [0, plotArea.width] : [plotArea.height, 0],
-    nice: true,
-  });
-  const stackedLayers = stacked
-    ? getStackedValues(
-        data,
-        series.map((entry) => ({ id: entry.id ?? String(entry.key), value: entry.key })),
-      )
-    : [];
+  if (props.activeIndex == null || !props.activeSeries) {
+    return null;
+  }
 
+  const bars = resolveBarGeometry({
+    data: props.data,
+    series: props.visibleSeries,
+    xKey: props.xKey,
+    yDomain: props.yDomain,
+    stacked: props.stacked,
+    grouped: props.grouped,
+    horizontal: props.horizontal,
+    minBarSize: props.minBarSize,
+    plotWidth: plotArea.width,
+    plotHeight: plotArea.height,
+  });
+  const bar = findDefinedBar(bars, props.activeIndex, props.resolvedSeriesIndex);
+  if (!bar) {
+    return null;
+  }
+
+  return {
+    plotX: bar.anchorX,
+    plotY: bar.anchorY,
+    surfaceX: plotArea.x + bar.anchorX,
+    surfaceY: plotArea.y + bar.anchorY,
+  };
+};
+
+const BarActiveLayers = <TDatum,>(props: BarActiveProps<TDatum>) => {
+  const activePoint = useBarActivePoint(props);
   return (
-    <g data-kamod-chart-bars="">
-      {series.map((entry, seriesIndex) => {
-        const readY = normalizeAccessor(entry.key);
-        const seriesId = entry.id ?? String(entry.key);
-        return data.map((datum, index) => {
-          const category = categoryOf(readX(datum, index), index);
-          const categoryPosition = categoryScale(category);
-          if (categoryPosition == null) {
-            return null;
-          }
+    <CartesianActiveOverlay
+      activeIndex={props.activeIndex}
+      activeSeries={props.activeSeries}
+      visibleSeries={props.visibleSeries}
+      xKey={props.xKey}
+      xScale="band"
+      yDomain={props.yDomain}
+      tooltip={props.tooltip}
+      defaultMode="nearest"
+      activePoint={activePoint}
+    />
+  );
+};
 
-          const raw = readY(datum, index);
-          const value = typeof raw === "number" && Number.isFinite(raw) ? raw : 0;
-          const stackValue = stackedLayers[seriesIndex]?.[index];
-          const valueStart = stacked ? (stackValue?.y0 ?? 0) : 0;
-          const valueEnd = stacked ? (stackValue?.y1 ?? value) : value;
-          const scaledStart = valueScale(valueStart);
-          const scaledEnd = valueScale(valueEnd);
-          const groupOffset = stacked ? 0 : (innerScale(seriesId) ?? 0);
-          const bandSize = stacked ? categoryScale.bandwidth() : innerScale.bandwidth();
-          const x = horizontal ? Math.min(scaledStart, scaledEnd) : categoryPosition + groupOffset;
-          const y = horizontal ? categoryPosition + groupOffset : Math.min(scaledStart, scaledEnd);
-          const barWidth = horizontal
-            ? Math.max(Math.abs(scaledEnd - scaledStart), minBarSize)
-            : bandSize;
-          const barHeight = horizontal
-            ? bandSize
-            : Math.max(Math.abs(scaledEnd - scaledStart), minBarSize);
-          const labelX = horizontal ? x + barWidth + 4 : x + barWidth / 2;
-          const labelY = horizontal ? y + barHeight / 2 : y - 4;
-
-          return (
-            <g key={`${seriesId}-${index}`}>
-              <path
-                d={roundedRectPath(x, y, barWidth, barHeight, radius)}
-                fill={entry.color ?? `var(--chart-${(seriesIndex % 4) + 1})`}
-                data-kamod-chart-bar=""
-                onClick={onBarClick ? () => onBarClick(datum, seriesId, index, value) : undefined}
-              />
-              {valueLabels ? (
-                <text
-                  x={labelX}
-                  y={labelY}
-                  text-anchor={horizontal ? "start" : "middle"}
-                  dominant-baseline="middle"
-                >
-                  {value}
-                </text>
-              ) : null}
-            </g>
-          );
-        });
-      })}
-    </g>
+const BarActiveCrosshair = <TDatum,>(props: BarActiveProps<TDatum>) => {
+  const activePoint = useBarActivePoint(props);
+  return (
+    <CartesianActiveCrosshair
+      activeIndex={props.activeIndex}
+      activeSeries={props.activeSeries}
+      visibleSeries={props.visibleSeries}
+      xKey={props.xKey}
+      xScale="band"
+      yDomain={props.yDomain}
+      tooltip={props.tooltip}
+      defaultMode="nearest"
+      activePoint={activePoint}
+    />
   );
 };

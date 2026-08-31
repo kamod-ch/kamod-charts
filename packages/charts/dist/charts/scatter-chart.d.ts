@@ -1,10 +1,11 @@
 import * as preact from 'preact';
-import { S as ScatterChartProps } from '../types-Cs-xxkSo.js';
-import '../types-CzGslxWS.js';
-import '../line-series-BY85caZx.js';
+import { S as ScatterChartProps } from '../types--XoS3nc_.js';
+import '../types-vhy5Wa3f.js';
+import '../types-Doyfwbln.js';
+import '../tooltip-placement-DZrqa8Zt.js';
+import '../paths-lqMAeFHq.js';
 import 'd3-shape';
-import '../domain-COQUkiLk.js';
 
-declare const ScatterChart: <TDatum>({ data, xKey, xScale, series, width, height, initialWidth, responsive, title, description, id, showGrid, showLegend, tooltip, pointSize, referenceLines, }: ScatterChartProps<TDatum>) => preact.JSX.Element;
+declare const ScatterChart: <TDatum>({ data, xKey, xScale, series, width, height, initialWidth, responsive, title, description, id, showGrid, showLegend, tooltip, pointSize, referenceLines, animate, }: ScatterChartProps<TDatum>) => preact.JSX.Element;
 
 export { ScatterChart };

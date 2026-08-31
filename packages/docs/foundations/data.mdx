@@ -1,0 +1,38 @@
+---
+title: Data
+description: How Kamod Charts expects row data and accessors.
+---
+
+import { CodePreview } from "../components/shared/CodePreview";
+
+## Row-oriented data
+
+High-level charts take an array of objects. Each series reads a numeric field through `key` (string) or a custom accessor function.
+
+<CodePreview
+  code={`type MonthlyMetric = {
+  month: string;
+  revenue: number;
+  customers: number;
+  costs: number | null;
+};
+
+const data: MonthlyMetric[] = [
+{ month: "Jan", revenue: 28400, customers: 1120, costs: 14200 },
+{ month: "Feb", revenue: 31200, customers: 1240, costs: null },
+];`}
+/>
+
+## Accessors
+
+`xKey`, series `key`, and pie `valueKey` / `labelKey` accept either a property name or `(datum, index) => value`.
+
+Nullish y-values create gaps for line charts unless `connectNulls` is enabled.
+
+## Empty and sparse sets
+
+- Empty arrays render the default empty surface from chart core.
+- Sparse series with `null` values are supported on cartesian charts.
+- Prefer centralized datasets in your app so demos and production stay consistent.
+
+Docs examples live in `packages/docs/data/datasets.ts`.

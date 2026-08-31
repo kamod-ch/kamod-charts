@@ -37,7 +37,11 @@ export const useAxisScale = <TDatum>({
   const resolvedDataKey = dataKey ?? (orientation === "x" ? xKey : undefined);
   const resolvedScale = scale ?? (orientation === "x" ? xScale : undefined) ?? "linear";
   const range: readonly [number, number] =
-    orientation === "x" ? [0, plotArea.width] : [plotArea.height, 0];
+    orientation === "x"
+      ? [0, plotArea.width]
+      : resolvedScale === "band" || resolvedScale === "point"
+        ? [0, plotArea.height]
+        : [plotArea.height, 0];
 
   if (resolvedScale === "band") {
     const categoricalDomain = inferCategoricalDomain(

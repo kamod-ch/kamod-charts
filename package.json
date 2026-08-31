@@ -10,15 +10,19 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm -r --filter !@kamod-ch/charts-docs build",
     "typecheck": "pnpm -r typecheck",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "test": "pnpm -r test",
+    "test": "pnpm -r --filter !@kamod-ch/charts-docs test",
     "test:exports": "pnpm build && node scripts/test-package-exports.mjs",
     "size:report": "pnpm build && node scripts/bundle-size-report.mjs",
+    "docs:dev": "pnpm --filter @kamod-ch/charts-docs dev",
+    "docs:build": "pnpm --filter @kamod-ch/charts-docs build",
+    "docs:preview": "pnpm --filter @kamod-ch/charts-docs preview",
+    "ci": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs && pnpm docs:build && pnpm size:report && git diff --exit-code -- docs/bundle-size.md",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs"
   },
   "devDependencies": {

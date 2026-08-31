@@ -1,9 +1,13 @@
 import { useMemo, useState } from "preact/hooks";
+import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
-import { Chart, normalizeAccessor, type ChartInteraction } from "../core";
-import { createChartKeyboardHandler, getNearestIndexByX, getPointerPosition } from "../interaction";
-import { Crosshair, Grid, Legend, LiveRegion, ReferenceLine, Tooltip } from "../primitives";
-import { inferCombinedNumericDomain, LineSeries } from "../series";
+import { Chart } from "../core";
+import { createChartKeyboardHandler, getPointerPosition } from "../interaction";
+import { Grid, Legend, ReferenceLine } from "../primitives";
+import { inferCombinedNumericDomain, LineSeries as StaticLineSeries } from "../series";
+import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
+import { findNearestCartesianIndexByX, resolvePlotAreaFromSize } from "./cartesian-interaction";
+import { isTooltipEnabled } from "./tooltip-options";
 import type { LineChartProps } from "./types";
 
 export const LineChart = <TDatum,>({
@@ -25,12 +29,15 @@ export const LineChart = <TDatum,>({
   connectNulls = false,
   showPoints = "auto",
   referenceLines = [],
+  animate,
 }: LineChartProps<TDatum>) => {
+  const motion = useChartMotionContext();
+  const LineSeries = (motion.slots.LineSeries ?? StaticLineSeries) as typeof StaticLineSeries;
   const [hiddenSeries, setHiddenSeries] = useState<readonly string[]>([]);
   const visibleSeries = series.filter(
     (entry) => !entry.hidden && !hiddenSeries.includes(entry.id ?? String(entry.key)),
   );
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
   const yDomain = useMemo(
     () =>
@@ -40,24 +47,11 @@ export const LineChart = <TDatum,>({
       ),
     [data, visibleSeries],
   );
-  const activeSeries = visibleSeries[activeSeriesIndex];
-  const activeDatum = data[activeIndex];
-  const activeValue =
-    activeDatum && activeSeries
-      ? normalizeAccessor(activeSeries.key)(activeDatum, activeIndex)
-      : null;
-  const interaction: ChartInteraction<TDatum> | null =
-    activeDatum && activeSeries
-      ? {
-          datum: activeDatum,
-          seriesId: activeSeries.id ?? String(activeSeries.key),
-          index: activeIndex,
-          value: typeof activeValue === "number" ? activeValue : null,
-          x: 40 + activeIndex * 24,
-          y: 24,
-        }
-      : null;
-  const plotWidth = Math.max((width ?? initialWidth ?? 640) - 56, 1);
+  const resolvedSeriesIndex =
+    visibleSeries.length === 0 ? 0 : Math.min(activeSeriesIndex, visibleSeries.length - 1);
+  const activeSeries = visibleSeries[resolvedSeriesIndex];
+  const tooltipEnabled = isTooltipEnabled(tooltip);
+  const fallbackWidth = width ?? initialWidth ?? 640;
 
   return (
     <Chart
@@ -72,26 +66,39 @@ export const LineChart = <TDatum,>({
       description={description}
       id={id}
       tabIndex={0}
-      onPointerMove={(event) => {
-        const position = getPointerPosition(event, {
-          x: 40,
-          y: 16,
-          width: plotWidth,
-          height: Math.max(height - 48, 1),
-        });
-        setActiveIndex(getNearestIndexByX(position.plotX, plotWidth, data.length));
-      }}
-      onPointerLeave={() => setActiveIndex(0)}
+      style={tooltipEnabled ? { cursor: "crosshair" } : undefined}
+      onPointerMove={
+        tooltipEnabled
+          ? (event) => {
+              const size = {
+                width: event.currentTarget.viewBox.baseVal.width || fallbackWidth,
+                height: event.currentTarget.viewBox.baseVal.height || height,
+              };
+              const nextPlot = resolvePlotAreaFromSize(size.width, size.height);
+              const position = getPointerPosition(event, nextPlot);
+              setActiveIndex(
+                findNearestCartesianIndexByX({
+                  data,
+                  xKey,
+                  xScale,
+                  plotWidth: nextPlot.width,
+                  plotX: position.plotX,
+                }),
+              );
+            }
+          : undefined
+      }
+      onPointerLeave={tooltipEnabled ? () => setActiveIndex(null) : undefined}
       onKeyDown={createChartKeyboardHandler({
         pointCount: data.length,
-        seriesCount: visibleSeries.length,
-        activeIndex,
-        activeSeriesIndex,
+        seriesCount: Math.max(visibleSeries.length, 1),
+        activeIndex: activeIndex ?? 0,
+        activeSeriesIndex: resolvedSeriesIndex,
         onChange: (state) => {
           setActiveIndex(state.activeIndex);
           setActiveSeriesIndex(state.activeSeriesIndex);
         },
-        onEscape: () => setActiveIndex(0),
+        onEscape: () => setActiveIndex(null),
       })}
       overlay={
         <>
@@ -112,15 +119,30 @@ export const LineChart = <TDatum,>({
               }
             />
           ) : null}
-          {tooltip ? <Tooltip interaction={interaction} /> : null}
-          <LiveRegion interaction={interaction} />
+          <CartesianActiveOverlay
+            activeIndex={activeIndex}
+            activeSeries={activeSeries}
+            visibleSeries={visibleSeries}
+            xKey={xKey}
+            xScale={xScale}
+            yDomain={yDomain}
+            tooltip={tooltip}
+            defaultMode="axis"
+          />
         </>
       }
     >
       {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
-      {tooltip ? (
-        <Crosshair interaction={interaction} width={plotWidth} height={Math.max(height - 48, 1)} />
-      ) : null}
+      <CartesianActiveCrosshair
+        activeIndex={activeIndex}
+        activeSeries={activeSeries}
+        visibleSeries={visibleSeries}
+        xKey={xKey}
+        xScale={xScale}
+        yDomain={yDomain}
+        tooltip={tooltip}
+        defaultMode="axis"
+      />
       <XAxis dataKey={xKey} scale={xScale} />
       <YAxis domain={yDomain} />
       {referenceLines.map((line, index) => (
@@ -147,6 +169,7 @@ export const LineChart = <TDatum,>({
           connectNulls={connectNulls}
           showPoints={showPoints}
           activeIndex={entry === activeSeries ? activeIndex : null}
+          {...(animate === undefined ? {} : { animate })}
         />
       ))}
     </Chart>

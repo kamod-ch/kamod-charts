@@ -26,6 +26,11 @@ export const getPointerPosition = (
   };
 };
 
+/**
+ * Maps plot X to a datum index assuming equal spacing across the plot width.
+ * Intended only for explicitly index-spaced domains. Continuous numeric/time
+ * and scatter selection should use projected-position helpers instead.
+ */
 export const getNearestIndexByX = (
   plotX: number,
   plotWidth: number,

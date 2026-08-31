@@ -5,13 +5,13 @@ import { getScalePosition } from "../axes";
 
 export interface ReferenceLineProps<TDatum> {
   x?: string | number | Date;
-  y?: number | Date;
+  y?: string | number | Date;
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
-  yKey?: DataAccessor<TDatum, number | Date | null | undefined>;
+  yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ScaleKind;
-  yScale?: "linear" | "time";
+  yScale?: ScaleKind;
   xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
-  yDomain?: readonly [number, number] | readonly [Date, Date];
+  yDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
   xPadding?: number | DomainPadding;
   yPadding?: number | DomainPadding;
   label?: string;

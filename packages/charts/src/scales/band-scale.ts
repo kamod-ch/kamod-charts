@@ -14,7 +14,7 @@ export type BandChartScale = ScaleBand<string>;
 export const createBandScale = ({
   domain,
   range,
-  paddingInner = 0.1,
+  paddingInner = 0.2,
   paddingOuter = 0.05,
   align = 0.5,
   round = false,

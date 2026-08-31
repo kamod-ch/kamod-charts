@@ -49,6 +49,34 @@ describe("axes and grid SSR", () => {
     expect(bandMarkup).toContain(">B</text>");
   });
 
+  it("renders categorical YAxis with band scale", () => {
+    const markup = renderToString(
+      <Chart data={data} width={400} height={240} id="categorical-y-axis">
+        <XAxis scale="linear" domain={[0, 20]} tickCount={3} />
+        <YAxis dataKey="category" scale="band" />
+      </Chart>,
+    );
+
+    expect(markup).toContain(">A</text>");
+    expect(markup).toContain(">B</text>");
+    expect(markup).toContain("data-kamod-chart-y-axis");
+  });
+
+  it("renders orientation-correct grid with numeric X and categorical Y", () => {
+    const markup = renderToString(
+      <Chart data={data} width={400} height={240} id="horizontal-grid">
+        <Grid xScale="linear" xDomain={[-10, 10]} yKey="category" yScale="band" />
+        <XAxis scale="linear" domain={[-10, 10]} tickCount={3} />
+        <YAxis dataKey="category" scale="band" />
+      </Chart>,
+    );
+
+    expect(markup).toContain("data-kamod-chart-grid");
+    expect(markup).toContain("data-kamod-chart-x-axis");
+    expect(markup).toContain("data-kamod-chart-y-axis");
+    expect(markup).toContain(">A</text>");
+  });
+
   it("handles empty data and one-point domains", () => {
     const empty = renderToString(
       <Chart data={[]} width={320} height={180} id="empty-axis-chart" emptyState={null}>

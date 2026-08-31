@@ -1,0 +1,60 @@
+---
+title: Line Chart
+description: Show change over time with an accessible, SVG-first line chart.
+---
+
+import { Badge } from "@kamod-ch/ui";
+import { LineExamples, LineHeroDemo } from "../components/examples/LineExamples";
+import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
+import { CodePreview } from "../components/shared/CodePreview";
+import { PropsTable } from "../components/shared/PropsTable";
+import { commonCartesianProps, lineSpecificProps } from "../data/props";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Line Chart</p>
+
+<div class="not-prose mb-6 flex flex-wrap gap-2">
+  <Badge variant="outline">Preact native</Badge>
+  <Badge variant="outline">Responsive</Badge>
+  <Badge variant="outline">Keyboard accessible</Badge>
+</div>
+
+## Overview
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <LineHeroDemo />
+</div>
+
+```sh
+pnpm add @kamod-ch/charts
+```
+
+```ts
+import { LineChart } from "@kamod-ch/charts/line";
+```
+
+## Variants
+
+<LineExamples />
+
+## Props
+
+Key props from the TypeScript definitions. See `LineChartProps` in `@kamod-ch/charts/line` for the full surface.
+
+<PropsTable rows={[...commonCartesianProps, ...lineSpecificProps]} caption="LineChart props" />
+
+## Accessibility
+
+<AccessibilityNotes
+  items={[
+    "Pass title and description for SVG <title> / <desc>.",
+    "Focus the chart and use arrow keys to move between points.",
+    "Tooltip updates are announced through a polite live region.",
+    "Animations respect prefers-reduced-motion via the charts theme.",
+  ]}
+/>
+
+## Related
+
+- [Area Chart](/charts/area)
+- [Scatter Chart](/charts/scatter)
+- [Playground](/playground/)

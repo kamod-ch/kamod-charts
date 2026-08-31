@@ -1,15 +1,15 @@
-import { arc, pie, type PieArcDatum } from "d3-shape";
 import type { ComponentChildren } from "preact";
 import { useMemo } from "preact/hooks";
-import { normalizeAccessor, useChartContext, type DataAccessor } from "../core";
+import { useChartContext, type DataAccessor } from "../core";
+import {
+  buildPieSlices,
+  defaultPieColors,
+  pieLabelPoint,
+  pieSlicePath,
+  type PieDatum,
+} from "./pie-geometry";
 
-export interface PieDatum<TDatum> {
-  datum: TDatum;
-  index: number;
-  label: string;
-  value: number;
-  color: string;
-}
+export type { PieDatum };
 
 export interface PieSeriesProps<TDatum> {
   valueKey: DataAccessor<TDatum, number | null | undefined>;
@@ -28,16 +28,6 @@ export interface PieSeriesProps<TDatum> {
   onSegmentClick?: (datum: TDatum, index: number, value: number) => void;
 }
 
-const defaultColors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"];
-
-const valueToLabel = (value: string | number | Date | null | undefined, index: number): string => {
-  if (value == null) {
-    return `Segment ${index + 1}`;
-  }
-
-  return value instanceof Date ? value.toISOString() : String(value);
-};
-
 export const PieSeries = <TDatum,>({
   valueKey,
   labelKey,
@@ -48,7 +38,7 @@ export const PieSeries = <TDatum,>({
   sort = false,
   activeIndex = null,
   activeOffset = 6,
-  colors = defaultColors,
+  colors = defaultPieColors,
   labelPosition = "inside",
   centerContent,
   class: className,
@@ -58,37 +48,35 @@ export const PieSeries = <TDatum,>({
   const radius = outerRadius ?? Math.max(0, Math.min(plotArea.width, plotArea.height) / 2);
   const centerX = plotArea.width / 2;
   const centerY = plotArea.height / 2;
-  const readValue = normalizeAccessor(valueKey);
-  const readLabel = normalizeAccessor(labelKey ?? ((_datum: TDatum, index: number) => index));
-  const pieData = useMemo(
+  const { slices, total } = useMemo(
     () =>
-      data.map((datum, index) => {
-        const raw = readValue(datum, index);
-        const value = typeof raw === "number" && Number.isFinite(raw) ? Math.max(0, raw) : 0;
-        return {
-          datum,
-          index,
-          label: valueToLabel(readLabel(datum, index), index),
-          value,
-          color: colors[index % colors.length] ?? "var(--chart-1)",
-        };
+      buildPieSlices({
+        data,
+        valueKey,
+        labelKey,
+        innerRadius,
+        outerRadius: radius,
+        padAngle,
+        cornerRadius,
+        sort,
+        colors,
+        activeIndex,
+        activeOffset,
       }),
-    [colors, data, readLabel, readValue],
+    [
+      activeIndex,
+      activeOffset,
+      colors,
+      cornerRadius,
+      data,
+      innerRadius,
+      labelKey,
+      padAngle,
+      radius,
+      sort,
+      valueKey,
+    ],
   );
-  const total = pieData.reduce((sum, datum) => sum + datum.value, 0);
-  const arcs = useMemo(() => {
-    const generator = pie<PieDatum<TDatum>>()
-      .value((datum) => datum.value)
-      .padAngle(padAngle);
-
-    if (sort === false) {
-      generator.sort(null);
-    } else if (typeof sort === "function") {
-      generator.sort(sort);
-    }
-
-    return generator(pieData.filter((datum) => datum.value > 0));
-  }, [padAngle, pieData, sort]);
 
   if (total <= 0) {
     return (
@@ -111,34 +99,29 @@ export const PieSeries = <TDatum,>({
       data-kamod-chart-pie-series=""
       transform={`translate(${centerX} ${centerY})`}
     >
-      {arcs.map((segment) => {
-        const isActive = activeIndex === segment.data.index;
-        const segmentArc = arc<PieArcDatum<PieDatum<TDatum>>>()
-          .innerRadius(innerRadius)
-          .outerRadius(radius + (isActive ? activeOffset : 0))
-          .cornerRadius(cornerRadius);
-        const labelArc = arc<PieArcDatum<PieDatum<TDatum>>>()
-          .innerRadius(labelPosition === "outside" ? radius + 18 : (innerRadius + radius) / 2)
-          .outerRadius(labelPosition === "outside" ? radius + 18 : (innerRadius + radius) / 2);
-        const [labelX, labelY] = labelArc.centroid(segment);
+      {slices.map((slice) => {
+        const isActive = activeIndex === slice.index;
+        const [labelX, labelY] =
+          labelPosition === "none" ? [0, 0] : pieLabelPoint(slice, labelPosition);
 
         return (
-          <g key={segment.data.index} data-kamod-chart-pie-segment="">
+          <g key={slice.key} data-kamod-chart-pie-segment="" data-kamod-chart-key={slice.key}>
             <path
-              d={segmentArc(segment) ?? ""}
-              fill={segment.data.color}
+              d={pieSlicePath(slice)}
+              fill={slice.color}
               stroke="var(--chart-tooltip-background)"
               stroke-width="1"
               data-kamod-chart-active={isActive ? "true" : undefined}
+              data-kamod-chart-key={slice.key}
               onClick={
                 onSegmentClick
-                  ? () => onSegmentClick(segment.data.datum, segment.data.index, segment.data.value)
+                  ? () => onSegmentClick(slice.datum, slice.index, slice.value)
                   : undefined
               }
             />
             {labelPosition === "none" ? null : (
               <text x={labelX} y={labelY} text-anchor="middle" dominant-baseline="middle">
-                {segment.data.label}
+                {slice.label}
               </text>
             )}
           </g>

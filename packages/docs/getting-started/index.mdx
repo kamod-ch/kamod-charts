@@ -1,0 +1,80 @@
+---
+title: Getting started
+description: Install @kamod-ch/charts and render your first Preact-native chart.
+---
+
+import { LineChart } from "@kamod-ch/charts/line";
+import { halfYearMetrics, chartColors } from "../data/datasets";
+import { CodePreview } from "../components/shared/CodePreview";
+import { CopyButton } from "../components/shared/CopyButton";
+
+## Installation
+
+Install the package with your workspace package manager:
+
+<div class="not-prose my-4 flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+  <code class="font-mono text-sm text-[color:var(--brand)]">pnpm add @kamod-ch/charts preact</code>
+  <CopyButton value="pnpm add @kamod-ch/charts preact" />
+</div>
+
+Import theme tokens once in your app entry:
+
+```ts
+import "@kamod-ch/charts/theme.css";
+```
+
+`preact` is a peer dependency. React, `react-dom`, and `preact/compat` are not supported.
+
+## Quick start
+
+High-level charts accept typed row data plus a `series` configuration:
+
+<div class="not-prose my-6 docs-chart-frame overflow-visible rounded-xl border border-border bg-card p-4">
+  <LineChart
+    data={halfYearMetrics}
+    xKey="month"
+    xScale="point"
+    series={[{ key: "revenue", label: "Revenue", color: chartColors.primary }]}
+    height={240}
+    initialWidth={640}
+    responsive
+    showGrid
+    tooltip
+    title="Monthly revenue"
+    description="Getting started demo for LineChart."
+  />
+</div>
+
+<CodePreview
+  code={`import { LineChart } from "@kamod-ch/charts/line";
+import "@kamod-ch/charts/theme.css";
+
+const data = [
+{ month: "Jan", revenue: 28400 },
+{ month: "Feb", revenue: 31200 },
+{ month: "Mar", revenue: 36800 },
+];
+
+export function RevenueChart() {
+  return (
+    <LineChart
+      data={data}
+      xKey="month"
+      xScale="point"
+      series={[{ key: "revenue", label: "Revenue", color: "var(--chart-1)" }]}
+      height={240}
+      initialWidth={640}
+      responsive
+      showGrid
+      tooltip
+      title="Monthly revenue"
+    />
+  );
+}`}
+/>
+
+## Next steps
+
+- Browse the [chart gallery](/)
+- Tune props in the [playground](/playground/)
+- Read [accessibility](/foundations/accessibility), [motion](/foundations/motion), and [theming](/foundations/colors-and-themes) foundations

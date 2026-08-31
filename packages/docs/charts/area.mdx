@@ -1,0 +1,48 @@
+---
+title: Area Chart
+description: Emphasize magnitude over time with filled area series.
+---
+
+import { Badge } from "@kamod-ch/ui";
+import { AreaExamples, AreaHeroDemo } from "../components/examples/AreaExamples";
+import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
+import { PropsTable } from "../components/shared/PropsTable";
+import { areaSpecificProps, commonCartesianProps } from "../data/props";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Area Chart</p>
+
+<div class="not-prose mb-6 flex flex-wrap gap-2">
+  <Badge variant="outline">Preact native</Badge>
+  <Badge variant="outline">Stackable</Badge>
+  <Badge variant="outline">SVG-first</Badge>
+</div>
+
+## Overview
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <AreaHeroDemo />
+</div>
+
+```ts
+import { AreaChart } from "@kamod-ch/charts/area";
+```
+
+## Variants
+
+<AreaExamples />
+
+## Props
+
+<PropsTable rows={[...commonCartesianProps, ...areaSpecificProps]} caption="AreaChart props" />
+
+## Accessibility
+
+<AccessibilityNotes
+  items={[
+    "Provide title and description on every production chart.",
+    "Prefer outline for stronger edges when contrast is critical.",
+    "Pair stacked areas with a data summary for screen reader users.",
+    "Arrow keys move the active datum; Escape dismisses the tooltip. The live region is the announcement surface.",
+    "Stacked tooltips report each series' original value, not the cumulative stack total.",
+  ]}
+/>

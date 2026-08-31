@@ -13,6 +13,15 @@ import {
 } from "../scales";
 import type { AxisScale } from "../axes";
 
+/**
+ * Internal cartesian scale contract:
+ * - High-level and composable components use the exact supplied or inferred
+ *   domain by default (`nice: false`).
+ * - A layer may apply `nice` only when every visual and interaction layer
+ *   receives the same resolved domain.
+ * - Active-point helpers must call {@link createCartesianScales} (or equivalent
+ *   options) rather than reconstructing a second scale path.
+ */
 export interface CartesianScaleOptions<TDatum> {
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   yKey: DataAccessor<TDatum, number | null | undefined>;
@@ -20,6 +29,12 @@ export interface CartesianScaleOptions<TDatum> {
   xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
   yDomain?: readonly [number, number];
   nice?: boolean | number;
+}
+
+export interface CreateCartesianScalesOptions<TDatum> extends CartesianScaleOptions<TDatum> {
+  data: readonly TDatum[];
+  xRange: readonly [number, number];
+  yRange: readonly [number, number];
 }
 
 export interface CartesianPoint<TDatum> {
@@ -53,19 +68,19 @@ export const inferCombinedNumericDomain = <TDatum>(
   return inferNumericDomain({ data: values.map((value) => ({ value })), accessor: "value" });
 };
 
-export const useCartesianScales = <TDatum>({
+export const createCartesianScales = <TDatum>({
+  data,
   xKey,
   yKey,
   xScale,
   xDomain,
   yDomain,
-  nice,
-}: CartesianScaleOptions<TDatum>): { xScale: AxisScale; yScale: AxisScale } => {
-  const { data, plotArea, xKey: contextXKey, xScale: contextXScale } = useChartContext<TDatum>();
-  const resolvedXKey = xKey ?? contextXKey ?? indexAccessor;
-  const resolvedXScale = xScale ?? contextXScale ?? "linear";
-  const xRange: readonly [number, number] = [0, plotArea.width];
-  const yRange: readonly [number, number] = [plotArea.height, 0];
+  xRange,
+  yRange,
+  nice = false,
+}: CreateCartesianScalesOptions<TDatum>): { xScale: AxisScale; yScale: AxisScale } => {
+  const resolvedXKey = xKey ?? indexAccessor;
+  const resolvedXScale = xScale ?? "linear";
 
   const nextXScale = (() => {
     if (resolvedXScale === "time") {
@@ -102,6 +117,29 @@ export const useCartesianScales = <TDatum>({
   const nextYScale = createLinearScale({ domain: nextYDomain, range: yRange, nice });
 
   return { xScale: nextXScale, yScale: nextYScale };
+};
+
+export const useCartesianScales = <TDatum>({
+  xKey,
+  yKey,
+  xScale,
+  xDomain,
+  yDomain,
+  nice = false,
+}: CartesianScaleOptions<TDatum>): { xScale: AxisScale; yScale: AxisScale } => {
+  const { data, plotArea, xKey: contextXKey, xScale: contextXScale } = useChartContext<TDatum>();
+
+  return createCartesianScales({
+    data,
+    xKey: xKey ?? contextXKey,
+    yKey,
+    xScale: xScale ?? contextXScale,
+    xDomain,
+    yDomain,
+    xRange: [0, plotArea.width],
+    yRange: [plotArea.height, 0],
+    nice,
+  });
 };
 
 export const getCartesianPoints = <TDatum>(

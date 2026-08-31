@@ -1,0 +1,177 @@
+@import "tailwindcss";
+@import "@kamod-ch/ui/theme.css";
+@import "@kamod-ch/charts/theme.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+@source "../../node_modules/@kamod-ch/ui/dist/**/*.{js,mjs}";
+@source "../components/**/*.{ts,tsx}";
+@source "../.preactpress/theme/**/*.{ts,tsx}";
+
+:root {
+  --brand: #fca503;
+  --brand-foreground: #191305;
+  --brand-hover: #e99500;
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --primary-accent: var(--brand-hover);
+  --ring: var(--brand);
+  --chart-1: var(--brand);
+  --chart-2: #1e3a8a;
+  --chart-3: #059669;
+  --chart-4: #7c3aed;
+  --docs-header-height: 3.5rem;
+  --docs-sidebar-width: 16rem;
+  --docs-outline-width: 14rem;
+  --docs-content-max: 56rem;
+  --docs-gallery-max: 72rem;
+}
+
+.dark {
+  --brand: #fca503;
+  --brand-foreground: #1b1404;
+  --brand-hover: #ffb833;
+  --primary: var(--brand);
+  --primary-foreground: var(--brand-foreground);
+  --primary-accent: var(--brand-hover);
+  --ring: var(--brand);
+  --chart-1: var(--brand);
+  --chart-2: #60a5fa;
+  --chart-3: #34d399;
+  --chart-4: #a78bfa;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-hover: var(--brand-hover);
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "IBM Plex Sans", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.docs-skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100%;
+  z-index: 100;
+  border-radius: var(--radius);
+  background: var(--brand);
+  color: var(--brand-foreground);
+  padding: 0.5rem 0.75rem;
+  font-weight: 600;
+}
+
+.docs-skip-link:focus {
+  top: 1rem;
+}
+
+.docs-prose {
+  max-width: var(--docs-content-max);
+}
+
+.docs-prose :is(h2, h3) {
+  scroll-margin-top: calc(var(--docs-header-height) + 1rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.docs-prose h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.35rem;
+  line-height: 1.35;
+}
+
+.docs-prose h3 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.docs-prose p,
+.docs-prose ul,
+.docs-prose ol {
+  margin: 0.85rem 0;
+  color: var(--muted-foreground);
+  line-height: 1.65;
+}
+
+.docs-prose a {
+  color: var(--brand-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.docs-prose :not(pre) > code {
+  border-radius: 0.35rem;
+  background: var(--muted);
+  padding: 0.1rem 0.35rem;
+  font-size: 0.9em;
+  color: var(--foreground);
+}
+
+.docs-prose pre {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--muted);
+  padding: 1rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.docs-chart-frame {
+  position: relative;
+  overflow: visible;
+  padding-top: 0.25rem;
+}
+
+.docs-chart-frame [data-kamod-chart-container] {
+  overflow: visible;
+}
+
+.docs-chart-frame [data-kamod-chart-tooltip] {
+  z-index: 40;
+}
+
+.docs-chart-frame [data-kamod-chart-surface] {
+  cursor: crosshair;
+}
+
+.hit-target {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}

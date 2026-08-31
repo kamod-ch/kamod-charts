@@ -1,0 +1,54 @@
+---
+title: Colors and themes
+description: Semantic chart tokens that follow light and dark mode.
+---
+
+import { BarChart } from "@kamod-ch/charts/bar";
+import { chartColors, weeklyDeployments } from "../data/datasets";
+import { CodePreview } from "../components/shared/CodePreview";
+
+## Chart tokens
+
+Import the charts theme once:
+
+```ts
+import "@kamod-ch/charts/theme.css";
+```
+
+Tokens resolve against Kamod UI semantic variables:
+
+- `--chart-1` … `--chart-4`
+- `--chart-axis`, `--chart-grid`
+- `--chart-tooltip-background`, `--chart-tooltip-foreground`
+- `--chart-focus-ring`, `--chart-reference-line`
+
+This docs site defines `--brand` once and maps `--chart-1` to it.
+
+## Example
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <BarChart
+    data={weeklyDeployments}
+    xKey="day"
+    series={[
+      { key: "deploys", label: "Deploys", color: chartColors.primary },
+      { key: "failures", label: "Failures", color: chartColors.quaternary },
+    ]}
+    height={220}
+    initialWidth={640}
+    responsive
+    showGrid
+    showLegend
+    radius={4}
+    title="Custom palette"
+  />
+</div>
+
+<CodePreview
+  code={`series={[
+  { key: "deploys", label: "Deploys", color: "var(--chart-1)" },
+  { key: "failures", label: "Failures", color: "var(--chart-4)" },
+]}`}
+/>
+
+Prefer CSS variables over hard-coded hex values so light and dark mode stay consistent.

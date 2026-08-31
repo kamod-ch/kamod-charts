@@ -1,0 +1,71 @@
+---
+title: Motion
+description: Optional data animations for Kamod Charts, powered by the packed @kamod-ch/motion API.
+---
+
+import { MotionExamples } from "../components/examples/MotionExamples";
+import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Foundations / Motion</p>
+
+## Overview
+
+The static `@kamod-ch/charts` entries stay SSR-safe and do not load a motion runtime.
+Import `@kamod-ch/charts/motion` when a chart should animate data changes.
+
+```sh
+pnpm add @kamod-ch/charts @kamod-ch/motion motion
+```
+
+```ts
+import { LineChart } from "@kamod-ch/charts/motion";
+```
+
+`animate` defaults to on for that entry. Disable it with `animate={false}` or wrap
+several charts in `MotionConfig`.
+
+## Static versus animated
+
+<MotionExamples />
+
+## Reduced motion
+
+`reducedMotion` accepts `user`, `always`, or `never`.
+
+- `user` follows `prefers-reduced-motion` after hydration.
+- `always` keeps the final geometry and skips clocks.
+- `never` animates even when the user prefers reduce.
+
+SSR and the first client render always use the final path, bars, slices, and
+points. Animation starts after hydration, so markup does not drift.
+
+## Performance
+
+- Line markers stay suppressed above 500 points (`showPoints: "auto"`).
+- One Value clock runs per series for path and bar updates. Scatter, bar, and
+  pie marks reuse that clock instead of opening one WAAPI timeline per point
+  when many items change together.
+- For streaming or very large datasets, set `animate={false}` or downsample
+  first with `@kamod-ch/charts/performance`.
+
+## Bundle impact
+
+`@kamod-ch/charts/line` and the root entry do not import `@kamod-ch/motion`.
+`@kamod-ch/charts/motion` is an optional subpath. `@kamod-ch/motion` and
+`motion` are optional peers.
+
+Measured from `pnpm size:report`:
+
+- `@kamod-ch/charts/line` — 406 bytes, no Motion imports
+- `@kamod-ch/charts/motion` — 34 401 bytes, peers stay external
+- Package JS/CSS total — 158 123 bytes, including the optional motion entry
+
+See `docs/bundle-size.md` for the full file list.
+
+<AccessibilityNotes
+  items={[
+    "Tooltip placement and live-region announcements use committed values, not tween frames.",
+    "Axes, grid, and legend do not animate.",
+    'Pass reducedMotion: "always" in tests or print styles when motion must stay off.',
+  ]}
+/>

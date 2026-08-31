@@ -1,13 +1,13 @@
 import { useChartContext, type DataAccessor } from "../core";
-import type { DomainPadding } from "../scales";
+import type { DomainPadding, ScaleKind } from "../scales";
 import { useAxisScale } from "./axis-scale";
 import { formatTick, type TickFormatter, type TickValue } from "./tick-format";
 import { getScalePosition, getTicks } from "./ticks";
 
 export interface YAxisProps<TDatum> {
-  dataKey?: DataAccessor<TDatum, number | Date | null | undefined>;
-  scale?: "linear" | "time";
-  domain?: readonly [number, number] | readonly [Date, Date];
+  dataKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+  scale?: ScaleKind;
+  domain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
   padding?: number | DomainPadding;
   nice?: boolean | number;
   tickCount?: number;

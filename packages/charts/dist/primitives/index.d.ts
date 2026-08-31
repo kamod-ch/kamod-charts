@@ -1,23 +1,27 @@
 import * as preact from 'preact';
 import { ComponentChildren } from 'preact';
-import { d as ChartInteraction, D as DataAccessor } from '../types-CzGslxWS.js';
-import { S as ScaleKind, D as DomainPadding } from '../domain-COQUkiLk.js';
+import { d as ChartInteraction, D as DataAccessor } from '../types-Doyfwbln.js';
+import { S as ScaleKind, D as DomainPadding } from '../domain-BtgmU7rB.js';
+import { T as TooltipPlacement } from '../tooltip-placement-DZrqa8Zt.js';
+export { R as ResolvedTooltipPlacement, a as TooltipPlacementInput, b as TooltipPlacementResult, c as calculateTooltipPlacement, d as clampTooltipPosition, v as viewBoxToContainerPixels } from '../tooltip-placement-DZrqa8Zt.js';
 
 interface CrosshairProps<TDatum> {
     interaction?: ChartInteraction<TDatum> | null;
-    width: number;
-    height: number;
+    /** Plot-relative width. Defaults to the chart plot area width from context. */
+    width?: number;
+    /** Plot-relative height. Defaults to the chart plot area height from context. */
+    height?: number;
     color?: string;
 }
 declare const Crosshair: <TDatum>({ interaction, width, height, color, }: CrosshairProps<TDatum>) => preact.JSX.Element | null;
 
 interface GridProps<TDatum> {
     xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
-    yKey?: DataAccessor<TDatum, number | Date | null | undefined>;
+    yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
     xScale?: ScaleKind;
-    yScale?: "linear" | "time";
+    yScale?: ScaleKind;
     xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
-    yDomain?: readonly [number, number] | readonly [Date, Date];
+    yDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
     xPadding?: number | DomainPadding;
     yPadding?: number | DomainPadding;
     xTickCount?: number;
@@ -48,13 +52,13 @@ declare const LiveRegion: <TDatum>({ interaction, format }: LiveRegionProps<TDat
 
 interface ReferenceLineProps<TDatum> {
     x?: string | number | Date;
-    y?: number | Date;
+    y?: string | number | Date;
     xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
-    yKey?: DataAccessor<TDatum, number | Date | null | undefined>;
+    yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
     xScale?: ScaleKind;
-    yScale?: "linear" | "time";
+    yScale?: ScaleKind;
     xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
-    yDomain?: readonly [number, number] | readonly [Date, Date];
+    yDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
     xPadding?: number | DomainPadding;
     yPadding?: number | DomainPadding;
     label?: string;
@@ -67,7 +71,9 @@ interface TooltipProps<TDatum> {
     interaction?: ChartInteraction<TDatum> | null;
     visible?: boolean;
     children?: (interaction: ChartInteraction<TDatum>) => ComponentChildren;
+    placement?: TooltipPlacement;
+    offset?: number;
 }
-declare const Tooltip: <TDatum>({ interaction, visible, children, }: TooltipProps<TDatum>) => preact.JSX.Element | null;
+declare const Tooltip: <TDatum>({ interaction, visible, children, placement, offset, }: TooltipProps<TDatum>) => preact.JSX.Element | null;
 
-export { Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceLine, type ReferenceLineProps, Tooltip, type TooltipProps };
+export { Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceLine, type ReferenceLineProps, Tooltip, TooltipPlacement, type TooltipProps };

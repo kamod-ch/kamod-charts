@@ -1,0 +1,33 @@
+---
+title: Examples
+description: Jump to live gallery examples for each chart type.
+---
+
+import { galleryExamples } from "../data/gallery";
+
+## Gallery examples
+
+All kitchen-sink cards render real chart components — no screenshots.
+
+<ul class="not-prose my-6 space-y-3">
+  {galleryExamples.map((example) => (
+    <li key={example.id} class="rounded-xl border border-border px-4 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <a
+            class="font-medium text-foreground underline-offset-4 hover:underline"
+            href={example.href}
+          >
+            {example.title}
+          </a>
+          <p class="text-sm text-muted-foreground">{example.description}</p>
+        </div>
+        <span class="rounded-full border border-border px-2 py-0.5 text-xs uppercase tracking-wide text-muted-foreground">
+          {example.kind}
+        </span>
+      </div>
+    </li>
+  ))}
+</ul>
+
+Open the [gallery](/) to filter by chart type, or the [playground](/playground/) to tune props live.

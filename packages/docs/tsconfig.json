@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "types": ["vite/client"]
+  },
+  "include": [
+    ".preactpress/**/*",
+    "components/**/*",
+    "data/**/*",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mdx"
+  ],
+  "exclude": ["dist", "node_modules"]
+}

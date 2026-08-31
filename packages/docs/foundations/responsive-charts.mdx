@@ -1,0 +1,48 @@
+---
+title: Responsive charts
+description: Fluid widths with SSR-safe initial dimensions.
+---
+
+import { LineChart } from "@kamod-ch/charts/line";
+import { chartColors, halfYearMetrics } from "../data/datasets";
+import { ResponsivePreview } from "../components/shared/AccessibilityNotes";
+import { CodePreview } from "../components/shared/CodePreview";
+
+## Container-driven width
+
+Set `responsive` and provide `initialWidth` for SSR / first paint. The chart then follows its parent with ResizeObserver.
+
+<ResponsivePreview>
+  <LineChart
+    data={halfYearMetrics}
+    xKey="month"
+    xScale="point"
+    series={[{ key: "revenue", label: "Revenue", color: chartColors.primary }]}
+    height={200}
+    initialWidth={480}
+    responsive
+    showGrid
+    tooltip
+    title="Responsive revenue"
+  />
+</ResponsivePreview>
+
+<CodePreview
+  code={`<LineChart
+  data={data}
+  xKey="month"
+      xScale="point"
+  series={[{ key: "revenue", label: "Revenue" }]}
+  height={200}
+  initialWidth={480}
+  responsive
+  showGrid
+  tooltip
+/>`}
+/>
+
+## Practical tips
+
+- Keep a stable `height` to avoid layout jumps while width changes.
+- Avoid nesting charts inside `overflow: hidden` containers if tooltips must escape.
+- On mobile, prefer full-bleed single-column layouts and shorter tick labels.

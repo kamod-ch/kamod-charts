@@ -1,5 +1,5 @@
-import { D as DataAccessor } from '../types-CzGslxWS.js';
-import { S as ScaleKind, D as DomainPadding } from '../domain-COQUkiLk.js';
+import { D as DataAccessor } from '../types-Doyfwbln.js';
+import { S as ScaleKind, D as DomainPadding } from '../domain-BtgmU7rB.js';
 import { ScaleLinear, ScaleTime, ScaleBand, ScalePoint } from 'd3-scale';
 import * as preact from 'preact';
 
@@ -48,9 +48,9 @@ interface XAxisProps<TDatum> {
 declare const XAxis: <TDatum>({ dataKey, scale, domain, padding, nice, tickCount, tickFormatter, formatSpecifier, label, tickRotation, class: className, }: XAxisProps<TDatum>) => preact.JSX.Element;
 
 interface YAxisProps<TDatum> {
-    dataKey?: DataAccessor<TDatum, number | Date | null | undefined>;
-    scale?: "linear" | "time";
-    domain?: readonly [number, number] | readonly [Date, Date];
+    dataKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    scale?: ScaleKind;
+    domain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
     padding?: number | DomainPadding;
     nice?: boolean | number;
     tickCount?: number;
