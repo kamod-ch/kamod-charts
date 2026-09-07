@@ -9,7 +9,7 @@ The requested package is `@kamod-ch/charts`. The repository starts empty, while 
 
 ## Decision
 
-Create a pnpm workspace and place the publishable package in `packages/charts`.
+Create a pnpm workspace and place the publishable package in `packages/core`.
 
 Planned root files:
 
@@ -19,13 +19,13 @@ pnpm-workspace.yaml
 pnpm-lock.yaml
 tsconfig.base.json
 docs/
-packages/charts/
+packages/core/
 ```
 
 Planned package files:
 
 ```text
-packages/charts/
+packages/core/
 ├── src/
 ├── tests/
 ├── package.json

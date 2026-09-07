@@ -5,8 +5,8 @@
 > **Drift check (run first)**:
 >
 > ```sh
-> git diff --stat 85f905c..HEAD -- packages/charts/src/interaction packages/charts/src/charts/cartesian-interaction.ts packages/charts/src/charts/line-chart.tsx packages/charts/src/charts/scatter-chart.tsx packages/charts/tests
-> git diff -- packages/charts/src/interaction packages/charts/src/charts/cartesian-interaction.ts packages/charts/src/charts/line-chart.tsx packages/charts/src/charts/scatter-chart.tsx packages/charts/tests
+> git diff --stat 85f905c..HEAD -- packages/core/src/interaction packages/core/src/charts/cartesian-interaction.ts packages/core/src/charts/line-chart.tsx packages/core/src/charts/scatter-chart.tsx packages/core/tests
+> git diff -- packages/core/src/interaction packages/core/src/charts/cartesian-interaction.ts packages/core/src/charts/line-chart.tsx packages/core/src/charts/scatter-chart.tsx packages/core/tests
 > ```
 >
 > This plan includes uncommitted interaction work not represented by commit `85f905c`. Compare the live files with the excerpts below and preserve all user changes.
@@ -28,16 +28,16 @@ Current pointer selection assumes every datum occupies an equal fraction of the 
 
 Relevant files:
 
-- `packages/charts/src/interaction/pointer.ts` — pointer-coordinate conversion and equal-index helper.
-- `packages/charts/src/interaction/hit-testing.ts` — already contains a correct squared-distance scan for `CartesianPoint[]`, but high-level scatter does not use it.
-- `packages/charts/src/charts/cartesian-interaction.ts` — projects an indexed datum to plot/surface coordinates.
-- `packages/charts/src/charts/line-chart.tsx` and `scatter-chart.tsx` — currently call equal-index hit-testing on every pointer move.
-- `packages/charts/src/charts/cartesian-active-layers.tsx` — consumes `activeIndex` and `activeSeries`; do not duplicate tooltip rendering here.
+- `packages/core/src/interaction/pointer.ts` — pointer-coordinate conversion and equal-index helper.
+- `packages/core/src/interaction/hit-testing.ts` — already contains a correct squared-distance scan for `CartesianPoint[]`, but high-level scatter does not use it.
+- `packages/core/src/charts/cartesian-interaction.ts` — projects an indexed datum to plot/surface coordinates.
+- `packages/core/src/charts/line-chart.tsx` and `scatter-chart.tsx` — currently call equal-index hit-testing on every pointer move.
+- `packages/core/src/charts/cartesian-active-layers.tsx` — consumes `activeIndex` and `activeSeries`; do not duplicate tooltip rendering here.
 
 Current equal-spacing assumption:
 
 ```ts
-// packages/charts/src/interaction/pointer.ts:29-38
+// packages/core/src/interaction/pointer.ts:29-38
 export const getNearestIndexByX = (
   plotX: number,
   plotWidth: number,
@@ -51,14 +51,14 @@ export const getNearestIndexByX = (
 Current callers:
 
 ```ts
-// packages/charts/src/charts/line-chart.tsx:67-70
+// packages/core/src/charts/line-chart.tsx:67-70
 const nextPlot = resolvePlotAreaFromSize(size.width, size.height);
 const position = getPointerPosition(event, nextPlot);
 setActiveIndex(getNearestIndexByX(position.plotX, nextPlot.width, data.length));
 ```
 
 ```ts
-// packages/charts/src/charts/scatter-chart.tsx:65-68
+// packages/core/src/charts/scatter-chart.tsx:65-68
 const nextPlot = resolvePlotAreaFromSize(size.width, size.height);
 const position = getPointerPosition(event, nextPlot);
 setActiveIndex(getNearestIndexByX(position.plotX, nextPlot.width, data.length));
@@ -67,7 +67,7 @@ setActiveIndex(getNearestIndexByX(position.plotX, nextPlot.width, data.length));
 Existing reusable distance convention:
 
 ```ts
-// packages/charts/src/interaction/hit-testing.ts:13-18
+// packages/core/src/interaction/hit-testing.ts:13-18
 const distance = (point.x - x) ** 2 + (point.y - y) ** 2;
 if (distance < nearestDistance) {
   nearest = point;
@@ -88,14 +88,14 @@ if (distance < nearestDistance) {
 
 **In scope**:
 
-- `packages/charts/src/interaction/pointer.ts`
-- `packages/charts/src/interaction/hit-testing.ts`
-- `packages/charts/src/interaction/index.ts`
-- `packages/charts/src/charts/cartesian-interaction.ts`
-- `packages/charts/src/charts/line-chart.tsx`
-- `packages/charts/src/charts/scatter-chart.tsx`
-- `packages/charts/tests/hit-testing.test.ts` (create)
-- `packages/charts/tests/interactions.test.tsx`
+- `packages/core/src/interaction/pointer.ts`
+- `packages/core/src/interaction/hit-testing.ts`
+- `packages/core/src/interaction/index.ts`
+- `packages/core/src/charts/cartesian-interaction.ts`
+- `packages/core/src/charts/line-chart.tsx`
+- `packages/core/src/charts/scatter-chart.tsx`
+- `packages/core/tests/hit-testing.test.ts` (create)
+- `packages/core/tests/interactions.test.tsx`
 
 **Out of scope**:
 
@@ -103,7 +103,7 @@ if (distance < nearestDistance) {
 - Tooltip styling, collision handling, formatter APIs, and ARIA behavior.
 - AreaChart, BarChart, and PieChart interaction.
 - Animation, downsampling, spatial indexes, quadtrees, and new dependencies.
-- `packages/charts/dist/**`, docs, and lockfiles.
+- `packages/core/dist/**`, docs, and lockfiles.
 
 ## Git workflow
 
@@ -116,7 +116,7 @@ if (distance < nearestDistance) {
 
 ### Step 1: Add pure hit-testing regressions
 
-Create `packages/charts/tests/hit-testing.test.ts`. Test pure helpers without jsdom where possible.
+Create `packages/core/tests/hit-testing.test.ts`. Test pure helpers without jsdom where possible.
 
 Required cases:
 
@@ -168,7 +168,7 @@ After legend toggles, ensure a now-invalid `activeSeriesIndex` is clamped/reset 
 
 If `getNearestIndexByX` remains useful for an explicitly index-spaced API, keep it exported and document that constraint. Otherwise remove it and its export after confirming no callers remain.
 
-**Verify**: `rg -n "getNearestIndexByX" packages/charts/src` → either zero matches, or only the definition/export plus a clearly index-spaced caller; LineChart and ScatterChart must not appear.
+**Verify**: `rg -n "getNearestIndexByX" packages/core/src` → either zero matches, or only the definition/export plus a clearly index-spaced caller; LineChart and ScatterChart must not appear.
 
 ### Step 6: Run all quality gates
 

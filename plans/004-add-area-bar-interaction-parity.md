@@ -5,8 +5,8 @@
 > **Drift check (run first)**:
 >
 > ```sh
-> git diff --stat 85f905c..HEAD -- packages/charts/src/charts packages/charts/src/series packages/charts/tests packages/docs/components/examples packages/docs/charts packages/docs/data/props.ts
-> git diff -- packages/charts/src/charts/area-chart.tsx packages/charts/src/charts/bar-chart.tsx packages/charts/src/charts/types.ts packages/docs/components/examples/BarExamples.tsx
+> git diff --stat 85f905c..HEAD -- packages/core/src/charts packages/core/src/series packages/core/tests packages/docs/components/examples packages/docs/charts packages/docs/data/props.ts
+> git diff -- packages/core/src/charts/area-chart.tsx packages/core/src/charts/bar-chart.tsx packages/core/src/charts/types.ts packages/docs/components/examples/BarExamples.tsx
 > ```
 >
 > `packages/docs/` and cartesian tooltip helpers are currently untracked at commit `85f905c`. This plan assumes Plans 001–003 have been applied on top of that work. Stop if they have not.
@@ -28,17 +28,17 @@
 
 Relevant files:
 
-- `packages/charts/src/charts/types.ts` — Area/Bar inherit common `showLegend` and `tooltip` props.
-- `packages/charts/src/charts/area-chart.tsx` — destructures neither prop and has no overlay/interaction state.
-- `packages/charts/src/charts/bar-chart.tsx` — ignores both props and computes bar geometry inline inside nested maps.
-- `packages/charts/src/charts/cartesian-active-layers.tsx` — shared Line/Scatter active overlay after Plans 001–003.
-- `packages/charts/src/primitives/legend.tsx` — established HTML legend/toggle behavior.
+- `packages/core/src/charts/types.ts` — Area/Bar inherit common `showLegend` and `tooltip` props.
+- `packages/core/src/charts/area-chart.tsx` — destructures neither prop and has no overlay/interaction state.
+- `packages/core/src/charts/bar-chart.tsx` — ignores both props and computes bar geometry inline inside nested maps.
+- `packages/core/src/charts/cartesian-active-layers.tsx` — shared Line/Scatter active overlay after Plans 001–003.
+- `packages/core/src/primitives/legend.tsx` — established HTML legend/toggle behavior.
 - `packages/docs/components/examples/BarExamples.tsx` — currently promises unsupported behavior.
 
 API promise:
 
 ```ts
-// packages/charts/src/charts/types.ts:21-35
+// packages/core/src/charts/types.ts:21-35
 export interface CommonCartesianChartProps<TDatum> {
   // ...
   showGrid?: boolean;
@@ -50,7 +50,7 @@ export interface CommonCartesianChartProps<TDatum> {
 Area currently stops at grid/axes/series:
 
 ```tsx
-// packages/charts/src/charts/area-chart.tsx:39-54
+// packages/core/src/charts/area-chart.tsx:39-54
 <Chart ...>
   {showGrid ? <Grid ... /> : null}
   <XAxis dataKey={xKey} scale={xScale} />
@@ -60,7 +60,7 @@ Area currently stops at grid/axes/series:
 Bar geometry is currently embedded in rendering:
 
 ```ts
-// packages/charts/src/charts/bar-chart.tsx:179-195
+// packages/core/src/charts/bar-chart.tsx:179-195
 const raw = readY(datum, index);
 const value = typeof raw === "number" && Number.isFinite(raw) ? raw : 0;
 // ...
@@ -99,15 +99,15 @@ Do not run the docs build if it writes unwanted generated files without first ch
 
 **In scope**:
 
-- `packages/charts/src/charts/area-chart.tsx`
-- `packages/charts/src/charts/bar-chart.tsx`
-- `packages/charts/src/charts/types.ts`
-- `packages/charts/src/charts/cartesian-active-layers.tsx` (only to generalize reusable context; do not fork it)
-- `packages/charts/src/charts/bar-geometry.ts` (create if needed)
-- `packages/charts/src/series/area-series.tsx`
-- `packages/charts/src/series/stacked-area-series.tsx`
-- `packages/charts/tests/area-bar.test.tsx`
-- `packages/charts/tests/interactions.test.tsx`
+- `packages/core/src/charts/area-chart.tsx`
+- `packages/core/src/charts/bar-chart.tsx`
+- `packages/core/src/charts/types.ts`
+- `packages/core/src/charts/cartesian-active-layers.tsx` (only to generalize reusable context; do not fork it)
+- `packages/core/src/charts/bar-geometry.ts` (create if needed)
+- `packages/core/src/series/area-series.tsx`
+- `packages/core/src/series/stacked-area-series.tsx`
+- `packages/core/tests/area-bar.test.tsx`
+- `packages/core/tests/interactions.test.tsx`
 - `packages/docs/components/examples/AreaExamples.tsx`
 - `packages/docs/components/examples/BarExamples.tsx`
 - `packages/docs/charts/area.mdx`

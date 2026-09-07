@@ -5,8 +5,8 @@
 > **Drift check (run first)**:
 >
 > ```sh
-> git diff --stat 85f905c..HEAD -- packages/charts/src/series packages/charts/src/charts/cartesian-interaction.ts packages/charts/src/charts/bar-chart.tsx packages/charts/tests
-> git diff -- packages/charts/src/series packages/charts/src/charts/cartesian-interaction.ts packages/charts/src/charts/bar-chart.tsx packages/charts/tests
+> git diff --stat 85f905c..HEAD -- packages/core/src/series packages/core/src/charts/cartesian-interaction.ts packages/core/src/charts/bar-chart.tsx packages/core/tests
+> git diff -- packages/core/src/series packages/core/src/charts/cartesian-interaction.ts packages/core/src/charts/bar-chart.tsx packages/core/tests
 > ```
 >
 > This plan was written against commit `85f905c` **plus existing uncommitted tooltip work**. The second command is mandatory because `cartesian-interaction.ts` is currently untracked and several interaction files are modified. Preserve those changes. If the live excerpts do not match the current-state section, stop and report.
@@ -28,17 +28,17 @@ The library currently computes independent scales for plotted series, axes, grid
 
 Relevant files:
 
-- `packages/charts/src/series/cartesian.ts` — creates X/Y scales for line, scatter, and area series.
-- `packages/charts/src/series/line-series.tsx`, `scatter-series.tsx`, `area-series.tsx` — request `nice: true`.
-- `packages/charts/src/series/bar-series.tsx`, `stacked-area-series.tsx` — independently create `nice: true` value scales.
-- `packages/charts/src/charts/bar-chart.tsx` — contains a second high-level bar renderer with another `nice: true` scale.
-- `packages/charts/src/charts/cartesian-interaction.ts` — independently reconstructs raw-domain scales for active points.
-- `packages/charts/src/axes/axis-scale.ts`, `packages/charts/src/primitives/grid.tsx`, and `reference-line.tsx` — form the existing declarative axis/grid/reference convention. Keep this Preact-owned SVG pattern.
+- `packages/core/src/series/cartesian.ts` — creates X/Y scales for line, scatter, and area series.
+- `packages/core/src/series/line-series.tsx`, `scatter-series.tsx`, `area-series.tsx` — request `nice: true`.
+- `packages/core/src/series/bar-series.tsx`, `stacked-area-series.tsx` — independently create `nice: true` value scales.
+- `packages/core/src/charts/bar-chart.tsx` — contains a second high-level bar renderer with another `nice: true` scale.
+- `packages/core/src/charts/cartesian-interaction.ts` — independently reconstructs raw-domain scales for active points.
+- `packages/core/src/axes/axis-scale.ts`, `packages/core/src/primitives/grid.tsx`, and `reference-line.tsx` — form the existing declarative axis/grid/reference convention. Keep this Preact-owned SVG pattern.
 
 Current mismatch:
 
 ```ts
-// packages/charts/src/series/line-series.tsx:58-65
+// packages/core/src/series/line-series.tsx:58-65
 const scales = useCartesianScales({
   xKey: resolvedXKey,
   yKey: dataKey,
@@ -50,7 +50,7 @@ const scales = useCartesianScales({
 ```
 
 ```ts
-// packages/charts/src/charts/cartesian-interaction.ts:86-90
+// packages/core/src/charts/cartesian-interaction.ts:86-90
 const xScale = createXScale(data, xKey, xScaleKind, plotWidth);
 const yScale = createLinearScale({
   domain: yDomain,
@@ -59,7 +59,7 @@ const yScale = createLinearScale({
 ```
 
 ```ts
-// packages/charts/src/charts/bar-chart.tsx:155-159
+// packages/core/src/charts/bar-chart.tsx:155-159
 const valueScale = createLinearScale({
   domain: yDomain,
   range: horizontal ? [0, plotArea.width] : [plotArea.height, 0],
@@ -71,7 +71,7 @@ Repository conventions:
 
 - Preact only; no React compatibility layer and no imperative D3 DOM ownership (`CONTRIBUTING.md:10-17`).
 - D3 scale modules may perform calculations, but rendered SVG remains declarative.
-- Tests use Vitest, `@testing-library/preact`, and explicit DOM attribute assertions; model new render tests after `packages/charts/tests/interactions.test.tsx`.
+- Tests use Vitest, `@testing-library/preact`, and explicit DOM attribute assertions; model new render tests after `packages/core/tests/interactions.test.tsx`.
 - Public APIs must remain D3-independent.
 
 ## Commands you will need
@@ -84,22 +84,22 @@ Repository conventions:
 | Lint          | `pnpm lint`                                                                                          | exit 0                         |
 | Format check  | `pnpm format:check`                                                                                  | exit 0                         |
 
-Do not run `pnpm build` during implementation until the operator confirms that overwriting the currently modified tracked `packages/charts/dist/` tree is acceptable.
+Do not run `pnpm build` during implementation until the operator confirms that overwriting the currently modified tracked `packages/core/dist/` tree is acceptable.
 
 ## Scope
 
 **In scope**:
 
-- `packages/charts/src/series/cartesian.ts`
-- `packages/charts/src/series/line-series.tsx`
-- `packages/charts/src/series/scatter-series.tsx`
-- `packages/charts/src/series/area-series.tsx`
-- `packages/charts/src/series/bar-series.tsx`
-- `packages/charts/src/series/stacked-area-series.tsx`
-- `packages/charts/src/charts/cartesian-interaction.ts`
-- `packages/charts/src/charts/bar-chart.tsx`
-- `packages/charts/tests/scales.test.ts`
-- `packages/charts/tests/scale-alignment.test.tsx` (create)
+- `packages/core/src/series/cartesian.ts`
+- `packages/core/src/series/line-series.tsx`
+- `packages/core/src/series/scatter-series.tsx`
+- `packages/core/src/series/area-series.tsx`
+- `packages/core/src/series/bar-series.tsx`
+- `packages/core/src/series/stacked-area-series.tsx`
+- `packages/core/src/charts/cartesian-interaction.ts`
+- `packages/core/src/charts/bar-chart.tsx`
+- `packages/core/tests/scales.test.ts`
+- `packages/core/tests/scale-alignment.test.tsx` (create)
 
 **Out of scope**:
 
@@ -107,7 +107,7 @@ Do not run `pnpm build` during implementation until the operator confirms that o
 - Hit-testing and nearest-point selection; Plan 002 owns that.
 - Area/Bar tooltip and legend parity; Plan 004 owns that.
 - Axis orientation changes for horizontal bars; Plan 005 owns that.
-- `packages/charts/dist/**`, lockfiles, docs, and dependencies.
+- `packages/core/dist/**`, lockfiles, docs, and dependencies.
 
 ## Git workflow
 
@@ -120,7 +120,7 @@ Do not run `pnpm build` during implementation until the operator confirms that o
 
 ### Step 1: Add regression tests that expose the current disagreement
 
-Create `packages/charts/tests/scale-alignment.test.tsx`. Use finite numeric domains that D3 changes when `nice()` is applied, especially `[3, 97]`, rather than round domains that accidentally mask the bug.
+Create `packages/core/tests/scale-alignment.test.tsx`. Use finite numeric domains that D3 changes when `nice()` is applied, especially `[3, 97]`, rather than round domains that accidentally mask the bug.
 
 Add at least these tests:
 
@@ -135,7 +135,7 @@ Do not use snapshots as the primary assertion. Parse numeric SVG attributes/tran
 
 ### Step 2: Define and document the internal scale contract
 
-In `packages/charts/src/series/cartesian.ts`, make the default domain treatment explicit and reusable. The recommended contract for this release is:
+In `packages/core/src/series/cartesian.ts`, make the default domain treatment explicit and reusable. The recommended contract for this release is:
 
 - High-level and composable components use the exact supplied/inferred domain by default (`nice: false`).
 - A component may only apply `nice` when every visual and interaction layer receives the same resolved domain.
@@ -151,7 +151,7 @@ Update line, scatter, area, low-level bar, stacked area, and high-level bar rend
 
 Update `resolveCartesianActivePoint` to use the same construction helper/options as rendered series. Preserve support for linear, time, point, and band-style categorical X inputs. Avoid changing public prop names or adding a broad new public scale API in this plan.
 
-**Verify**: `rg -n "nice: true" packages/charts/src/series packages/charts/src/charts/bar-chart.tsx packages/charts/src/charts/cartesian-interaction.ts` → no unexplained hardcoded `nice: true` remains. Any remaining match must have a comment and a test proving every layer shares its resolved domain.
+**Verify**: `rg -n "nice: true" packages/core/src/series packages/core/src/charts/bar-chart.tsx packages/core/src/charts/cartesian-interaction.ts` → no unexplained hardcoded `nice: true` remains. Any remaining match must have a comment and a test proving every layer shares its resolved domain.
 
 ### Step 4: Make all alignment tests pass
 
@@ -174,7 +174,7 @@ pnpm format:check
 
 ## Test plan
 
-- New file: `packages/charts/tests/scale-alignment.test.tsx`.
+- New file: `packages/core/tests/scale-alignment.test.tsx`.
 - Required cases: non-round numeric X/Y domains, time domain if pure helper behavior changed, line marker/crosshair alignment, scatter marker/crosshair alignment, and one area/bar/reference alignment.
 - Existing patterns: event setup from `tests/interactions.test.tsx`; high-level chart rendering from `tests/line-scatter.test.tsx`; pure scale assertions from `tests/scales.test.ts`.
 - Tests must assert coordinates, not merely element existence.

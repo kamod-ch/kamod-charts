@@ -54,7 +54,7 @@ Rationale:
 
 - Matches existing Kamod monorepo conventions.
 - Leaves room for later docs/examples packages without changing package identity.
-- Keeps the publishable package at `packages/charts` with repository directory metadata.
+- Keeps the publishable package at `packages/core` with repository directory metadata.
 
 ## Public API model
 
@@ -140,7 +140,7 @@ Notes:
 
 ## Internal architecture
 
-Planned `packages/charts/src` structure by phase:
+Planned `packages/core/src` structure by phase:
 
 ```text
 core/             Chart root, context, layout, SVG surface, responsive sizing, shared types
@@ -164,7 +164,7 @@ Phase 1 should initialize:
 - Root `package.json` with pnpm package manager and workspace scripts.
 - `pnpm-workspace.yaml` with `packages/*`.
 - `tsconfig.base.json` with strict Preact JSX settings.
-- `packages/charts/package.json` using ESM, peer dependency on `preact`, and direct modular D3 dependencies.
+- `packages/core/package.json` using ESM, peer dependency on `preact`, and direct modular D3 dependencies.
 - `tsup` or Vite library build. Existing Kamod libraries commonly use `tsup`; for subpath exports with many entries, `tsup` is a good fit. If Vite is required later for CSS handling, it can be adopted with an ADR update.
 - Vitest with jsdom for component tests and render-to-string tests for SSR determinism.
 - Oxlint and Oxfmt scripts.
@@ -276,7 +276,7 @@ Later phases add:
 
 ## Theme strategy
 
-`packages/charts/src/theme/tokens.css` should define semantic tokens and avoid hardcoded component colors:
+`packages/core/src/theme/tokens.css` should define semantic tokens and avoid hardcoded component colors:
 
 ```css
 :root {

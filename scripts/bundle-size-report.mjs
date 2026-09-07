@@ -1,7 +1,7 @@
 import { readdir, stat, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 
-const dist = resolve(import.meta.dirname, "../packages/charts/dist");
+const dist = resolve(import.meta.dirname, "../packages/core/dist");
 const rows = [];
 
 async function walk(dir) {
@@ -22,7 +22,7 @@ const total = rows.reduce((sum, [, size]) => sum + size, 0);
 const markdown = [
   "# Bundle size report",
   "",
-  `Generated from current \`packages/charts/dist\`. Total JS/CSS bytes: ${total} bytes.`,
+  `Generated from current \`packages/core/dist\`. Total JS/CSS bytes: ${total} bytes.`,
   "",
   "| File | Bytes |",
   "| --- | ---: |",

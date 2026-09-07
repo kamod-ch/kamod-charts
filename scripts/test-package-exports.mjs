@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
 const packageJson = JSON.parse(
-  await readFile(resolve(root, "packages/charts/package.json"), "utf8"),
+  await readFile(resolve(root, "packages/core/package.json"), "utf8"),
 );
 
 for (const [name, entry] of Object.entries(packageJson.exports)) {
@@ -16,7 +16,7 @@ for (const [name, entry] of Object.entries(packageJson.exports)) {
     throw new Error(`Export ${name} has no import path`);
   }
 
-  await import(resolve(root, "packages/charts", importPath));
+  await import(resolve(root, "packages/core", importPath));
 }
 
 console.log("package exports ok");

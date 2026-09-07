@@ -21,4 +21,4 @@ pnpm --filter @kamod-ch/charts-docs format:check
 - `/foundations/*` — data, theming, responsive, accessibility
 - `/getting-started/`, `/examples/`, `/api/` — docs entry points
 
-Engineering ADRs/RFCs remain in the repository root `docs/` folder and are not part of this PreactPress app.
+Engineering ADRs, RFCs, and release artifacts remain in the repository root [`docs/`](../../docs/) folder and are not part of this PreactPress app.

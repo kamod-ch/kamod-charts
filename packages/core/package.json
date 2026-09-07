@@ -14,7 +14,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kamod-ch/charts.git",
-    "directory": "packages/charts"
+    "directory": "packages/core"
   },
   "files": [
     "dist"

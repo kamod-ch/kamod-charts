@@ -5,8 +5,8 @@
 > **Drift check (run first)**:
 >
 > ```sh
-> git diff --stat 85f905c..HEAD -- package.json pnpm-lock.yaml packages/charts/src/axes packages/charts/src/primitives/grid.tsx packages/charts/src/primitives/reference-line.tsx packages/charts/src/charts/bar-chart.tsx packages/charts/tests docs/release-checklist.md .github
-> git diff -- package.json packages/charts/src/axes packages/charts/src/primitives/grid.tsx packages/charts/src/primitives/reference-line.tsx packages/charts/src/charts/bar-chart.tsx packages/charts/tests docs/release-checklist.md
+> git diff --stat 85f905c..HEAD -- package.json pnpm-lock.yaml packages/core/src/axes packages/core/src/primitives/grid.tsx packages/core/src/primitives/reference-line.tsx packages/core/src/charts/bar-chart.tsx packages/core/tests docs/release-checklist.md .github
+> git diff -- package.json packages/core/src/axes packages/core/src/primitives/grid.tsx packages/core/src/primitives/reference-line.tsx packages/core/src/charts/bar-chart.tsx packages/core/tests docs/release-checklist.md
 > ```
 >
 > The plan was written against a dirty worktree. Preserve current package-script, docs, tooltip, and generated-file changes. Do not regenerate or normalize the lockfile merely to add CI.
@@ -28,11 +28,11 @@ Horizontal BarChart rotates its rectangle geometry but still renders a categoric
 
 Relevant files:
 
-- `packages/charts/src/charts/bar-chart.tsx` — horizontal rectangle geometry and currently orientation-agnostic axes/grid/references.
-- `packages/charts/src/axes/x-axis.tsx`, `y-axis.tsx`, `axis-scale.ts` — declarative axis components; `useAxisScale` already supports band/point on either orientation internally.
-- `packages/charts/src/primitives/grid.tsx` — public Y types are restricted to numeric/time despite internal scale support.
-- `packages/charts/src/primitives/reference-line.tsx` — selects an X or Y scale independently.
-- `packages/charts/tests/area-bar.test.tsx` — current horizontal test checks only element existence.
+- `packages/core/src/charts/bar-chart.tsx` — horizontal rectangle geometry and currently orientation-agnostic axes/grid/references.
+- `packages/core/src/axes/x-axis.tsx`, `y-axis.tsx`, `axis-scale.ts` — declarative axis components; `useAxisScale` already supports band/point on either orientation internally.
+- `packages/core/src/primitives/grid.tsx` — public Y types are restricted to numeric/time despite internal scale support.
+- `packages/core/src/primitives/reference-line.tsx` — selects an X or Y scale independently.
+- `packages/core/tests/area-bar.test.tsx` — current horizontal test checks only element existence.
 - `package.json` — has `check`, `test:exports`, `size:report`, and docs scripts.
 - `docs/release-checklist.md` — requires checks before publication.
 - `.github/workflows/` — absent.
@@ -40,7 +40,7 @@ Relevant files:
 Current mismatch:
 
 ```tsx
-// packages/charts/src/charts/bar-chart.tsx:81-95
+// packages/core/src/charts/bar-chart.tsx:81-95
 {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
 <XAxis dataKey={xKey} scale={xScale} />
 <YAxis domain={yDomain} />
@@ -51,7 +51,7 @@ Current mismatch:
 ```
 
 ```ts
-// packages/charts/src/charts/bar-chart.tsx:143-159
+// packages/core/src/charts/bar-chart.tsx:143-159
 const categoryScale = createBandScale({
   domain,
   range: horizontal ? [0, plotArea.height] : [0, plotArea.width],
@@ -65,7 +65,7 @@ const valueScale = createLinearScale({
 Weak existing test:
 
 ```ts
-// packages/charts/tests/area-bar.test.tsx:87-102
+// packages/core/tests/area-bar.test.tsx:87-102
 const stackedHorizontal = renderToString(<BarChart orientation="horizontal" ... />);
 expect(stackedHorizontal).toContain("data-kamod-chart-bar");
 ```
@@ -87,20 +87,20 @@ Existing gate:
 | Docs check       | `pnpm --filter @kamod-ch/charts-docs typecheck`                                                       | exit 0              |
 | CI syntax sanity | `node -e "import('node:fs').then(fs=>console.log(fs.existsSync('.github/workflows/ci.yml')))"`        | prints `true`       |
 
-Full build/export/size gates modify tracked `packages/charts/dist/**` and `docs/bundle-size.md`. Run them only after the operator approves generated-file updates or in a clean disposable CI checkout.
+Full build/export/size gates modify tracked `packages/core/dist/**` and `docs/bundle-size.md`. Run them only after the operator approves generated-file updates or in a clean disposable CI checkout.
 
 ## Scope
 
 **In scope**:
 
-- `packages/charts/src/axes/y-axis.tsx`
-- `packages/charts/src/axes/axis-scale.ts` only if needed for public type alignment
-- `packages/charts/src/primitives/grid.tsx`
-- `packages/charts/src/primitives/reference-line.tsx`
-- `packages/charts/src/charts/bar-chart.tsx`
-- `packages/charts/src/charts/types.ts` only for reference-line orientation semantics
-- `packages/charts/tests/area-bar.test.tsx`
-- `packages/charts/tests/axes-grid-ssr.test.tsx`
+- `packages/core/src/axes/y-axis.tsx`
+- `packages/core/src/axes/axis-scale.ts` only if needed for public type alignment
+- `packages/core/src/primitives/grid.tsx`
+- `packages/core/src/primitives/reference-line.tsx`
+- `packages/core/src/charts/bar-chart.tsx`
+- `packages/core/src/charts/types.ts` only for reference-line orientation semantics
+- `packages/core/tests/area-bar.test.tsx`
+- `packages/core/tests/axes-grid-ssr.test.tsx`
 - `packages/docs/charts/bar.mdx`
 - `package.json` only if a non-mutating CI/check script is needed
 - `docs/release-checklist.md`
@@ -193,7 +193,7 @@ Create `.github/workflows/ci.yml` with:
 
 For the generated bundle report, either compare `docs/bundle-size.md` with the committed expected report via `git diff --exit-code -- docs/bundle-size.md`, or explicitly upload/report it without committing. Choose one documented behavior. Do not put secrets into CI and do not add publishing steps.
 
-If build output is intentionally committed, add a CI assertion for generated drift only after confirming deterministic chunk filenames in a clean checkout. Otherwise do not fail CI on `packages/charts/dist/**` hash churn.
+If build output is intentionally committed, add a CI assertion for generated drift only after confirming deterministic chunk filenames in a clean checkout. Otherwise do not fail CI on `packages/core/dist/**` hash churn.
 
 **Verify**: inspect workflow syntax and run every listed shell command locally only if generated-file mutation is approved; otherwise execute them in a temporary clean worktree or leave full execution to CI and report that constraint.
 

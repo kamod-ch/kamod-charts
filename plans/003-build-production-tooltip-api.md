@@ -5,8 +5,8 @@
 > **Drift check (run first)**:
 >
 > ```sh
-> git diff --stat 85f905c..HEAD -- packages/charts/src/core/types.ts packages/charts/src/charts/types.ts packages/charts/src/charts/cartesian-active-layers.tsx packages/charts/src/primitives/tooltip.tsx packages/charts/src/primitives/live-region.tsx packages/charts/src/theme/tokens.css packages/charts/tests
-> git diff -- packages/charts/src/core/types.ts packages/charts/src/charts/types.ts packages/charts/src/charts/cartesian-active-layers.tsx packages/charts/src/primitives/tooltip.tsx packages/charts/src/primitives/live-region.tsx packages/charts/src/theme/tokens.css packages/charts/tests
+> git diff --stat 85f905c..HEAD -- packages/core/src/core/types.ts packages/core/src/charts/types.ts packages/core/src/charts/cartesian-active-layers.tsx packages/core/src/primitives/tooltip.tsx packages/core/src/primitives/live-region.tsx packages/core/src/theme/tokens.css packages/core/tests
+> git diff -- packages/core/src/core/types.ts packages/core/src/charts/types.ts packages/core/src/charts/cartesian-active-layers.tsx packages/core/src/primitives/tooltip.tsx packages/core/src/primitives/live-region.tsx packages/core/src/theme/tokens.css packages/core/tests
 > ```
 >
 > The current tooltip files contain uncommitted work beyond `85f905c`. Preserve it and compare against the excerpts below.
@@ -28,17 +28,17 @@ The current high-level API exposes only `tooltip?: boolean`, hardcodes raw numbe
 
 Relevant files:
 
-- `packages/charts/src/charts/types.ts` — `CommonCartesianChartProps` currently declares only `tooltip?: boolean`.
-- `packages/charts/src/core/types.ts` — `ChartInteraction<TDatum>` carries datum, series, index, value, x/y, and optional label.
-- `packages/charts/src/charts/cartesian-active-layers.tsx` — assembles series values and hardcodes tooltip markup/date formatting.
-- `packages/charts/src/primitives/tooltip.tsx` — visual HTML tooltip primitive with fixed thresholds and inline styles.
-- `packages/charts/src/primitives/live-region.tsx` — separate polite live region.
-- `packages/charts/src/core/responsive-container.tsx` — establishes the positioned container; follow its guarded browser-API convention.
+- `packages/core/src/charts/types.ts` — `CommonCartesianChartProps` currently declares only `tooltip?: boolean`.
+- `packages/core/src/core/types.ts` — `ChartInteraction<TDatum>` carries datum, series, index, value, x/y, and optional label.
+- `packages/core/src/charts/cartesian-active-layers.tsx` — assembles series values and hardcodes tooltip markup/date formatting.
+- `packages/core/src/primitives/tooltip.tsx` — visual HTML tooltip primitive with fixed thresholds and inline styles.
+- `packages/core/src/primitives/live-region.tsx` — separate polite live region.
+- `packages/core/src/core/responsive-container.tsx` — establishes the positioned container; follow its guarded browser-API convention.
 
 Current public limitation:
 
 ```ts
-// packages/charts/src/charts/types.ts:21-35
+// packages/core/src/charts/types.ts:21-35
 export interface CommonCartesianChartProps<TDatum> {
   // ...
   showLegend?: boolean;
@@ -49,7 +49,7 @@ export interface CommonCartesianChartProps<TDatum> {
 Current placement:
 
 ```ts
-// packages/charts/src/primitives/tooltip.tsx:25-42
+// packages/core/src/primitives/tooltip.tsx:25-42
 const preferBelow = interaction.y < 48;
 const preferLeft = interaction.x > 280;
 // left/top are interaction coordinates; transform uses the two booleans
@@ -58,7 +58,7 @@ const preferLeft = interaction.x > 280;
 Current fixed content:
 
 ```tsx
-// packages/charts/src/charts/cartesian-active-layers.tsx:139-145
+// packages/core/src/charts/cartesian-active-layers.tsx:139-145
 <span>
   {series.label}: {series.value ?? "–"}
 </span>
@@ -68,12 +68,12 @@ Current fixed content:
 Duplicate announcement paths:
 
 ```tsx
-// packages/charts/src/primitives/tooltip.tsx:29-31
+// packages/core/src/primitives/tooltip.tsx:29-31
 <div data-kamod-chart-tooltip="" role="status">
 ```
 
 ```tsx
-// packages/charts/src/primitives/live-region.tsx:9-12
+// packages/core/src/primitives/live-region.tsx:9-12
 <div data-kamod-chart-live-region="" aria-live="polite" aria-atomic="true">
 ```
 
@@ -90,17 +90,17 @@ Duplicate announcement paths:
 
 **In scope**:
 
-- `packages/charts/src/core/types.ts`
-- `packages/charts/src/charts/types.ts`
-- `packages/charts/src/charts/cartesian-active-layers.tsx`
-- `packages/charts/src/charts/line-chart.tsx`
-- `packages/charts/src/charts/scatter-chart.tsx`
-- `packages/charts/src/primitives/tooltip.tsx`
-- `packages/charts/src/primitives/live-region.tsx`
-- `packages/charts/src/primitives/index.ts`
-- `packages/charts/src/theme/tokens.css`
-- `packages/charts/tests/tooltip.test.tsx` (create)
-- `packages/charts/tests/interactions.test.tsx`
+- `packages/core/src/core/types.ts`
+- `packages/core/src/charts/types.ts`
+- `packages/core/src/charts/cartesian-active-layers.tsx`
+- `packages/core/src/charts/line-chart.tsx`
+- `packages/core/src/charts/scatter-chart.tsx`
+- `packages/core/src/primitives/tooltip.tsx`
+- `packages/core/src/primitives/live-region.tsx`
+- `packages/core/src/primitives/index.ts`
+- `packages/core/src/theme/tokens.css`
+- `packages/core/tests/tooltip.test.tsx` (create)
+- `packages/core/tests/interactions.test.tsx`
 
 **Out of scope**:
 
@@ -122,7 +122,7 @@ Duplicate announcement paths:
 
 ### Step 1: Define framework-native public tooltip types
 
-In `packages/charts/src/charts/types.ts`, introduce exported generic types with no D3 types:
+In `packages/core/src/charts/types.ts`, introduce exported generic types with no D3 types:
 
 - `CartesianTooltipMode = "axis" | "nearest"`.
 - `TooltipPlacement = "auto" | "top" | "right" | "bottom" | "left"`.
@@ -207,7 +207,7 @@ pnpm format:check
 
 ## Test plan
 
-Create `packages/charts/tests/tooltip.test.tsx` modeled on `interactions.test.tsx`, but mock realistic dimensions.
+Create `packages/core/tests/tooltip.test.tsx` modeled on `interactions.test.tsx`, but mock realistic dimensions.
 
 Required tests:
 

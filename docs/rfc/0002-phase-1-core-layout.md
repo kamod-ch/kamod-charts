@@ -11,7 +11,7 @@ Phase 1 establishes the package foundation and the reusable chart core. It inten
 Implemented:
 
 - pnpm workspace root.
-- Publishable package `@kamod-ch/charts` under `packages/charts`.
+- Publishable package `@kamod-ch/charts` under `packages/core`.
 - Strict TypeScript and Preact JSX configuration.
 - ESM build via `tsup`.
 - Public core types.

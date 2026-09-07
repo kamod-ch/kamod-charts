@@ -1,6 +1,6 @@
 # Bundle size report
 
-Generated from current `packages/charts/dist`. Total JS/CSS bytes: 158123 bytes.
+Generated from current `packages/core/dist`. Total JS/CSS bytes: 158123 bytes.
 
 | File                    | Bytes |
 | ----------------------- | ----: |

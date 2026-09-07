@@ -21,7 +21,7 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
 
-  packages/charts:
+  packages/core:
     dependencies:
       d3-array:
         specifier: ^3.2.4
@@ -95,7 +95,7 @@ importers:
         version: 0.1.0(preact@10.29.8)
       '@kamod-ch/charts':
         specifier: workspace:*
-        version: link:../charts
+        version: link:../core
       '@kamod-ch/icons':
         specifier: ^1.0.3
         version: 1.0.3(preact@10.29.8)
