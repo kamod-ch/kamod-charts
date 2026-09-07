@@ -1,7 +1,7 @@
 {
   "name": "@kamod-ch/charts",
-  "version": "0.1.0-alpha.0",
-  "description": "Preact-native, SVG-first chart components for Kamod applications.",
+  "version": "0.1.0",
+  "description": "Preact-native, SVG-first chart components for dashboards and data apps.",
   "keywords": [
     "charts",
     "data-visualization",
@@ -9,6 +9,10 @@
     "svg",
     "typescript"
   ],
+  "homepage": "https://kamod-ch.github.io/charts/",
+  "bugs": {
+    "url": "https://github.com/kamod-ch/charts/issues"
+  },
   "license": "MIT",
   "author": "Klaus Zahiragic <watzak>",
   "repository": {
