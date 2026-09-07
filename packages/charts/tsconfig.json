@@ -5,7 +5,10 @@
     "rootDir": ".",
     "declaration": true,
     "declarationMap": true,
-    "types": ["vitest/globals", "node"]
+    "types": ["vitest/globals", "node"],
+    "paths": {
+      "@testing-library/dom": ["./tests/shims/testing-library-dom.ts"]
+    }
   },
   "include": ["src", "tests"]
 }

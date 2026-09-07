@@ -3,12 +3,17 @@
   "compilerOptions": {
     "rootDir": ".",
     "noEmit": true,
-    "types": ["vite/client"]
+    "types": ["vite/client"],
+    "paths": {
+      "@kamod-ch/preactpress/client": ["./types/preactpress-client.d.ts"],
+      "@kamod-ch/preactpress/config": ["./types/preactpress-config.ts"]
+    }
   },
   "include": [
     ".preactpress/**/*",
     "components/**/*",
     "data/**/*",
+    "types/**/*",
     "**/*.ts",
     "**/*.tsx",
     "**/*.mdx"

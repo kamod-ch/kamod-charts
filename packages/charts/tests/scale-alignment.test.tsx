@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/preact";
+import { fireEvent, render } from "./testing-library";
 import { describe, expect, it } from "vitest";
 import {
   BarChart,

@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/preact";
+import { fireEvent, render } from "./testing-library";
 import { useState } from "preact/hooks";
 import renderToString from "preact-render-to-string";
 import { describe, expect, it } from "vitest";

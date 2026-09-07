@@ -1,6 +1,6 @@
 import renderToString from "preact-render-to-string";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "@testing-library/preact";
+import { fireEvent, render } from "./testing-library";
 import { AreaChart, AreaSeries, BarChart, BarSeries, Chart, Grid, XAxis, YAxis } from "../src";
 import { hitTestBars, resolveBarGeometry } from "../src/charts/bar-geometry";
 import { resolvePlotAreaFromSize } from "../src/charts/cartesian-interaction";

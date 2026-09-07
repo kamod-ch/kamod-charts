@@ -1,4 +1,4 @@
-import { act, render, waitFor } from "@testing-library/preact";
+import { act, render, waitFor } from "./testing-library";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Chart } from "../src/core";
 

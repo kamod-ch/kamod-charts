@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/preact";
+import { fireEvent, render, waitFor } from "./testing-library";
 import renderToString from "preact-render-to-string";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CartesianTooltipOptions, LineChartProps } from "../src";
