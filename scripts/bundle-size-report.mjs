@@ -19,14 +19,18 @@ async function walk(dir) {
 await walk(dist);
 rows.sort((a, b) => a[0].localeCompare(b[0]));
 const total = rows.reduce((sum, [, size]) => sum + size, 0);
+const fileWidth = Math.max("File".length, ...rows.map(([file]) => file.length));
+const bytesWidth = Math.max("Bytes".length, ...rows.map(([, size]) => String(size).length));
 const markdown = [
   "# Bundle size report",
   "",
   `Generated from current \`packages/core/dist\`. Total JS/CSS bytes: ${total} bytes.`,
   "",
-  "| File | Bytes |",
-  "| --- | ---: |",
-  ...rows.map(([file, size]) => `| ${file} | ${size} |`),
+  `| ${"File".padEnd(fileWidth)} | ${"Bytes".padStart(bytesWidth)} |`,
+  `| ${"-".repeat(fileWidth)} | ${"-".repeat(bytesWidth - 1)}: |`,
+  ...rows.map(
+    ([file, size]) => `| ${file.padEnd(fileWidth)} | ${String(size).padStart(bytesWidth)} |`,
+  ),
   "",
 ].join("\n");
 

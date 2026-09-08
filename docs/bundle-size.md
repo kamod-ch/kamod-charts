@@ -1,39 +1,40 @@
 # Bundle size report
 
-Generated from current `packages/core/dist`. Total JS/CSS bytes: 170835 bytes.
+Generated from current `packages/core/dist`. Total JS/CSS bytes: 175038 bytes.
 
 | File                    | Bytes |
 | ----------------------- | ----: |
 | accessibility/index.js  |   171 |
 | animation/index.js      |   313 |
-| axes/index.js           |   236 |
-| charts/area-chart.js    |   437 |
+| axes/index.js           |   269 |
+| charts/area-chart.js    |   468 |
 | charts/bar-chart.js     |   434 |
-| charts/line-chart.js    |   406 |
+| charts/line-chart.js    |   468 |
 | charts/pie-chart.js     |   279 |
 | charts/scatter-chart.js |   415 |
-| chunk-5M4QF2Z4.js       |  8054 |
-| chunk-6UJRSPPR.js       |   619 |
-| chunk-B4X27YLI.js       |  7744 |
-| chunk-CVEOUH65.js       |  2683 |
-| chunk-CZAARELV.js       |  6498 |
-| chunk-G4XF4ZSS.js       |  1641 |
-| chunk-HEQJ3Z2L.js       |  5829 |
+| chunk-4J4FPOLC.js       | 18607 |
+| chunk-4LBY4P6G.js       |  1641 |
+| chunk-AZJMY47N.js       |  1298 |
+| chunk-CWGMCFHK.js       | 13920 |
+| chunk-DLOJZK7P.js       |  5436 |
+| chunk-DWDH5FTV.js       |   864 |
+| chunk-EB7W5J2V.js       |  8064 |
+| chunk-EVJMQVJE.js       |  8295 |
 | chunk-J4VJMGOP.js       |  1481 |
-| chunk-JUQOAA5K.js       | 11142 |
-| chunk-KKL2D3HO.js       |  5651 |
-| chunk-KRGIQGV7.js       | 13920 |
 | chunk-LZDMVYEE.js       |   466 |
-| chunk-SGNZM562.js       | 18607 |
 | chunk-TWTY7ZW5.js       |  2556 |
-| chunk-VALVI2CV.js       |  4137 |
-| chunk-WMSIDP7I.js       |  4015 |
+| chunk-TZGLAZQC.js       | 11720 |
+| chunk-URSELUKU.js       |  7360 |
+| chunk-VEGKGV6X.js       |  4137 |
+| chunk-VK7IY74J.js       | 27770 |
+| chunk-X3JVCSL5.js       |  5829 |
+| chunk-XX4QBTMO.js       |  2683 |
 | chunk-YLMQXC4X.js       |  1134 |
-| chunk-YQP2EQIA.js       | 27770 |
+| chunk-ZVNGN5ZG.js       |  4669 |
 | core/index.js           |   343 |
-| index.js                |  1981 |
+| index.js                |  2044 |
 | interaction/index.js    |   242 |
-| motion/index.js         | 38278 |
+| motion/index.js         | 38309 |
 | performance/index.js    |   183 |
 | primitives/index.js     |   335 |
 | scales/index.js         |   313 |
