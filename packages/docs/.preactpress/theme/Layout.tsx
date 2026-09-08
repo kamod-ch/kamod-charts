@@ -16,6 +16,7 @@ import { useEffect, useState } from "preact/hooks";
 import { ChartLab } from "../../components/playground/ChartLab";
 import { GalleryPage } from "../../components/gallery/GalleryPage";
 import { BrandLogo } from "../../components/shared/BrandLogo";
+import Footer from "./Footer.js";
 import "../../styles/index.css";
 
 if (typeof window !== "undefined") {
@@ -350,9 +351,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
         ) : null}
       </div>
 
-      <footer class="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        {themeConfig.footer ?? "Released under the MIT License."}
-      </footer>
+      <Footer base={site.base} />
     </div>
   );
 };

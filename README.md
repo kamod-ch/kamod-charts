@@ -5,67 +5,74 @@
 
 # Kamod Charts
 
-Preact-native, SVG-first chart components for dashboards and data apps. High-level charts for common cases, composable primitives when you need full control.
+<p align="center">
+  Preact-native, SVG-first chart components for dashboards and data applications.
+</p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@kamod-ch/charts"><img src="https://img.shields.io/npm/v/@kamod-ch/charts" alt="npm version" /></a>
-  <a href="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml"><img src="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml/badge.svg" alt="Docs deploy" /></a>
-  <a href="https://github.com/kamod-ch/kamod-charts/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/kamod-ch/kamod-charts" alt="license" /></a>
+  <a href="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml"><img src="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml/badge.svg" alt="Documentation build" /></a>
+  <a href="https://github.com/kamod-ch/kamod-charts/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/kamod-ch/kamod-charts" alt="MIT license" /></a>
 </p>
 
-**[Docs](https://kamod-ch.github.io/kamod-charts/)** · **[Gallery](https://kamod-ch.github.io/kamod-charts/)** · **[npm](https://www.npmjs.com/package/@kamod-ch/charts)** · **[GitHub](https://github.com/kamod-ch/kamod-charts)** · **[Issues](https://github.com/kamod-ch/kamod-charts/issues)**
+<p align="center">
+  <strong><a href="https://kamod-ch.github.io/kamod-charts/">Gallery</a></strong> ·
+  <strong><a href="https://kamod-ch.github.io/kamod-charts/getting-started/">Getting started</a></strong> ·
+  <strong><a href="https://kamod-ch.github.io/kamod-charts/api/">API</a></strong> ·
+  <strong><a href="https://kamod-ch.github.io/kamod-charts/playground/">Playground</a></strong>
+</p>
 
-## Why Kamod Charts?
+## Features
 
-Most chart libraries target React, ship heavy runtimes, or wrap D3 in ways that fight your renderer. Kamod Charts is built for Preact apps that want SVG in the DOM with a small, typed surface:
+- **Built for Preact** — no React, React DOM, `preact/compat`, or D3 DOM manipulation.
+- **SVG-first** — charts render as regular, inspectable SVG elements.
+- **Typed and composable** — use ready-made charts or assemble your own from primitives.
+- **Tree-shakeable** — dedicated subpath exports let you import only the chart or module you need.
+- **Accessible** — keyboard navigation, live regions, chart descriptions, and optional data tables.
+- **Responsive and SSR-safe** — stable initial dimensions avoid hydration mismatches before `ResizeObserver` runs.
+- **Animation is optional** — static imports do not load the Motion integration.
 
-- **Preact-native** — SVG is rendered by Preact, not by D3 selection APIs.
-- **Modular D3** — scales, shapes, and formatters only; no `d3-selection` or full `d3` bundle.
-- **Tree-shakeable** — import `@kamod-ch/charts/line` (~400 B) instead of the full package when you only need one chart.
-- **Accessible** — keyboard navigation, live regions, and an optional data-table alternative.
-- **SSR-safe** — responsive sizing and tooltips avoid unguarded browser APIs during render.
-
-## Chart types
-
-| Chart   | Import                     | Notes                                    |
-| ------- | -------------------------- | ---------------------------------------- |
-| Line    | `@kamod-ch/charts/line`    | Axis tooltips, time/linear/band X scales |
-| Area    | `@kamod-ch/charts/area`    | Stacked or grouped, outline option       |
-| Bar     | `@kamod-ch/charts/bar`     | Vertical/horizontal, grouped, stacked    |
-| Pie     | `@kamod-ch/charts/pie`     | Donut, labels, segment click             |
-| Scatter | `@kamod-ch/charts/scatter` | Nearest-point tooltips                   |
-
-Optional animated variants live under `@kamod-ch/charts/motion` and keep Motion as an external peer.
-
-## Quick start
+## Installation
 
 ```bash
 pnpm add @kamod-ch/charts preact
 ```
 
-Import theme tokens once in your app stylesheet:
+Or with npm:
 
-```css
-@import "@kamod-ch/charts/theme.css";
+```bash
+npm install @kamod-ch/charts preact
 ```
+
+Import the chart theme once in your application entry point or global stylesheet:
+
+```ts
+import "@kamod-ch/charts/theme.css";
+```
+
+> `preact` is a peer dependency. The package is ESM-only and requires Preact 10.29 or newer.
+
+## Quick start
 
 ```tsx
 import { LineChart } from "@kamod-ch/charts/line";
+import "@kamod-ch/charts/theme.css";
 
 const data = [
-  { date: new Date("2026-01-01"), revenue: 1200, costs: 800 },
-  { date: new Date("2026-01-02"), revenue: 1500, costs: 900 },
+  { month: "Jan", revenue: 28_400, costs: 18_200 },
+  { month: "Feb", revenue: 31_200, costs: 19_100 },
+  { month: "Mar", revenue: 36_800, costs: 21_400 },
 ];
 
 export function RevenueChart() {
   return (
     <LineChart
       data={data}
-      xKey="date"
-      xScale="time"
+      xKey="month"
+      xScale="point"
       series={[
-        { key: "revenue", id: "revenue", label: "Revenue", color: "var(--chart-1)" },
-        { key: "costs", id: "costs", label: "Costs", color: "var(--chart-2)" },
+        { key: "revenue", label: "Revenue", color: "var(--chart-1)" },
+        { key: "costs", label: "Costs", color: "var(--chart-2)" },
       ]}
       height={320}
       initialWidth={640}
@@ -73,102 +80,133 @@ export function RevenueChart() {
       showGrid
       showLegend
       tooltip
+      title="Monthly revenue and costs"
+      description="Revenue and costs from January through March."
     />
   );
 }
 ```
 
-Browse the [live docs](https://kamod-ch.github.io/kamod-charts/charts/line) for tooltips, formatters, motion, and playground examples.
+`initialWidth` provides deterministic server-rendered and first-paint markup. With `responsive` enabled, the chart follows its parent after hydration.
+
+## Available charts
+
+| Chart                                                              | Import                     | Highlights                                        |
+| ------------------------------------------------------------------ | -------------------------- | ------------------------------------------------- |
+| [Line](https://kamod-ch.github.io/kamod-charts/charts/line/)       | `@kamod-ch/charts/line`    | Multiple series, stacking, curves, annotations    |
+| [Area](https://kamod-ch.github.io/kamod-charts/charts/area/)       | `@kamod-ch/charts/area`    | Grouped or stacked areas, gradients, outlines     |
+| [Bar](https://kamod-ch.github.io/kamod-charts/charts/bar/)         | `@kamod-ch/charts/bar`     | Vertical, horizontal, grouped, and stacked bars   |
+| [Pie](https://kamod-ch.github.io/kamod-charts/charts/pie/)         | `@kamod-ch/charts/pie`     | Labels, legends, rose layout, segment interaction |
+| [Donut](https://kamod-ch.github.io/kamod-charts/charts/donut/)     | `@kamod-ch/charts/donut`   | Center content, labels, and segment interaction   |
+| [Scatter](https://kamod-ch.github.io/kamod-charts/charts/scatter/) | `@kamod-ch/charts/scatter` | Nearest-point tooltips and reference annotations  |
+
+See the [gallery](https://kamod-ch.github.io/kamod-charts/) for complete examples or tune chart props in the [playground](https://kamod-ch.github.io/kamod-charts/playground/).
 
 ## Composable API
 
-Use primitives when you need custom layout or mixed series:
+High-level components cover common use cases. For custom layouts and mixed visualizations, compose the same lower-level building blocks directly:
 
 ```tsx
-import { Chart, Grid, LineSeries, ReferenceLine, Tooltip, XAxis, YAxis } from "@kamod-ch/charts";
+import { Chart, Grid, LineSeries, ReferenceLine, XAxis, YAxis } from "@kamod-ch/charts";
 
-<Chart data={data} xKey="date" xScale="time" height={320}>
-  <Grid yDomain={[0, 2000]} />
+<Chart
+  data={data}
+  xKey="month"
+  xScale="point"
+  height={320}
+  initialWidth={640}
+  responsive
+  title="Monthly revenue"
+>
+  <Grid xKey="month" xScale="point" yDomain={[0, 40_000]} />
   <XAxis />
-  <YAxis domain={[0, 2000]} />
-  <LineSeries dataKey="revenue" />
-  <ReferenceLine y={1000} label="Target" />
+  <YAxis domain={[0, 40_000]} />
+  <LineSeries dataKey="revenue" xScale="point" yDomain={[0, 40_000]} />
+  <ReferenceLine y={30_000} yDomain={[0, 40_000]} label="Target" />
 </Chart>;
 ```
 
-## Tooltips and legends
-
-High-level charts accept `tooltip` as a boolean or structured options:
-
-```tsx
-<BarChart
-  grouped
-  showLegend
-  tooltip={{
-    mode: "nearest",
-    formatValue: (value) => (value == null ? "–" : `${value} €`),
-  }}
-  /* ... */
-/>
-```
-
-See [Bar chart docs](https://kamod-ch.github.io/kamod-charts/charts/bar) for horizontal orientation and reference-line semantics.
-
-## Subpath exports
-
-| Subpath                              | Purpose                                |
-| ------------------------------------ | -------------------------------------- |
-| `@kamod-ch/charts/line` … `/scatter` | High-level chart components            |
-| `@kamod-ch/charts/core`              | `Chart`, `ResponsiveContainer`, layout |
-| `@kamod-ch/charts/series`            | Low-level series primitives            |
-| `@kamod-ch/charts/primitives`        | Grid, legend, tooltip, crosshair       |
-| `@kamod-ch/charts/axes`              | `XAxis`, `YAxis`                       |
-| `@kamod-ch/charts/accessibility`     | `DataTable`, `buildChartDescription`   |
-| `@kamod-ch/charts/performance`       | Downsampling helpers                   |
-| `@kamod-ch/charts/motion`            | Animated chart wrappers (optional)     |
-| `@kamod-ch/charts/theme.css`         | Semantic chart tokens                  |
-
 ## Theming
 
-Charts read CSS variables such as `--chart-1` … `--chart-4`, `--chart-grid`, and tooltip tokens. They align with [Kamod Themes](https://www.npmjs.com/package/@kamod-ch/themes) and [Kamod UI](https://www.npmjs.com/package/@kamod-ch/ui) out of the box:
+Kamod Charts uses semantic CSS custom properties, including `--chart-1` through `--chart-4`, `--chart-grid`, and tooltip tokens. Override them in your own theme or combine the defaults with [Kamod Themes](https://www.npmjs.com/package/@kamod-ch/themes):
 
 ```css
 @import "@kamod-ch/themes/default.css";
 @import "@kamod-ch/charts/theme.css";
+
+.dashboard-chart {
+  --chart-1: oklch(62% 0.18 250);
+  --chart-2: oklch(70% 0.16 155);
+}
 ```
+
+Read the [theming guide](https://kamod-ch.github.io/kamod-charts/foundations/colors-and-themes/) for all supported tokens.
+
+## Optional motion
+
+Install the optional peers only when you need animated chart updates:
+
+```bash
+pnpm add @kamod-ch/motion motion
+```
+
+Then use the motion entry point:
+
+```tsx
+import { LineChart, MotionConfig } from "@kamod-ch/charts/motion";
+```
+
+Static imports such as `@kamod-ch/charts/line` remain motion-free. See the [motion guide](https://kamod-ch.github.io/kamod-charts/foundations/motion/).
+
+## Package exports
+
+| Import                                                                 | Purpose                                           |
+| ---------------------------------------------------------------------- | ------------------------------------------------- |
+| `@kamod-ch/charts`                                                     | Complete public API                               |
+| `@kamod-ch/charts/line`, `/area`, `/bar`, `/pie`, `/donut`, `/scatter` | High-level chart components                       |
+| `@kamod-ch/charts/core`                                                | Chart container, responsive layout, and context   |
+| `@kamod-ch/charts/series`                                              | Low-level series components and geometry helpers  |
+| `@kamod-ch/charts/primitives`                                          | Grid, legend, tooltip, crosshair, and annotations |
+| `@kamod-ch/charts/axes`                                                | X and Y axes                                      |
+| `@kamod-ch/charts/scales`                                              | Scale and domain utilities                        |
+| `@kamod-ch/charts/accessibility`                                       | Data table and chart-description helpers          |
+| `@kamod-ch/charts/interaction`                                         | Pointer, keyboard, and hit-testing helpers        |
+| `@kamod-ch/charts/performance`                                         | Downsampling helpers                              |
+| `@kamod-ch/charts/motion`                                              | Animated charts and motion utilities              |
+| `@kamod-ch/charts/theme.css`                                           | Default semantic chart tokens                     |
 
 ## Requirements
 
-- **Preact** `>= 10.29`
-- **Node** `>= 20` for development tooling
-- ESM bundler (Vite, Rolldown, etc.) — the package is ESM-only
-- Optional: `@kamod-ch/motion` and `motion` for `@kamod-ch/charts/motion`
+- Preact `>= 10.29.2`
+- An ESM-capable bundler such as Vite or Rolldown
+- Node.js `>= 20` for development tooling
+- Optional: `@kamod-ch/motion` and `motion` for the motion entry point
 
-## Runtime policy
-
-- Preact only — no React, React DOM, or `preact/compat` in the library.
-- D3 is computation-only (`d3-scale`, `d3-shape`, …).
-- Static chart entries do not import Motion; use `@kamod-ch/charts/motion` when you need data animations.
-
-## Monorepo layout
-
-| Path            | Role                                        |
-| --------------- | ------------------------------------------- |
-| `packages/core` | Publishable npm package `@kamod-ch/charts`  |
-| `packages/docs` | PreactPress documentation site              |
-| `docs/`         | Release checklist, ADRs, bundle-size report |
+For supported browsers, see [`docs/browser-support.md`](docs/browser-support.md).
 
 ## Development
 
+This repository is a pnpm workspace. The publishable package lives in `packages/core`; the documentation site lives in `packages/docs`.
+
 ```bash
 pnpm install
-pnpm test
-pnpm typecheck
+pnpm check
 pnpm docs:dev
 ```
 
-Release gates and publish steps are documented in [`docs/release-checklist.md`](docs/release-checklist.md).
+Useful commands:
+
+| Command              | Purpose                                     |
+| -------------------- | ------------------------------------------- |
+| `pnpm test`          | Run package tests                           |
+| `pnpm typecheck`     | Check TypeScript types across the workspace |
+| `pnpm build`         | Build publishable packages                  |
+| `pnpm docs:build`    | Build the documentation site                |
+| `pnpm size:report`   | Regenerate the bundle-size report           |
+| `pnpm release:check` | Run all release gates                       |
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [`release checklist`](docs/release-checklist.md) before opening a release PR.
 
 ## License
 
-MIT — see [LICENSE.md](LICENSE.md).
+[MIT](LICENSE.md) © Klaus Zahiragic

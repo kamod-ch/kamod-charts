@@ -175,3 +175,55 @@ body {
   min-width: 2.75rem;
   min-height: 2.75rem;
 }
+
+.docs-footer {
+  width: min(100% - 2rem, 90rem);
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+}
+
+.docs-footer-built,
+.docs-footer-copy,
+.docs-footer-license {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.docs-footer-built a,
+.docs-footer-copy a {
+  color: var(--brand-hover);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.docs-footer-built a:hover,
+.docs-footer-copy a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.docs-footer-logo {
+  display: inline-flex;
+  line-height: 0;
+  text-decoration: none;
+}
+
+.docs-footer-logo .kamod-mark {
+  height: auto;
+  width: min(9.5rem, 52vw);
+}
+
+.docs-footer-logo .kamod-mark__img {
+  display: block;
+  height: auto;
+  width: 100%;
+  max-width: none;
+  justify-self: center;
+}
