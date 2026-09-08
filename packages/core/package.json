@@ -74,6 +74,10 @@
       "types": "./dist/charts/pie-chart.d.ts",
       "import": "./dist/charts/pie-chart.js"
     },
+    "./donut": {
+      "types": "./dist/charts/donut-chart.d.ts",
+      "import": "./dist/charts/donut-chart.js"
+    },
     "./primitives": {
       "types": "./dist/primitives/index.d.ts",
       "import": "./dist/primitives/index.js"

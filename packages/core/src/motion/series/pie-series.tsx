@@ -1,23 +1,20 @@
 import { useMemo } from "preact/hooks";
 import type { ChartAnimate } from "../../animation";
 import { useChartContext } from "../../core";
-import {
-  buildPieSlices,
-  pieSlicePath,
-  resolvePieRoseOptions,
-  type PieSlice,
-} from "../../series/pie-geometry";
+import { pieSlicePath, resolvePieRoseOptions, type PieSlice } from "../../series/pie-geometry";
 import {
   createPieSlicePointerHandler,
   PieSeries,
   type PieSeriesProps,
 } from "../../series/pie-series";
-import {
-  layoutPieLabels,
-  resolvePieLabelOptions,
-  resolvePieOuterRadius,
-} from "../../series/pie-label";
+import { layoutPieLabels } from "../../series/pie-label";
 import { PieLabelLayer } from "../../series/pie-label-layer";
+import {
+  buildPieSlicesForLayout,
+  pieCenterContentTransform,
+  pieSeriesTransform,
+  resolvePieSeriesLayout,
+} from "../../series/pie-series-layout";
 import { lerp } from "../interpolate";
 import { useKeyedTransition } from "../presence";
 import { easingFn } from "../easing";
@@ -41,6 +38,8 @@ const AnimatedPieSeries = <TDatum,>({
   valueKey,
   labelKey,
   innerRadius = 0,
+  innerRadiusRatio,
+  variant = "full",
   outerRadius,
   padAngle = 0,
   cornerRadius = 0,
@@ -64,20 +63,39 @@ const AnimatedPieSeries = <TDatum,>({
   const resolved = useResolvedAnimate(animate);
   const suppressed = useMotionSuppressed(resolved);
   const { data, plotArea } = useChartContext<TDatum>();
-  const labelOptions = resolvePieLabelOptions(labels ?? labelPosition ?? "inside");
-  const radius = resolvePieOuterRadius(plotArea, outerRadius, labelOptions);
+  const { layout, labelOptions } = useMemo(
+    () =>
+      resolvePieSeriesLayout({
+        plotArea,
+        labels,
+        labelPosition,
+        innerRadius,
+        innerRadiusRatio,
+        variant,
+        outerRadius,
+        activeOffset,
+      }),
+    [
+      activeOffset,
+      innerRadius,
+      innerRadiusRatio,
+      labelPosition,
+      labels,
+      outerRadius,
+      plotArea,
+      variant,
+    ],
+  );
   const roseEnabled = resolvePieRoseOptions(rose) != null;
-  const centerX = plotArea.width / 2;
-  const centerY = plotArea.height / 2;
+  const isDonut = innerRadiusRatio !== undefined;
   const pointerEnabled = Boolean(onSlicePointerEnter || onSlicePointerMove || onSlicePointerLeave);
   const { slices, total } = useMemo(
     () =>
-      buildPieSlices({
+      buildPieSlicesForLayout({
         data,
         valueKey,
         labelKey,
-        innerRadius,
-        outerRadius: radius,
+        layout,
         padAngle,
         cornerRadius,
         sort,
@@ -94,10 +112,9 @@ const AnimatedPieSeries = <TDatum,>({
       cornerRadius,
       data,
       hiddenKeys,
-      innerRadius,
       labelKey,
+      layout,
       padAngle,
-      radius,
       rose,
       sort,
       valueKey,
@@ -151,10 +168,12 @@ const AnimatedPieSeries = <TDatum,>({
         slices: animatedSlices,
         labelOptions,
         plotArea,
+        layout,
         activeIndex,
       }),
-    [activeIndex, animatedSlices, labelOptions, plotArea],
+    [activeIndex, animatedSlices, labelOptions, layout, plotArea],
   );
+  const centerTransform = pieCenterContentTransform(layout);
 
   if (total <= 0) {
     return (
@@ -163,10 +182,12 @@ const AnimatedPieSeries = <TDatum,>({
         data-kamod-chart-pie-series=""
         data-kamod-chart-pie-empty=""
         data-kamod-chart-motion=""
-        transform={`translate(${centerX} ${centerY})`}
+        {...(isDonut ? { "data-kamod-chart-donut": "" } : {})}
+        {...(variant === "half" ? { "data-kamod-chart-circular-variant": "half" } : {})}
+        transform={pieSeriesTransform(layout)}
       >
         {emptyContent}
-        {centerContent}
+        {centerContent ? <g transform={centerTransform}>{centerContent}</g> : null}
       </g>
     );
   }
@@ -177,7 +198,9 @@ const AnimatedPieSeries = <TDatum,>({
       data-kamod-chart-pie-series=""
       data-kamod-chart-motion=""
       {...(roseEnabled ? { "data-kamod-chart-pie-rose": "" } : {})}
-      transform={`translate(${centerX} ${centerY})`}
+      {...(isDonut ? { "data-kamod-chart-donut": "" } : {})}
+      {...(variant === "half" ? { "data-kamod-chart-circular-variant": "half" } : {})}
+      transform={pieSeriesTransform(layout)}
     >
       {displayed.map((slice) => {
         const isActive = activeIndex === slice.index;
@@ -207,12 +230,14 @@ const AnimatedPieSeries = <TDatum,>({
                 geometry,
                 activeIndex,
                 plotArea,
+                layout,
                 onSlicePointerEnter,
               )}
               onPointerMove={createPieSlicePointerHandler(
                 geometry,
                 activeIndex,
                 plotArea,
+                layout,
                 onSlicePointerMove,
               )}
               onPointerLeave={onSlicePointerLeave}
@@ -221,7 +246,7 @@ const AnimatedPieSeries = <TDatum,>({
         );
       })}
       <PieLabelLayer layouts={labelLayouts} />
-      {centerContent}
+      {centerContent ? <g transform={centerTransform}>{centerContent}</g> : null}
     </g>
   );
 };

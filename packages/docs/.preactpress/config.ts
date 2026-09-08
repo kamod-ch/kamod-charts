@@ -75,6 +75,10 @@ export default defineConfig({
           replacement: resolve(chartsSrc, "charts/pie-chart.tsx"),
         },
         {
+          find: "@kamod-ch/charts/donut",
+          replacement: resolve(chartsSrc, "charts/donut-chart.tsx"),
+        },
+        {
           find: "@kamod-ch/charts/scatter",
           replacement: resolve(chartsSrc, "charts/scatter-chart.tsx"),
         },
@@ -159,6 +163,7 @@ export default defineConfig({
           { text: "Area Chart", link: "/charts/area" },
           { text: "Bar Chart", link: "/charts/bar" },
           { text: "Pie Chart", link: "/charts/pie" },
+          { text: "Donut Chart", link: "/charts/donut" },
           { text: "Scatter Chart", link: "/charts/scatter" },
         ],
       },

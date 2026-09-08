@@ -1,6 +1,7 @@
 import { AreaChart } from "@kamod-ch/charts/area";
 import { BarChart } from "@kamod-ch/charts/bar";
 import { LineChart } from "@kamod-ch/charts/line";
+import { DonutChart } from "@kamod-ch/charts/donut";
 import { PieChart } from "@kamod-ch/charts/pie";
 import { ScatterChart } from "@kamod-ch/charts/scatter";
 import { AccessibilityIcon, ComponentIcon, LineChartIcon } from "@kamod-ch/icons/shadcn";
@@ -19,6 +20,7 @@ import {
 } from "../../data/datasets";
 import { airCargoLanes, airCargoRegions } from "../../data/scatter-datasets";
 import { carrierCapacityMix, regionalParcelVolumes } from "../../data/pie-datasets";
+import { halfYearProgress, revenueSegments, storageQuota } from "../../data/donut-datasets";
 import { type ChartKind, galleryExamples } from "../../data/gallery";
 import { ChartCard } from "../shared/ChartCard";
 
@@ -28,6 +30,7 @@ const filters: Array<{ id: "all" | ChartKind; label: string }> = [
   { id: "area", label: "Area" },
   { id: "bar", label: "Bar" },
   { id: "pie", label: "Pie" },
+  { id: "donut", label: "Donut" },
   { id: "scatter", label: "Scatter" },
 ];
 
@@ -235,6 +238,54 @@ function GalleryPreview({ id }: { id: string }): JSX.Element {
           showLegend
           title="Hub capacity"
           centerContent={<span class="text-xs font-semibold">79%</span>}
+        />
+      );
+    case "donut-revenue":
+      return (
+        <DonutChart
+          data={revenueSegments}
+          valueKey="revenue"
+          labelKey="product"
+          height={180}
+          initialWidth={420}
+          responsive
+          colors={palette}
+          tooltip
+          showLegend
+          title="Revenue split"
+        />
+      );
+    case "donut-kpi":
+      return (
+        <DonutChart
+          data={storageQuota}
+          valueKey="gigabytes"
+          labelKey="label"
+          height={180}
+          initialWidth={420}
+          responsive
+          colors={[chartColors.primary, chartColors.quaternary]}
+          labels="none"
+          showTotal={false}
+          centerContent="68%"
+          title="Storage utilization"
+        />
+      );
+    case "donut-half":
+      return (
+        <DonutChart
+          data={halfYearProgress}
+          valueKey="amount"
+          labelKey="quarter"
+          height={180}
+          initialWidth={420}
+          responsive
+          colors={[chartColors.primary, chartColors.secondary]}
+          variant="half"
+          labels="none"
+          tooltip
+          showLegend
+          title="Half-year progress"
         />
       );
     case "scatter-basic":

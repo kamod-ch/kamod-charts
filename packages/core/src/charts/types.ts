@@ -246,6 +246,58 @@ export interface PieChartProps<TDatum> {
   animate?: ChartAnimate;
 }
 
+export type DonutVariant = "full" | "half";
+
+export interface DonutCenterContext<TDatum> {
+  data: readonly TDatum[];
+  variant: DonutVariant;
+  total: number;
+  grandTotal: number;
+  visibleCount: number;
+  segmentCount: number;
+}
+
+export type DonutCenterContent<TDatum> =
+  | ComponentChildren
+  | ((context: DonutCenterContext<TDatum>) => ComponentChildren);
+
+export type DonutFormatTotal<TDatum> = (
+  total: number,
+  context: DonutCenterContext<TDatum>,
+) => ComponentChildren;
+
+export interface DonutChartProps<TDatum> {
+  data: readonly TDatum[];
+  valueKey: DataAccessor<TDatum, number | null | undefined>;
+  labelKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+  width?: number;
+  height: number;
+  initialWidth?: number;
+  responsive?: boolean;
+  title?: string;
+  description?: string;
+  id?: string;
+  variant?: DonutVariant;
+  innerRadiusRatio?: number;
+  outerRadius?: number;
+  padAngle?: number;
+  cornerRadius?: number;
+  sort?: boolean | PieSortComparator<TDatum>;
+  labels?: PieLabels<TDatum>;
+  colors?: readonly string[];
+  showTotal?: boolean;
+  formatTotal?: DonutFormatTotal<TDatum>;
+  centerContent?: DonutCenterContent<TDatum>;
+  /** Shown when data exists but no slice has a finite value > 0. Omit for no fallback text. */
+  emptyContent?: ComponentChildren;
+  activeOffset?: number;
+  tooltip?: boolean | PieTooltipOptions<TDatum>;
+  showLegend?: boolean;
+  legend?: PieLegendOptions;
+  onSegmentClick?: (datum: TDatum, index: number, value: number) => void;
+  animate?: ChartAnimate;
+}
+
 export interface PieLegendOptions {
   /** When `false`, legend items render without toggle behavior. Defaults to interactive toggling. */
   interactive?: boolean;

@@ -1,4 +1,4 @@
-export type ChartKind = "line" | "area" | "bar" | "pie" | "scatter";
+export type ChartKind = "line" | "area" | "bar" | "pie" | "donut" | "scatter";
 
 export type GalleryExample = {
   id: string;
@@ -164,6 +164,30 @@ export const galleryExamples: GalleryExample[] = [
     kind: "pie",
     href: "/charts/pie#carrier-capacity",
     tags: ["legend", "colors"],
+  },
+  {
+    id: "donut-revenue",
+    title: "Revenue split",
+    description: "Full donut with outside labels, legend, and tooltip.",
+    kind: "donut",
+    href: "/charts/donut#revenue-split",
+    tags: ["legend", "tooltip", "responsive"],
+  },
+  {
+    id: "donut-kpi",
+    title: "KPI storage ring",
+    description: "Used vs available with center utilization label.",
+    kind: "donut",
+    href: "/charts/donut#kpi-ring",
+    tags: ["colors"],
+  },
+  {
+    id: "donut-half",
+    title: "Half-year progress",
+    description: "Semicircle with total below the arc.",
+    kind: "donut",
+    href: "/charts/donut#half-donut",
+    tags: ["legend", "tooltip"],
   },
   {
     id: "scatter-basic",

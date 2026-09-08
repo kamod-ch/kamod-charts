@@ -26,6 +26,24 @@ export {
   resolvePieOuterRadius,
 } from "./pie-label";
 export {
+  DEFAULT_INNER_RADIUS_RATIO,
+  DEFAULT_PIE_ACTIVE_OFFSET,
+  FULL_PIE_END_ANGLE,
+  FULL_PIE_START_ANGLE,
+  HALF_PIE_CENTER_Y_RATIO,
+  HALF_PIE_END_ANGLE,
+  HALF_PIE_START_ANGLE,
+  MAX_INNER_RADIUS_RATIO,
+  resolvePieLayout,
+} from "./pie-layout";
+export type {
+  CircularVariant,
+  PieLayoutLabelOptions,
+  PieLayoutPlotArea,
+  ResolvePieLayoutOptions,
+  ResolvedPieLayout,
+} from "./pie-layout";
+export {
   computeRoseOuterRadius,
   normalizeRoseScale,
   resolvePieRoseOptions,

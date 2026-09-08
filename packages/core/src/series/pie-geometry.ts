@@ -1,6 +1,7 @@
 import { arc, pie, type PieArcDatum } from "d3-shape";
 import { sliceKey, uniquifyKeys } from "../animation/keys";
 import { normalizeAccessor, type DataAccessor } from "../core";
+import { FULL_PIE_END_ANGLE, FULL_PIE_START_ANGLE, type ResolvedPieLayout } from "./pie-layout";
 import {
   computeRoseOuterRadius,
   resolvePieRoseOptions,
@@ -183,6 +184,8 @@ export interface BuildPieSlicesOptions<TDatum> {
   activeIndex?: number | null;
   activeOffset?: number;
   rose?: PieRose;
+  startAngle?: number;
+  endAngle?: number;
 }
 
 export const buildPieSlices = <TDatum>({
@@ -199,6 +202,8 @@ export const buildPieSlices = <TDatum>({
   activeIndex = null,
   activeOffset = 6,
   rose,
+  startAngle = FULL_PIE_START_ANGLE,
+  endAngle = FULL_PIE_END_ANGLE,
 }: BuildPieSlicesOptions<TDatum>): { slices: PieSlice<TDatum>[]; total: number } => {
   const { visible, total } = normalizePieData({
     data,
@@ -216,7 +221,9 @@ export const buildPieSlices = <TDatum>({
     const maxValue = visible.reduce((max, entry) => Math.max(max, entry.value), 0);
     const generator = pie<PieDatum<TDatum>>()
       .value(() => 1)
-      .padAngle(padAngle);
+      .padAngle(padAngle)
+      .startAngle(startAngle)
+      .endAngle(endAngle);
 
     if (sort === false) {
       generator.sort(null);
@@ -252,7 +259,9 @@ export const buildPieSlices = <TDatum>({
 
   const generator = pie<PieDatum<TDatum>>()
     .value((entry) => entry.value)
-    .padAngle(padAngle);
+    .padAngle(padAngle)
+    .startAngle(startAngle)
+    .endAngle(endAngle);
 
   if (sort === false) {
     generator.sort(null);
@@ -356,13 +365,12 @@ export const toPieSliceContext = <TDatum>(
 export const pieSliceSurfacePoint = <TDatum>(
   slice: PieSlice<TDatum>,
   plotArea: { x: number; y: number; width: number; height: number },
+  layout: ResolvedPieLayout,
 ): { x: number; y: number } => {
-  const centerX = plotArea.width / 2;
-  const centerY = plotArea.height / 2;
   const [localX, localY] = pieSliceAnchor(slice);
 
   return {
-    x: plotArea.x + centerX + localX,
-    y: plotArea.y + centerY + localY,
+    x: plotArea.x + layout.centerX + localX,
+    y: plotArea.y + layout.centerY + localY,
   };
 };

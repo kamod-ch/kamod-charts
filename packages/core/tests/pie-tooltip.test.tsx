@@ -3,6 +3,7 @@ import renderToString from "preact-render-to-string";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PieChart } from "../src";
 import { pieSliceAnchor, pieSliceSurfacePoint, buildPieSlices } from "../src/series/pie-geometry";
+import { resolveFullPieLayout } from "../src/series/pie-layout";
 
 interface Datum {
   name: string;
@@ -271,7 +272,17 @@ describe("pie slice anchor geometry", () => {
     expect(distance).toBeGreaterThan(slice.innerRadius);
     expect(distance).toBeLessThan(slice.outerRadius + 0.01);
 
-    const surface = pieSliceSurfacePoint(slice, { x: 0, y: 0, width: 320, height: 320 });
+    const plotArea = { x: 0, y: 0, width: 320, height: 320 };
+    const layout = resolveFullPieLayout(
+      plotArea,
+      { position: "inside" },
+      {
+        innerRadius: 48,
+        outerRadius: 120,
+        activeOffset: 10,
+      },
+    );
+    const surface = pieSliceSurfacePoint(slice, plotArea, layout);
     expect(surface.x).toBeGreaterThan(0);
     expect(surface.y).toBeGreaterThan(0);
     expect(surface.x).toBeLessThan(320);

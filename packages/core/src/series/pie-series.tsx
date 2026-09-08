@@ -1,8 +1,8 @@
 import type { ComponentChildren, JSX } from "preact";
 import { useMemo } from "preact/hooks";
+import type { ChartAnimate } from "../animation";
 import { useChartContext, type DataAccessor } from "../core";
 import {
-  buildPieSlices,
   defaultPieColors,
   pieSlicePath,
   pieSliceSurfacePoint,
@@ -13,8 +13,14 @@ import {
 } from "./pie-geometry";
 import { resolvePieRoseOptions, type PieRose } from "./pie-rose";
 import { PieLabelLayer } from "./pie-label-layer";
-import { layoutPieLabels, resolvePieLabelOptions, resolvePieOuterRadius } from "./pie-label";
-import type { PieLabels } from "./pie-label";
+import { layoutPieLabels, type PieLabels } from "./pie-label";
+import {
+  buildPieSlicesForLayout,
+  pieCenterContentTransform,
+  pieSeriesTransform,
+  resolvePieSeriesLayout,
+} from "./pie-series-layout";
+import type { CircularVariant } from "./pie-layout";
 
 export type { PieDatum, PieSliceContext, PieSortComparator } from "./pie-geometry";
 export type { PieRose, PieRoseOptions } from "./pie-rose";
@@ -44,6 +50,8 @@ export interface PieSeriesProps<TDatum> {
   valueKey: DataAccessor<TDatum, number | null | undefined>;
   labelKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   innerRadius?: number;
+  innerRadiusRatio?: number;
+  variant?: CircularVariant;
   outerRadius?: number;
   padAngle?: number;
   cornerRadius?: number;
@@ -64,6 +72,7 @@ export interface PieSeriesProps<TDatum> {
   onSlicePointerEnter?: (event: PieSlicePointerEvent<TDatum>) => void;
   onSlicePointerMove?: (event: PieSlicePointerEvent<TDatum>) => void;
   onSlicePointerLeave?: () => void;
+  animate?: ChartAnimate;
 }
 
 export const createPieSlicePointerHandler =
@@ -71,6 +80,7 @@ export const createPieSlicePointerHandler =
     slice: PieSlice<TDatum>,
     activeIndex: number | null,
     plotArea: { x: number; y: number; width: number; height: number },
+    layout: ReturnType<typeof resolvePieSeriesLayout>["layout"],
     handler?: (event: PieSlicePointerEvent<TDatum>) => void,
   ) =>
   (nativeEvent: JSX.TargetedPointerEvent<SVGPathElement>) => {
@@ -78,7 +88,7 @@ export const createPieSlicePointerHandler =
       return;
     }
 
-    const anchor = pieSliceSurfacePoint(slice, plotArea);
+    const anchor = pieSliceSurfacePoint(slice, plotArea, layout);
 
     handler({
       context: toPieSliceContext(slice, activeIndex === slice.index),
@@ -92,6 +102,8 @@ export const PieSeries = <TDatum,>({
   valueKey,
   labelKey,
   innerRadius = 0,
+  innerRadiusRatio,
+  variant = "full",
   outerRadius,
   padAngle = 0,
   cornerRadius = 0,
@@ -112,19 +124,37 @@ export const PieSeries = <TDatum,>({
   onSlicePointerLeave,
 }: PieSeriesProps<TDatum>) => {
   const { data, plotArea } = useChartContext<TDatum>();
-  const labelOptions = resolvePieLabelOptions(labels ?? labelPosition ?? "inside");
-  const radius = resolvePieOuterRadius(plotArea, outerRadius, labelOptions);
-  const centerX = plotArea.width / 2;
-  const centerY = plotArea.height / 2;
+  const { layout, labelOptions } = useMemo(
+    () =>
+      resolvePieSeriesLayout({
+        plotArea,
+        labels,
+        labelPosition,
+        innerRadius,
+        innerRadiusRatio,
+        variant,
+        outerRadius,
+        activeOffset,
+      }),
+    [
+      activeOffset,
+      innerRadius,
+      innerRadiusRatio,
+      labelPosition,
+      labels,
+      outerRadius,
+      plotArea,
+      variant,
+    ],
+  );
   const pointerEnabled = Boolean(onSlicePointerEnter || onSlicePointerMove || onSlicePointerLeave);
   const { slices, total } = useMemo(
     () =>
-      buildPieSlices({
+      buildPieSlicesForLayout({
         data,
         valueKey,
         labelKey,
-        innerRadius,
-        outerRadius: radius,
+        layout,
         padAngle,
         cornerRadius,
         sort,
@@ -141,26 +171,28 @@ export const PieSeries = <TDatum,>({
       cornerRadius,
       data,
       hiddenKeys,
-      innerRadius,
       labelKey,
+      layout,
       padAngle,
-      radius,
       rose,
       sort,
       valueKey,
     ],
   );
   const roseEnabled = resolvePieRoseOptions(rose) != null;
+  const isDonut = innerRadiusRatio !== undefined;
   const labelLayouts = useMemo(
     () =>
       layoutPieLabels({
         slices,
         labelOptions,
         plotArea,
+        layout,
         activeIndex,
       }),
-    [activeIndex, labelOptions, plotArea, slices],
+    [activeIndex, labelOptions, layout, plotArea, slices],
   );
+  const centerTransform = pieCenterContentTransform(layout);
 
   if (total <= 0) {
     return (
@@ -168,10 +200,12 @@ export const PieSeries = <TDatum,>({
         class={className}
         data-kamod-chart-pie-series=""
         data-kamod-chart-pie-empty=""
-        transform={`translate(${centerX} ${centerY})`}
+        {...(isDonut ? { "data-kamod-chart-donut": "" } : {})}
+        {...(variant === "half" ? { "data-kamod-chart-circular-variant": "half" } : {})}
+        transform={pieSeriesTransform(layout)}
       >
         {emptyContent}
-        {centerContent}
+        {centerContent ? <g transform={centerTransform}>{centerContent}</g> : null}
       </g>
     );
   }
@@ -181,7 +215,9 @@ export const PieSeries = <TDatum,>({
       class={className}
       data-kamod-chart-pie-series=""
       {...(roseEnabled ? { "data-kamod-chart-pie-rose": "" } : {})}
-      transform={`translate(${centerX} ${centerY})`}
+      {...(isDonut ? { "data-kamod-chart-donut": "" } : {})}
+      {...(variant === "half" ? { "data-kamod-chart-circular-variant": "half" } : {})}
+      transform={pieSeriesTransform(layout)}
     >
       {slices.map((slice) => {
         const isActive = activeIndex === slice.index;
@@ -205,12 +241,14 @@ export const PieSeries = <TDatum,>({
                 slice,
                 activeIndex,
                 plotArea,
+                layout,
                 onSlicePointerEnter,
               )}
               onPointerMove={createPieSlicePointerHandler(
                 slice,
                 activeIndex,
                 plotArea,
+                layout,
                 onSlicePointerMove,
               )}
               onPointerLeave={onSlicePointerLeave}
@@ -219,7 +257,7 @@ export const PieSeries = <TDatum,>({
         );
       })}
       <PieLabelLayer layouts={labelLayouts} />
-      {centerContent}
+      {centerContent ? <g transform={centerTransform}>{centerContent}</g> : null}
     </g>
   );
 };

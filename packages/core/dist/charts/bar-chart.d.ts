@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { B as BarChartProps } from '../types-CU6K8ud0.js';
+import { B as BarChartProps } from '../types-Dqcdlu94.js';
 import '../types-vhy5Wa3f.js';
 import '../types-Doyfwbln.js';
 import '../tooltip-placement-DZrqa8Zt.js';

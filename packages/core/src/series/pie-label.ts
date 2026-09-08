@@ -1,6 +1,8 @@
 import type { ComponentChildren } from "preact";
 import type { PieSlice, PieSliceContext } from "./pie-geometry";
 import { pieLabelPoint, toPieSliceContext } from "./pie-geometry";
+import type { ResolvedPieLayout } from "./pie-layout";
+import { resolvePieLayout } from "./pie-layout";
 
 export type PieLabelPosition = "none" | "inside" | "outside";
 
@@ -91,18 +93,13 @@ export const resolvePieOuterRadius = <TDatum>(
   plotArea: { width: number; height: number },
   explicitOuterRadius: number | undefined,
   labelOptions: PieLabelOptions<TDatum>,
-): number => {
-  if (explicitOuterRadius !== undefined) {
-    return explicitOuterRadius;
-  }
-
-  const maxRadius = Math.max(0, Math.min(plotArea.width, plotArea.height) / 2);
-  if (labelOptions.position !== "outside") {
-    return maxRadius;
-  }
-
-  return Math.max(0, maxRadius - computeOutsideLabelGutter(labelOptions));
-};
+): number =>
+  resolvePieLayout({
+    plotArea,
+    variant: "full",
+    outerRadius: explicitOuterRadius,
+    labelOptions,
+  }).outerRadius;
 
 const sliceMidAngle = <TDatum>(slice: PieSlice<TDatum>): number =>
   (slice.startAngle + slice.endAngle) / 2;
@@ -283,13 +280,28 @@ export interface LayoutPieLabelsOptions<TDatum> {
   slices: readonly PieSlice<TDatum>[];
   labelOptions: PieLabelOptions<TDatum>;
   plotArea: { width: number; height: number };
+  layout?: ResolvedPieLayout;
   activeIndex?: number | null;
 }
+
+const resolveOutsideLabelBounds = (
+  plotArea: { width: number; height: number },
+  layout?: ResolvedPieLayout,
+): { minY: number; maxY: number } => {
+  const centerY = layout?.centerY ?? plotArea.height / 2;
+  const spacing = DEFAULT_PIE_LABEL_SPACING / 2;
+
+  return {
+    minY: -(centerY - spacing),
+    maxY: plotArea.height - centerY - spacing,
+  };
+};
 
 export const layoutPieLabels = <TDatum>({
   slices,
   labelOptions,
   plotArea,
+  layout,
   activeIndex = null,
 }: LayoutPieLabelsOptions<TDatum>): PieLabelLayoutEntry[] => {
   const position = labelOptions.position ?? "inside";
@@ -299,9 +311,7 @@ export const layoutPieLabels = <TDatum>({
 
   const line = labelOptions.line ?? {};
   const lineStrokeWidth = line.strokeWidth ?? 1;
-  const verticalBound = plotArea.height / 2 - DEFAULT_PIE_LABEL_SPACING / 2;
-  const minY = -verticalBound;
-  const maxY = verticalBound;
+  const { minY, maxY } = resolveOutsideLabelBounds(plotArea, layout);
   const collision = labelOptions.collision ?? (position === "outside" ? "shift" : "none");
   const spacing = DEFAULT_PIE_LABEL_SPACING;
 

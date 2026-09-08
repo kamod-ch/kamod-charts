@@ -2,10 +2,12 @@ import { AreaChart as StaticAreaChart } from "../charts/area-chart";
 import { BarChart as StaticBarChart } from "../charts/bar-chart";
 import { LineChart as StaticLineChart } from "../charts/line-chart";
 import { PieChart as StaticPieChart } from "../charts/pie-chart";
+import { DonutChart as StaticDonutChart } from "../charts/donut-chart";
 import { ScatterChart as StaticScatterChart } from "../charts/scatter-chart";
 import type {
   AreaChartProps,
   BarChartProps,
+  DonutChartProps,
   LineChartProps,
   PieChartProps,
   ScatterChartProps,
@@ -33,6 +35,12 @@ export const BarChart = <TDatum,>(props: BarChartProps<TDatum>) => (
 export const PieChart = <TDatum,>(props: PieChartProps<TDatum>) => (
   <MotionConfig>
     <StaticPieChart {...props} animate={props.animate ?? true} />
+  </MotionConfig>
+);
+
+export const DonutChart = <TDatum,>(props: DonutChartProps<TDatum>) => (
+  <MotionConfig>
+    <StaticDonutChart {...props} animate={props.animate ?? true} />
   </MotionConfig>
 );
 

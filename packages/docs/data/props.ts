@@ -571,7 +571,197 @@ export const pieSpecificProps: PropRow[] = [
     name: "animate",
     type: "boolean | ChartAnimateOptions",
     description:
-      "Optional data animation. No-op on the static pie entry unless MotionConfig is present.",
+      "Optional data animation. No-op on the static donut entry unless MotionConfig is present.",
+  },
+];
+
+export const donutSpecificProps: PropRow[] = [
+  {
+    name: "valueKey",
+    type: "DataAccessor<TDatum, number | null | undefined>",
+    description:
+      "Numeric value for each slice. Only finite values strictly greater than zero render as slices.",
+  },
+  {
+    name: "labelKey",
+    type: "DataAccessor<TDatum, string | number | Date | null | undefined>",
+    description: "Label accessor for slices, legend items, and tooltips.",
+  },
+  {
+    name: "height",
+    type: "number",
+    description: "Chart height in pixels.",
+  },
+  {
+    name: "width",
+    type: "number",
+    description: "Fixed width. Prefer responsive + initialWidth for fluid layouts.",
+  },
+  {
+    name: "initialWidth",
+    type: "number",
+    description: "SSR / first-paint width before ResizeObserver measures the container.",
+  },
+  {
+    name: "responsive",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Stretch to the parent container width.",
+  },
+  {
+    name: "title",
+    type: "string",
+    description: "Accessible chart title rendered into SVG title.",
+  },
+  {
+    name: "description",
+    type: "string",
+    description: "Accessible description rendered into SVG desc.",
+  },
+  {
+    name: "variant",
+    type: '"full" | "half"',
+    defaultValue: '"full"',
+    description:
+      "full renders a closed ring; half renders the upper semicircle with space below the baseline for center totals.",
+  },
+  {
+    name: "innerRadiusRatio",
+    type: "number",
+    defaultValue: "0.68",
+    description:
+      "Inner hole as a ratio of outer radius, clamped to [0, 0.95]. 0.68 matches UIpkge thickness 0.32. Set 0 for a filled disc.",
+  },
+  {
+    name: "outerRadius",
+    type: "number",
+    description:
+      "Outer radius in pixels. Defaults to available plot size; outside labels auto-shrink radius for gutter space.",
+  },
+  {
+    name: "padAngle",
+    type: "number",
+    defaultValue: "Math.PI / 90",
+    description: "Gap between adjacent slices in radians (~2° by default).",
+  },
+  {
+    name: "cornerRadius",
+    type: "number",
+    defaultValue: "6",
+    description: "Rounded outer corners for slice arcs.",
+  },
+  {
+    name: "sort",
+    type: "boolean | PieSortComparator<TDatum>",
+    defaultValue: "false",
+    description:
+      "When true, sorts slices by descending value. Pass a comparator for custom ordering.",
+  },
+  {
+    name: "labels",
+    type: "PieLabelPosition | PieLabelOptions<TDatum>",
+    defaultValue: '"outside"',
+    description:
+      'Default "outside" on DonutChart (PieChart defaults to "inside"). Use "none" on half variants.',
+  },
+  {
+    name: "colors",
+    type: "readonly string[]",
+    description: "Explicit palette for slices. Colors stay stable by original data index.",
+  },
+  {
+    name: "showTotal",
+    type: "boolean",
+    defaultValue: "true",
+    description:
+      "Render automatic center total when centerContent is omitted. Uses visible slice sum.",
+  },
+  {
+    name: "formatTotal",
+    type: "DonutFormatTotal<TDatum>",
+    description: "Format the visible total for center display. Ignored when centerContent is set.",
+  },
+  {
+    name: "centerContent",
+    type: "DonutCenterContent<TDatum>",
+    description:
+      "Static children, primitives, or render function receiving DonutCenterContext. Highest priority for center display.",
+  },
+  {
+    name: "emptyContent",
+    type: "ComponentChildren",
+    description:
+      "Fallback when data exists but no slice has a finite value greater than zero, or when every slice is hidden via legend.",
+  },
+  {
+    name: "activeOffset",
+    type: "number",
+    defaultValue: "3",
+    description:
+      "Pixel expansion applied to the active slice outer radius on pointer or keyboard focus.",
+  },
+  {
+    name: "tooltip",
+    type: "boolean | PieTooltipOptions<TDatum>",
+    defaultValue: "false",
+    description:
+      "Pointer and keyboard tooltips for the active slice. true uses default value and percentage formatting.",
+  },
+  {
+    name: "showLegend",
+    type: "boolean",
+    defaultValue: "false",
+    description:
+      "Render an HTML legend with per-slice visibility toggles keyed by stable slice keys.",
+  },
+  {
+    name: "legend",
+    type: "PieLegendOptions",
+    description: "Legend behavior. interactive defaults to true for segment toggling.",
+  },
+  {
+    name: "onSegmentClick",
+    type: "(datum, index, value) => void",
+    description: "Called when a slice is activated with pointer click or keyboard Enter/Space.",
+  },
+  {
+    name: "animate",
+    type: "boolean | ChartAnimateOptions",
+    description:
+      "Optional data animation. No-op on the static donut entry unless MotionConfig is present.",
+  },
+];
+
+export const donutCenterContextProps: PropRow[] = [
+  {
+    name: "data",
+    type: "readonly TDatum[]",
+    description: "Original chart data array.",
+  },
+  {
+    name: "variant",
+    type: "DonutVariant",
+    description: "Resolved variant: full or half.",
+  },
+  {
+    name: "total",
+    type: "number",
+    description: "Sum of visible slice values (respects legend toggles).",
+  },
+  {
+    name: "grandTotal",
+    type: "number",
+    description: "Sum of all positive slices regardless of legend visibility.",
+  },
+  {
+    name: "visibleCount",
+    type: "number",
+    description: "Number of slices currently visible.",
+  },
+  {
+    name: "segmentCount",
+    type: "number",
+    description: "Number of slices with positive values in the source data.",
   },
 ];
 

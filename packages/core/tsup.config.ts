@@ -10,6 +10,7 @@ export default defineConfig({
     "charts/bar-chart": "src/charts/bar-chart.tsx",
     "charts/line-chart": "src/charts/line-chart.tsx",
     "charts/pie-chart": "src/charts/pie-chart.tsx",
+    "charts/donut-chart": "src/charts/donut-chart.tsx",
     "charts/scatter-chart": "src/charts/scatter-chart.tsx",
     "core/index": "src/core/index.ts",
     "interaction/index": "src/interaction/index.ts",

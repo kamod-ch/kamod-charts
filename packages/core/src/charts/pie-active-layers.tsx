@@ -3,14 +3,14 @@ import { useMemo } from "preact/hooks";
 import type { ChartInteraction, DataAccessor } from "../core";
 import { useChartContext } from "../core";
 import { LiveRegion, Tooltip } from "../primitives";
+import { buildPieSlicesForLayout, resolvePieSeriesLayout } from "../series/pie-series-layout";
 import {
-  buildPieSlices,
-  toPieSliceContext,
   pieSliceSurfacePoint,
+  toPieSliceContext,
   type PieRose,
   type PieSortComparator,
 } from "../series/pie-geometry";
-import { resolvePieLabelOptions, resolvePieOuterRadius, type PieLabels } from "../series/pie-label";
+import type { PieLabels } from "../series/pie-label";
 import { resolvePieTooltipOptions } from "./pie-tooltip-options";
 import type { PieSliceContext, PieTooltipOptions } from "./types";
 
@@ -39,7 +39,9 @@ export interface PieActiveOverlayProps<TDatum> {
   tooltip?: boolean | PieTooltipOptions<TDatum>;
   valueKey: DataAccessor<TDatum, number | null | undefined>;
   labelKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
-  innerRadius: number;
+  innerRadius?: number;
+  innerRadiusRatio?: number;
+  variant?: import("../series/pie-layout").CircularVariant;
   outerRadius?: number;
   padAngle: number;
   cornerRadius: number;
@@ -57,7 +59,9 @@ const usePieActiveState = <TDatum,>({
   tooltip,
   valueKey,
   labelKey,
-  innerRadius,
+  innerRadius = 0,
+  innerRadiusRatio,
+  variant = "full",
   outerRadius,
   padAngle,
   cornerRadius,
@@ -77,16 +81,26 @@ const usePieActiveState = <TDatum,>({
   const { data, plotArea } = useChartContext<TDatum>();
   const options = resolvePieTooltipOptions(tooltip);
   const activeIndex = pointerIndex ?? keyboardIndex;
-  const labelOptions = resolvePieLabelOptions(labels);
-  const radius = resolvePieOuterRadius(plotArea, outerRadius, labelOptions);
+  const { layout } = useMemo(
+    () =>
+      resolvePieSeriesLayout({
+        plotArea,
+        labels,
+        innerRadius,
+        innerRadiusRatio,
+        variant,
+        outerRadius,
+        activeOffset,
+      }),
+    [activeOffset, innerRadius, innerRadiusRatio, labels, outerRadius, plotArea, variant],
+  );
   const { slices } = useMemo(
     () =>
-      buildPieSlices({
+      buildPieSlicesForLayout({
         data,
         valueKey,
         labelKey,
-        innerRadius,
-        outerRadius: radius,
+        layout,
         padAngle,
         cornerRadius,
         sort,
@@ -103,10 +117,9 @@ const usePieActiveState = <TDatum,>({
       cornerRadius,
       data,
       hiddenKeys,
-      innerRadius,
       labelKey,
+      layout,
       padAngle,
-      radius,
       rose,
       sort,
       valueKey,
@@ -138,7 +151,7 @@ const usePieActiveState = <TDatum,>({
       return null;
     }
 
-    const anchor = pieSliceSurfacePoint(slice, plotArea);
+    const anchor = pieSliceSurfacePoint(slice, plotArea, layout);
 
     return {
       datum: context.datum,

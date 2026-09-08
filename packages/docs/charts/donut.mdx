@@ -1,0 +1,129 @@
+---
+title: Donut Chart
+description: Ratio-based rings and semicircles with center totals, outside labels, and focused subpath imports.
+---
+
+import { Badge } from "@kamod-ch/ui";
+import { DonutApiNotes } from "../components/examples/DonutApiNotes";
+import { DonutExamples, DonutHeroDemo } from "../components/examples/DonutExamples";
+import { PropsTable } from "../components/shared/PropsTable";
+import {
+  donutCenterContextProps,
+  donutSpecificProps,
+  pieLegendOptionsProps,
+  pieTooltipOptionsProps,
+} from "../data/props";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Donut Chart</p>
+
+<div class="not-prose mb-6 flex flex-wrap gap-2">
+  <Badge variant="outline">innerRadiusRatio</Badge>
+  <Badge variant="outline">full & half</Badge>
+  <Badge variant="outline">Center totals</Badge>
+  <Badge variant="outline">@kamod-ch/charts/donut</Badge>
+</div>
+
+## Overview
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <DonutHeroDemo />
+</div>
+
+```ts
+import { DonutChart } from "@kamod-ch/charts/donut";
+```
+
+DonutChart is the dedicated preset for rings and semicircles. It scales the hole with `innerRadiusRatio`, applies product defaults (rounded corners, slice gaps, outside labels on full charts), and can render an automatic center total via `showTotal`.
+
+<DonutApiNotes />
+
+## Gallery
+
+Four reference variants — revenue split, filled disc, half progress, and KPI ring — each using the public package API with real data accessors.
+
+<DonutExamples />
+
+## Props
+
+<PropsTable rows={donutSpecificProps} caption="DonutChart props" />
+
+### DonutCenterContext
+
+Passed to `centerContent` render functions and `formatTotal`.
+
+<PropsTable rows={donutCenterContextProps} caption="DonutCenterContext fields" />
+
+### PieTooltipOptions
+
+DonutChart reuses pie tooltip options via `tooltip`.
+
+<PropsTable rows={pieTooltipOptionsProps} caption="PieTooltipOptions fields" />
+
+### PieLegendOptions
+
+Nested under `legend` when `showLegend` is true.
+
+<PropsTable rows={pieLegendOptionsProps} caption="PieLegendOptions fields" />
+
+## DonutChart vs PieChart
+
+| Concern            | DonutChart                                                 | PieChart               |
+| ------------------ | ---------------------------------------------------------- | ---------------------- |
+| Hole sizing        | `innerRadiusRatio` (0–0.95) scales with plot size          | Pixel `innerRadius`    |
+| Layout presets     | `variant="full" \| "half"`, default outside labels on full | Full circle only       |
+| Center totals      | `showTotal`, `formatTotal`, typed `centerContent`          | `centerContent` only   |
+| Rose / Nightingale | Not supported — use PieChart                               | `rose` option          |
+| Import             | `@kamod-ch/charts/donut` (tree-shakeable)                  | `@kamod-ch/charts/pie` |
+
+When you need a permanent filled pie without ratio semantics, prefer [PieChart](/charts/pie). DonutChart with `innerRadiusRatio={0}` is explicit about removing the hole but still routes through the donut preset.
+
+## Variants, ratios, and UIpkge mapping
+
+**`variant="full"`** (default) renders a closed ring centered in the plot. **Default labels:** `"outside"` with leader lines.
+
+**`variant="half"`** renders the upper semicircle (`-π/2` through `π/2`) with a lower center point. Reserve the baseline area for totals — use `labels="none"` so outside labels do not collide with the flat edge.
+
+**`innerRadiusRatio`** maps to the inner hole as a fraction of the resolved outer radius, clamped to `[0, 0.95]`. Default `0.68` matches UIpkge `thickness={0.32}` because ring thickness `0.32` leaves `1 - 0.32 = 0.68` as inner ratio. Set `innerRadiusRatio={0}` for a filled disc.
+
+**`padAngle`** is in **radians** (d3 convention). Default `Math.PI / 90` ≈ **2°**. Convert degrees: `(degrees * Math.PI) / 180`.
+
+**`cornerRadius`** rounds outer arc corners (default `6`). **`activeOffset`** expands the focused slice (default `3` px on DonutChart vs `6` on PieChart).
+
+## Center content priority
+
+1. **`centerContent`** — static children, primitives (`"68%"`), or `(context) => …` render function. Wins over all automatic totals.
+2. **`formatTotal`** — formats the visible `total` when `showTotal` is true and `centerContent` is omitted.
+3. **`showTotal`** — when `true` (default), renders `String(context.total)` if neither of the above overrides apply.
+
+**`total`** sums **visible** slices (respects legend toggles). **`grandTotal`** always sums every positive slice regardless of legend visibility — useful for KPI denominators.
+
+## Tooltip, legend, and interaction
+
+Both **`tooltip`** and **`showLegend`** default to **`false`** on DonutChart — enable them explicitly in dashboards that need exploration (see Revenue split). Tooltips reuse `PieSliceContext` and `PieTooltipOptions`. The legend toggles slice visibility by stable slice keys; percentages in tooltips track visible slices only.
+
+Keyboard: tab to the chart surface, **ArrowLeft/ArrowRight** move between slices, **Enter/Space** activate `onSegmentClick`. Pointer hover applies `activeOffset` expansion with visible focus alignment.
+
+## Values, empty states, and responsive SSR
+
+Only **finite values strictly greater than zero** become slices. Zero, negative, and non-finite values are omitted. When no slice qualifies, render **`emptyContent`**. When every slice is hidden via legend, `emptyContent` appears while the legend remains interactive.
+
+Pair **`responsive`** with **`initialWidth`** so SSR and first client paint share the same width before `ResizeObserver` runs. See [Responsive charts](/foundations/responsive-charts).
+
+## Motion and focused imports
+
+Static **`@kamod-ch/charts/donut`** does not bundle motion. Wrap charts in **`MotionConfig`** from `@kamod-ch/charts/motion` when animation is required, and honor **`prefers-reduced-motion`** — see [Motion](/foundations/motion).
+
+The focused entry avoids cartesian chart modules:
+
+```ts
+import { DonutChart } from "@kamod-ch/charts/donut";
+import type { DonutChartProps, DonutCenterContext } from "@kamod-ch/charts/donut";
+```
+
+Root `@kamod-ch/charts` re-exports the same symbols.
+
+## Accessibility
+
+Always set **`title`** and **`description`** — they render into SVG `<title>` and `<desc>`. For critical financial or operational metrics, pair the chart with a [`DataTable`](/foundations/accessibility) so screen-reader users can read exact values without relying on slice color alone.
+
+Do not use DonutChart as a live **`progressbar`** — describe utilization in `title`/`description` and keep `centerContent` informational (see KPI ring example).

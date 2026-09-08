@@ -1,6 +1,6 @@
 export { AnimatedValue } from "./animated-value";
 export type { AnimatedValueProps } from "./animated-value";
-export { AreaChart, BarChart, LineChart, PieChart, ScatterChart } from "./charts";
+export { AreaChart, BarChart, LineChart, PieChart, DonutChart, ScatterChart } from "./charts";
 export { MotionConfig } from "./config";
 export type { MotionConfigProps } from "./config";
 export { MotionAreaSeries as AreaSeries, MotionAreaSeries } from "./series/area-series";
