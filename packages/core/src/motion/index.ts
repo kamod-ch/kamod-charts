@@ -13,6 +13,10 @@ export {
   MotionStackedAreaSeries as StackedAreaSeries,
   MotionStackedAreaSeries,
 } from "./series/stacked-area-series";
+export {
+  MotionStackedLineSeries as StackedLineSeries,
+  MotionStackedLineSeries,
+} from "./series/stacked-line-series";
 export type {
   ChartAnimate,
   ChartAnimateOptions,

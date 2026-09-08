@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { S as ScatterChartProps } from '../types-rXUpLNcG.js';
+import { S as ScatterChartProps } from '../types-rWItxzD0.js';
 import '../types-vhy5Wa3f.js';
 import '../types-Doyfwbln.js';
 import '../tooltip-placement-DZrqa8Zt.js';

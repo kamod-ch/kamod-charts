@@ -8,6 +8,14 @@ export { LiveRegion } from "./live-region";
 export type { LiveRegionProps } from "./live-region";
 export { ReferenceLine } from "./reference-line";
 export type { ReferenceLineProps } from "./reference-line";
+export { ReferenceArea } from "./reference-area";
+export type { ReferenceAreaProps } from "./reference-area";
+export { ReferencePoint } from "./reference-point";
+export type {
+  ReferencePointProps,
+  ReferencePointLabelPosition,
+  ReferencePointShape,
+} from "./reference-point";
 export { Tooltip } from "./tooltip";
 export type { TooltipProps } from "./tooltip";
 export {

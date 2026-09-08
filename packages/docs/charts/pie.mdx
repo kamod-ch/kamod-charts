@@ -5,7 +5,6 @@ description: Show parts of a whole with pie or donut layouts.
 
 import { Badge } from "@kamod-ch/ui";
 import { PieExamples, PieHeroDemo } from "../components/examples/PieExamples";
-import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
 import { PropsTable } from "../components/shared/PropsTable";
 import { pieSpecificProps } from "../data/props";
 
@@ -34,13 +33,3 @@ import { PieChart } from "@kamod-ch/charts/pie";
 ## Props
 
 <PropsTable rows={pieSpecificProps} caption="PieChart props" />
-
-## Accessibility
-
-<AccessibilityNotes
-  items={[
-    "Pie charts support keyboard focus and segment interaction.",
-    "Prefer outside labels or an accompanying legend for many slices.",
-    "centerContent is decorative unless you also expose the summary in text.",
-  ]}
-/>

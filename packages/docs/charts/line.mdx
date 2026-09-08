@@ -4,9 +4,9 @@ description: Show change over time with an accessible, SVG-first line chart.
 ---
 
 import { Badge } from "@kamod-ch/ui";
+import { LineApiNotes } from "../components/examples/LineApiNotes";
 import { LineExamples, LineHeroDemo } from "../components/examples/LineExamples";
-import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
-import { CodePreview } from "../components/shared/CodePreview";
+import { LineIntro } from "../components/examples/LineIntro";
 import { PropsTable } from "../components/shared/PropsTable";
 import { commonCartesianProps, lineSpecificProps } from "../data/props";
 
@@ -15,7 +15,8 @@ import { commonCartesianProps, lineSpecificProps } from "../data/props";
 <div class="not-prose mb-6 flex flex-wrap gap-2">
   <Badge variant="outline">Preact native</Badge>
   <Badge variant="outline">Responsive</Badge>
-  <Badge variant="outline">Keyboard accessible</Badge>
+  <Badge variant="outline">Stackable</Badge>
+  <Badge variant="outline">Typed props</Badge>
 </div>
 
 ## Overview
@@ -24,37 +25,16 @@ import { commonCartesianProps, lineSpecificProps } from "../data/props";
   <LineHeroDemo />
 </div>
 
-```sh
-pnpm add @kamod-ch/charts
-```
+<LineIntro />
 
-```ts
-import { LineChart } from "@kamod-ch/charts/line";
-```
+<LineApiNotes />
 
-## Variants
+## Gallery
+
+Thirteen functional patterns covering curves, forecasts, stacking, and cartesian annotations. Each preview uses Kamod’s real LineChart API — no copied option objects.
 
 <LineExamples />
 
 ## Props
 
-Key props from the TypeScript definitions. See `LineChartProps` in `@kamod-ch/charts/line` for the full surface.
-
 <PropsTable rows={[...commonCartesianProps, ...lineSpecificProps]} caption="LineChart props" />
-
-## Accessibility
-
-<AccessibilityNotes
-  items={[
-    "Pass title and description for SVG <title> / <desc>.",
-    "Focus the chart and use arrow keys to move between points.",
-    "Tooltip updates are announced through a polite live region.",
-    "Animations respect prefers-reduced-motion via the charts theme.",
-  ]}
-/>
-
-## Related
-
-- [Area Chart](/charts/area)
-- [Scatter Chart](/charts/scatter)
-- [Playground](/playground/)

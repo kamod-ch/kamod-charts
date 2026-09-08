@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { A as AreaChartProps } from '../types-rXUpLNcG.js';
+import { A as AreaChartProps } from '../types-rWItxzD0.js';
 import '../types-vhy5Wa3f.js';
 import '../types-Doyfwbln.js';
 import '../tooltip-placement-DZrqa8Zt.js';

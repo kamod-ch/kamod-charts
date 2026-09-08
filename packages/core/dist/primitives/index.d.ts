@@ -63,9 +63,56 @@ interface ReferenceLineProps<TDatum> {
     yPadding?: number | DomainPadding;
     label?: string;
     color?: string;
+    strokeWidth?: number;
+    strokeDasharray?: string;
     class?: string;
 }
-declare const ReferenceLine: <TDatum>({ x, y, xKey, yKey, xScale, yScale, xDomain, yDomain, xPadding, yPadding, label, color, class: className, }: ReferenceLineProps<TDatum>) => preact.JSX.Element | null;
+declare const ReferenceLine: <TDatum>({ x, y, xKey, yKey, xScale, yScale, xDomain, yDomain, xPadding, yPadding, label, color, strokeWidth, strokeDasharray, class: className, }: ReferenceLineProps<TDatum>) => preact.JSX.Element | null;
+
+interface ReferenceAreaProps<TDatum> {
+    x1?: string | number | Date;
+    x2?: string | number | Date;
+    y1?: string | number | Date;
+    y2?: string | number | Date;
+    xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    xScale?: ScaleKind;
+    yScale?: ScaleKind;
+    xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
+    yDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
+    xPadding?: number | DomainPadding;
+    yPadding?: number | DomainPadding;
+    id?: string;
+    label?: string;
+    fill?: string;
+    fillOpacity?: number;
+    class?: string;
+}
+declare const ReferenceArea: <TDatum>({ x1, x2, y1, y2, xKey, yKey, xScale, yScale, xDomain, yDomain, xPadding, yPadding, id, label, fill, fillOpacity, class: className, }: ReferenceAreaProps<TDatum>) => preact.JSX.Element | null;
+
+type ReferencePointShape = "circle" | "square" | "diamond";
+type ReferencePointLabelPosition = "top" | "right" | "bottom" | "left";
+
+interface ReferencePointProps<TDatum> {
+    x: string | number | Date;
+    y: string | number | Date;
+    xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    xScale?: ScaleKind;
+    yScale?: ScaleKind;
+    xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
+    yDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
+    xPadding?: number | DomainPadding;
+    yPadding?: number | DomainPadding;
+    id?: string;
+    label?: string;
+    color?: string;
+    size?: number;
+    shape?: ReferencePointShape;
+    labelPosition?: ReferencePointLabelPosition;
+    class?: string;
+}
+declare const ReferencePoint: <TDatum>({ x, y, xKey, yKey, xScale, yScale, xDomain, yDomain, xPadding, yPadding, id, label, color, size, shape, labelPosition, class: className, }: ReferencePointProps<TDatum>) => preact.JSX.Element | null;
 
 interface TooltipProps<TDatum> {
     interaction?: ChartInteraction<TDatum> | null;
@@ -76,4 +123,4 @@ interface TooltipProps<TDatum> {
 }
 declare const Tooltip: <TDatum>({ interaction, visible, children, placement, offset, }: TooltipProps<TDatum>) => preact.JSX.Element | null;
 
-export { Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceLine, type ReferenceLineProps, Tooltip, TooltipPlacement, type TooltipProps };
+export { Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceArea, type ReferenceAreaProps, ReferenceLine, type ReferenceLineProps, ReferencePoint, type ReferencePointLabelPosition, type ReferencePointProps, type ReferencePointShape, Tooltip, TooltipPlacement, type TooltipProps };

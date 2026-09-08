@@ -16,6 +16,8 @@ export interface ReferenceLineProps<TDatum> {
   yPadding?: number | DomainPadding;
   label?: string;
   color?: string;
+  strokeWidth?: number;
+  strokeDasharray?: string;
   class?: string;
 }
 
@@ -32,6 +34,8 @@ export const ReferenceLine = <TDatum,>({
   yPadding,
   label,
   color = "var(--chart-reference-line)",
+  strokeWidth,
+  strokeDasharray = "4 4",
   class: className,
 }: ReferenceLineProps<TDatum>) => {
   const { plotArea } = useChartContext<TDatum>();
@@ -52,14 +56,15 @@ export const ReferenceLine = <TDatum,>({
   const isVertical = x != null;
 
   return (
-    <g class={className} data-kamod-chart-reference-line="">
+    <g class={className} data-kamod-chart-reference-line="" aria-hidden="true">
       <line
         x1={isVertical ? position : 0}
         x2={isVertical ? position : plotArea.width}
         y1={isVertical ? 0 : position}
         y2={isVertical ? plotArea.height : position}
         stroke={color}
-        stroke-dasharray="4 4"
+        stroke-width={strokeWidth}
+        stroke-dasharray={strokeDasharray}
       />
       {label ? (
         <text

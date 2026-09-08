@@ -5,7 +5,6 @@ description: Discover relationships between numeric variables.
 
 import { Badge } from "@kamod-ch/ui";
 import { ScatterExamples, ScatterHeroDemo } from "../components/examples/ScatterExamples";
-import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
 import { PropsTable } from "../components/shared/PropsTable";
 import { commonCartesianProps, scatterSpecificProps } from "../data/props";
 
@@ -36,14 +35,4 @@ import { ScatterChart } from "@kamod-ch/charts/scatter";
 <PropsTable
   rows={[...commonCartesianProps, ...scatterSpecificProps]}
   caption="ScatterChart props"
-/>
-
-## Accessibility
-
-<AccessibilityNotes
-  items={[
-    "Scatter charts support keyboard navigation across points.",
-    "Use reference lines to communicate thresholds in both visual and textual form.",
-    "Provide a data table when individual point values matter.",
-  ]}
 />

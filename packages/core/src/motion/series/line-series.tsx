@@ -43,9 +43,11 @@ const AnimatedLineSeries = <TDatum,>({
   id,
   color = "var(--chart-1)",
   strokeWidth = 2,
+  strokeDasharray,
   curve = "linear",
   connectNulls = false,
   showPoints = "auto",
+  pointRadius = 2.5,
   activeIndex = null,
   class: className,
   animate,
@@ -67,10 +69,11 @@ const AnimatedLineSeries = <TDatum,>({
     [data, dataKey, resolvedXKey, scales.xScale, scales.yScale],
   );
   const keys = uniquifyKeys(points.map((point) => pointKey(seriesId, point.xValue, point.index)));
+  const activePointRadius = pointRadius + 1.5;
   const motionPoints = points.map((point, index) => ({
     ...point,
     key: keys[index] ?? pointKey(seriesId, point.xValue, point.index),
-    r: activeIndex === point.index ? 4 : 2.5,
+    r: activeIndex === point.index ? activePointRadius : pointRadius,
     opacity: point.defined ? 1 : 0,
   }));
   const targetKey = `${plotArea.width}x${plotArea.height}::${motionPoints
@@ -116,6 +119,7 @@ const AnimatedLineSeries = <TDatum,>({
         fill="none"
         stroke={color}
         stroke-width={strokeWidth}
+        stroke-dasharray={strokeDasharray}
         stroke-linecap="round"
         stroke-linejoin="round"
       />

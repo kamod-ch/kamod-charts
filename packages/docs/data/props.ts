@@ -71,8 +71,9 @@ export const commonCartesianProps: PropRow[] = [
   },
   {
     name: "series",
-    type: "readonly CartesianSeriesConfig<TDatum>[]",
-    description: "One or more numeric series configurations.",
+    type: "readonly LineSeriesConfig<TDatum>[]",
+    description:
+      "One or more line series. LineSeriesConfig extends the cartesian config with strokeWidth, strokeDasharray, showPoints, and pointRadius.",
   },
   {
     name: "animate",
@@ -84,10 +85,16 @@ export const commonCartesianProps: PropRow[] = [
 
 export const lineSpecificProps: PropRow[] = [
   {
+    name: "stacked",
+    type: "boolean",
+    defaultValue: "false",
+    description: "Stack series on cumulative y1 geometry. Tooltips still report raw series values.",
+  },
+  {
     name: "curve",
-    type: '"linear" | "monotoneX" | "basis" | CurveFactory',
+    type: '"linear" | "monotoneX" | "basis" | "step" | "stepBefore" | "stepAfter" | CurveFactory',
     defaultValue: '"linear"',
-    description: "Interpolation used for the path.",
+    description: "Path interpolation for every visible series.",
   },
   {
     name: "connectNulls",
@@ -96,15 +103,44 @@ export const lineSpecificProps: PropRow[] = [
     description: "Draw across null / undefined values.",
   },
   {
+    name: "strokeWidth",
+    type: "number",
+    description: "Default line stroke width. Overridden by per-series strokeWidth.",
+  },
+  {
+    name: "strokeDasharray",
+    type: "string",
+    description:
+      'Default SVG dash pattern, e.g. "6 4". Overridden by per-series strokeDasharray. Use explicit patterns instead of a dashed boolean.',
+  },
+  {
     name: "showPoints",
     type: 'boolean | "auto"',
     defaultValue: '"auto"',
-    description: "Render markers on each datum.",
+    description: "Render markers on each defined datum (auto hides markers above 500 points).",
+  },
+  {
+    name: "pointRadius",
+    type: "number",
+    defaultValue: "2.5",
+    description: "Default marker radius when showPoints is enabled.",
   },
   {
     name: "referenceLines",
     type: "readonly CartesianReferenceLine<TDatum>[]",
-    description: "Optional x/y reference markers.",
+    description:
+      "Optional x/y reference markers with label, color, strokeWidth, and strokeDasharray.",
+  },
+  {
+    name: "referenceAreas",
+    type: "readonly CartesianReferenceArea<TDatum>[]",
+    description: "Vertical x1/x2 or horizontal y1/y2 highlight bands clipped to the plot area.",
+  },
+  {
+    name: "referencePoints",
+    type: "readonly CartesianReferencePoint<TDatum>[]",
+    description:
+      "Explicit x/y event markers with shape, label, and labelPosition. Kamod does not infer peaks.",
   },
 ];
 

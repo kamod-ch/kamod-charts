@@ -9,6 +9,8 @@ import {
 } from "../interaction/hit-testing";
 import type { NumericDomain } from "../scales";
 import { createCartesianScales, getCartesianPoints } from "../series/cartesian";
+import { getStackedSeriesValueAt } from "../series/stacked-line-points";
+import type { StackSeries } from "../series/stack";
 
 export type CartesianActivePoint = {
   surfaceX: number;
@@ -76,6 +78,72 @@ export const resolveCartesianActivePoint = <TDatum>({
 
   const plotX = getScalePosition(xScale, xValue as never);
   const plotY = getScalePosition(yScale, yValue);
+
+  if (typeof plotX !== "number" || typeof plotY !== "number") {
+    return null;
+  }
+
+  return {
+    plotX,
+    plotY,
+    surfaceX: plotOffsetX + plotX,
+    surfaceY: plotOffsetY + plotY,
+  };
+};
+
+export const resolveStackedCartesianActivePoint = <TDatum>({
+  data,
+  index,
+  stackSeries,
+  activeSeriesId,
+  xKey,
+  xScale: xScaleKind,
+  yDomain,
+  plotWidth,
+  plotHeight,
+  plotOffsetX,
+  plotOffsetY,
+}: {
+  data: readonly TDatum[];
+  index: number;
+  stackSeries: readonly StackSeries<TDatum>[];
+  activeSeriesId: string;
+  xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+  xScale?: ChartCartesianScaleKind;
+  yDomain: NumericDomain;
+  plotWidth: number;
+  plotHeight: number;
+  plotOffsetX: number;
+  plotOffsetY: number;
+}): CartesianActivePoint | null => {
+  const datum = data[index];
+  if (!datum) {
+    return null;
+  }
+
+  const stackPoint = getStackedSeriesValueAt(data, stackSeries, activeSeriesId, index);
+  if (!stackPoint) {
+    return null;
+  }
+
+  const { xScale, yScale } = createCartesianScales({
+    data,
+    xKey,
+    yKey: stackSeries[0]?.value ?? indexAccessor,
+    xScale: xScaleKind,
+    yDomain,
+    xRange: [0, plotWidth],
+    yRange: [plotHeight, 0],
+  });
+  const readX = normalizeAccessor(xKey ?? indexAccessor);
+  const xValue = readX(datum, index);
+
+  if (xValue == null) {
+    return null;
+  }
+
+  const plotX = getScalePosition(xScale, xValue as never);
+  const plotY = getScalePosition(yScale, stackPoint.y1);
 
   if (typeof plotX !== "number" || typeof plotY !== "number") {
     return null;

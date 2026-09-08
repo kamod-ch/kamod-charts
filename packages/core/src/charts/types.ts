@@ -12,11 +12,48 @@ export interface CartesianSeriesConfig<TDatum> {
   hidden?: boolean;
 }
 
+export interface LineSeriesConfig<TDatum> extends CartesianSeriesConfig<TDatum> {
+  strokeWidth?: number;
+  strokeDasharray?: string;
+  showPoints?: boolean | "auto";
+  pointRadius?: number;
+}
+
 export interface CartesianReferenceLine<TDatum> {
   y?: number | Date | string;
   x?: string | number | Date;
   label?: string;
   color?: string;
+  strokeWidth?: number;
+  strokeDasharray?: string;
+  yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+}
+
+export interface CartesianReferencePoint<TDatum> {
+  id?: string;
+  x: string | number | Date;
+  y: number | Date | string;
+  label?: string;
+  color?: string;
+  size?: number;
+  shape?: "circle" | "square" | "diamond";
+  labelPosition?: "top" | "right" | "bottom" | "left";
+  class?: string;
+  xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+  yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+}
+
+export interface CartesianReferenceArea<TDatum> {
+  id?: string;
+  x1?: string | number | Date;
+  x2?: string | number | Date;
+  y1?: number | Date | string;
+  y2?: number | Date | string;
+  label?: string;
+  fill?: string;
+  fillOpacity?: number;
+  class?: string;
+  xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
 }
 
@@ -29,6 +66,8 @@ export interface CartesianTooltipSeriesValue<TDatum> {
   color?: string;
   value: number | null;
   series: CartesianSeriesConfig<TDatum>;
+  stackStart?: number;
+  stackEnd?: number;
 }
 
 export interface CartesianTooltipContext<TDatum> {
@@ -76,11 +115,17 @@ export interface CommonCartesianChartProps<TDatum> {
 }
 
 export interface LineChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {
-  series: readonly CartesianSeriesConfig<TDatum>[];
+  series: readonly LineSeriesConfig<TDatum>[];
+  stacked?: boolean;
   curve?: LineCurve;
   connectNulls?: boolean;
+  strokeWidth?: number;
+  strokeDasharray?: string;
   showPoints?: boolean | "auto";
+  pointRadius?: number;
   referenceLines?: readonly CartesianReferenceLine<TDatum>[];
+  referenceAreas?: readonly CartesianReferenceArea<TDatum>[];
+  referencePoints?: readonly CartesianReferencePoint<TDatum>[];
 }
 
 export interface AreaChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {

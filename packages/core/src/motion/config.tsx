@@ -10,6 +10,7 @@ import { MotionLineSeries } from "./series/line-series";
 import { MotionPieSeries } from "./series/pie-series";
 import { MotionScatterSeries } from "./series/scatter-series";
 import { MotionStackedAreaSeries } from "./series/stacked-area-series";
+import { MotionStackedLineSeries } from "./series/stacked-line-series";
 
 export interface MotionConfigProps extends ChartAnimateOptions {
   children?: ComponentChildren;
@@ -31,6 +32,7 @@ export const MotionConfig = ({
         LineSeries: MotionLineSeries as never,
         AreaSeries: MotionAreaSeries as never,
         StackedAreaSeries: MotionStackedAreaSeries as never,
+        StackedLineSeries: MotionStackedLineSeries as never,
         BarSeries: MotionBarSeries as never,
         BarMarks: MotionBarMarks as never,
         PieSeries: MotionPieSeries as never,

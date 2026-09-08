@@ -14,5 +14,8 @@ export { ScatterSeries } from "./scatter-series";
 export type { ScatterSeriesProps } from "./scatter-series";
 export { inferGroupedDomain, inferStackedDomain, getStackedValues } from "./stack";
 export type { StackedValue, StackSeries } from "./stack";
+export { stackedLayerToCartesianPoints, getStackedSeriesValueAt } from "./stacked-line-points";
 export { StackedAreaSeries } from "./stacked-area-series";
 export type { StackedAreaSeriesProps } from "./stacked-area-series";
+export { StackedLineSeries } from "./stacked-line-series";
+export type { StackedLineSeriesEntry, StackedLineSeriesProps } from "./stacked-line-series";

@@ -16,9 +16,11 @@ export interface LineSeriesProps<TDatum> {
   id?: string;
   color?: string;
   strokeWidth?: number;
+  strokeDasharray?: string;
   curve?: LineCurve;
   connectNulls?: boolean;
   showPoints?: boolean | "auto";
+  pointRadius?: number;
   activeIndex?: number | null;
   class?: string;
 }
@@ -32,9 +34,11 @@ export const LineSeries = <TDatum,>({
   id,
   color = "var(--chart-1)",
   strokeWidth = 2,
+  strokeDasharray,
   curve = "linear",
   connectNulls = false,
   showPoints = "auto",
+  pointRadius = 2.5,
   activeIndex = null,
   class: className,
 }: LineSeriesProps<TDatum>) => {
@@ -58,6 +62,7 @@ export const LineSeries = <TDatum,>({
     [connectNulls, curve, points],
   );
   const shouldShowPoints = showPoints === true || (showPoints === "auto" && points.length <= 500);
+  const activePointRadius = pointRadius + 1.5;
 
   return (
     <g class={className} data-kamod-chart-line-series="" data-kamod-chart-series-id={id}>
@@ -66,6 +71,7 @@ export const LineSeries = <TDatum,>({
         fill="none"
         stroke={color}
         stroke-width={strokeWidth}
+        stroke-dasharray={strokeDasharray}
         stroke-linecap="round"
         stroke-linejoin="round"
       />
@@ -76,7 +82,7 @@ export const LineSeries = <TDatum,>({
                 key={keys[pointIndex]}
                 cx={point.x ?? 0}
                 cy={point.y ?? 0}
-                r={activeIndex === point.index ? 4 : 2.5}
+                r={activeIndex === point.index ? activePointRadius : pointRadius}
                 fill={color}
                 stroke="var(--chart-tooltip-background)"
                 stroke-width={activeIndex === point.index ? 2 : 1}

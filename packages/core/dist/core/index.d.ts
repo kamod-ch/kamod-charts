@@ -32,9 +32,9 @@ interface ChartSurfaceProps extends ChartAccessibilityOptions, ChartSize {
 }
 declare const ChartSurface: ({ id, title, description, labelledBy, describedBy, role, width, height, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, children, }: ChartSurfaceProps) => JSX.Element;
 
-declare const defaultEmptyState: preact.JSX.Element;
-declare const ChartRoot: <TDatum>({ data, width, height, initialWidth, responsive, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, overlay, emptyState, }: ChartRootProps<TDatum>) => preact.JSX.Element;
-declare const Chart: <TDatum>({ data, width, height, initialWidth, responsive, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, overlay, emptyState, }: ChartRootProps<TDatum>) => preact.JSX.Element;
+declare const defaultEmptyState: JSX.Element;
+declare const ChartRoot: <TDatum>({ data, width, height, initialWidth, responsive, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, overlay, emptyState, }: ChartRootProps<TDatum>) => JSX.Element;
+declare const Chart: <TDatum>({ data, width, height, initialWidth, responsive, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, overlay, emptyState, }: ChartRootProps<TDatum>) => JSX.Element;
 
 interface PlotAreaProps {
     children?: ComponentChildren;

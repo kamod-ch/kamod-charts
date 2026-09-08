@@ -1,17 +1,9 @@
 import { D as DataAccessor } from '../types-Doyfwbln.js';
 import { S as ScaleKind, D as DomainPadding } from '../domain-BtgmU7rB.js';
-import { ScaleLinear, ScaleTime, ScaleBand, ScalePoint } from 'd3-scale';
+import { A as AxisScale } from '../ticks-CmQrA2Ry.js';
+export { a as AxisTick, b as AxisTickValue, g as getScalePosition, c as getTicks } from '../ticks-CmQrA2Ry.js';
 import * as preact from 'preact';
-
-type AxisScale = ScaleLinear<number, number, never> | ScaleTime<number, number, never> | ScaleBand<string> | ScalePoint<string>;
-type AxisTickValue = string | number | Date;
-interface AxisTick<TValue extends AxisTickValue = AxisTickValue> {
-    value: TValue;
-    position: number;
-    label: string;
-}
-declare const getScalePosition: (scale: AxisScale, value: AxisTickValue) => number | undefined;
-declare const getTicks: (scale: AxisScale, tickCount?: number) => AxisTickValue[];
+import 'd3-scale';
 
 interface AxisScaleOptions<TDatum> {
     dataKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
@@ -30,6 +22,8 @@ interface TickFormatOptions<TValue extends TickValue = TickValue> {
     formatter?: TickFormatter<TValue>;
     formatSpecifier?: string;
 }
+/** SI-style compact labels (e.g. 52k) when magnitudes exceed typical left-margin width. */
+declare const inferNumericTickFormatSpecifier: (domain: readonly [number, number]) => string | undefined;
 declare const formatTick: <TValue extends TickValue>(value: TValue, index: number, options?: TickFormatOptions<TValue>) => string;
 
 interface XAxisProps<TDatum> {
@@ -61,4 +55,4 @@ interface YAxisProps<TDatum> {
 }
 declare const YAxis: <TDatum>({ dataKey, scale, domain, padding, nice, tickCount, tickFormatter, formatSpecifier, label, class: className, }: YAxisProps<TDatum>) => preact.JSX.Element;
 
-export { type AxisScale, type AxisScaleOptions, type AxisTick, type AxisTickValue, type TickFormatOptions, type TickFormatter, type TickValue, XAxis, type XAxisProps, YAxis, type YAxisProps, formatTick, getScalePosition, getTicks, useAxisScale };
+export { AxisScale, type AxisScaleOptions, type TickFormatOptions, type TickFormatter, type TickValue, XAxis, type XAxisProps, YAxis, type YAxisProps, formatTick, inferNumericTickFormatSpecifier, useAxisScale };

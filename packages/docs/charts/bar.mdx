@@ -5,7 +5,6 @@ description: Compare values across categories with vertical or horizontal bars.
 
 import { Badge } from "@kamod-ch/ui";
 import { BarExamples, BarHeroDemo } from "../components/examples/BarExamples";
-import { AccessibilityNotes } from "../components/shared/AccessibilityNotes";
 import { PropsTable } from "../components/shared/PropsTable";
 import { barSpecificProps, commonCartesianProps } from "../data/props";
 
@@ -43,14 +42,3 @@ Reference lines follow chart coordinates, not data column names:
 
 - `referenceLine.x` draws a vertical line at a value on the horizontal axis (numeric thresholds on horizontal charts).
 - `referenceLine.y` draws a horizontal line at a value on the vertical axis (numeric thresholds on vertical charts, or a category string such as `"Mon"` on horizontal charts).
-
-## Accessibility
-
-<AccessibilityNotes
-  items={[
-    "Use title/description for the chart purpose.",
-    "Arrow keys move across categories and series, skipping missing bars. Enter/Space fires onBarClick for the active bar. Escape dismisses the tooltip.",
-    "Nearest mode selects the exact bar or stack segment. Axis mode reports every visible series in that category.",
-    "Keep category labels short enough to remain readable at mobile widths.",
-  ]}
-/>

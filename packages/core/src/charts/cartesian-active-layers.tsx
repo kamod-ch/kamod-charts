@@ -4,7 +4,11 @@ import type { ChartCartesianScaleKind, ChartInteraction, DataAccessor } from "..
 import { normalizeAccessor, useChartContext } from "../core";
 import { Crosshair, LiveRegion, Tooltip } from "../primitives";
 import type { NumericDomain } from "../scales";
-import { resolveCartesianActivePoint, type CartesianActivePoint } from "./cartesian-interaction";
+import {
+  resolveCartesianActivePoint,
+  resolveStackedCartesianActivePoint,
+  type CartesianActivePoint,
+} from "./cartesian-interaction";
 import { getSeriesId } from "./series-identity";
 import { resolveTooltipOptions } from "./tooltip-options";
 import type { CartesianPointerPlot } from "./use-cartesian-pointer-state";
@@ -15,6 +19,8 @@ import type {
   CartesianTooltipSeriesValue,
   CartesianSeriesConfig,
 } from "./types";
+import type { StackSeries } from "../series/stack";
+import { getStackedSeriesValueAt } from "../series/stacked-line-points";
 
 type ActiveLayersProps<TDatum> = {
   activeIndex: number | null;
@@ -27,6 +33,8 @@ type ActiveLayersProps<TDatum> = {
   defaultMode: CartesianTooltipMode;
   activePoint?: CartesianActivePoint | null;
   pointerPlot?: CartesianPointerPlot | null;
+  stacked?: boolean;
+  stackSeries?: readonly StackSeries<TDatum>[];
 };
 
 const clampPlotCoord = (value: number, max: number): number => Math.min(Math.max(value, 0), max);
@@ -100,6 +108,8 @@ const useActiveInteraction = <TDatum,>({
   pointerPlot,
   tooltip,
   defaultMode,
+  stacked = false,
+  stackSeries = [],
 }: ActiveLayersProps<TDatum>): {
   interaction: ChartInteraction<TDatum> | null;
   plotInteraction: ChartInteraction<TDatum> | null;
@@ -118,18 +128,35 @@ const useActiveInteraction = <TDatum,>({
       ? activePointOverride
       : activeIndex == null || !activeSeries
         ? null
-        : resolveCartesianActivePoint({
-            data,
-            index: activeIndex,
-            seriesKey: activeSeries.key,
-            xKey,
-            xScale,
-            yDomain,
-            plotWidth: plotArea.width,
-            plotHeight: plotArea.height,
-            plotOffsetX: plotArea.x,
-            plotOffsetY: plotArea.y,
-          });
+        : stacked && stackSeries.length > 0
+          ? resolveStackedCartesianActivePoint({
+              data,
+              index: activeIndex,
+              stackSeries,
+              activeSeriesId: getSeriesId(
+                activeSeries,
+                Math.max(visibleSeries.indexOf(activeSeries), 0),
+              ),
+              xKey,
+              xScale,
+              yDomain,
+              plotWidth: plotArea.width,
+              plotHeight: plotArea.height,
+              plotOffsetX: plotArea.x,
+              plotOffsetY: plotArea.y,
+            })
+          : resolveCartesianActivePoint({
+              data,
+              index: activeIndex,
+              seriesKey: activeSeries.key,
+              xKey,
+              xScale,
+              yDomain,
+              plotWidth: plotArea.width,
+              plotHeight: plotArea.height,
+              plotOffsetX: plotArea.x,
+              plotOffsetY: plotArea.y,
+            });
 
   const readX = normalizeAccessor(xKey ?? ((_datum: TDatum, index: number) => index));
   const xValue =
@@ -140,12 +167,19 @@ const useActiveInteraction = <TDatum,>({
     activeDatum && activeIndex != null
       ? visibleSeries.map((entry, seriesIndex) => {
           const raw = normalizeAccessor(entry.key)(activeDatum, activeIndex);
+          const seriesId = getSeriesId(entry, seriesIndex);
+          const stackPoint =
+            stacked && stackSeries.length > 0
+              ? getStackedSeriesValueAt(data, stackSeries, seriesId, activeIndex)
+              : null;
+
           return {
-            id: getSeriesId(entry, seriesIndex),
-            label: entry.label ?? getSeriesId(entry, seriesIndex),
+            id: seriesId,
+            label: entry.label ?? seriesId,
             color: entry.color,
             value: typeof raw === "number" && Number.isFinite(raw) ? raw : null,
             series: entry,
+            ...(stackPoint ? { stackStart: stackPoint.y0, stackEnd: stackPoint.y1 } : {}),
           };
         })
       : [];

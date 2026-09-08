@@ -4,6 +4,7 @@ import type { ComponentType } from "preact";
 import type { ChartAnimate, ChartAnimateOptions } from "./types";
 import type { AreaSeriesProps } from "../series/area-series";
 import type { StackedAreaSeriesProps } from "../series/stacked-area-series";
+import type { StackedLineSeriesProps } from "../series/stacked-line-series";
 import type { LineSeriesProps } from "../series/line-series";
 import type { ScatterSeriesProps } from "../series/scatter-series";
 import type { PieSeriesProps } from "../series/pie-series";
@@ -14,6 +15,7 @@ export interface ChartMotionSlots {
   LineSeries?: ComponentType<MotionSeriesProps<LineSeriesProps<unknown>>>;
   AreaSeries?: ComponentType<MotionSeriesProps<AreaSeriesProps<unknown>>>;
   StackedAreaSeries?: ComponentType<MotionSeriesProps<StackedAreaSeriesProps<unknown>>>;
+  StackedLineSeries?: ComponentType<MotionSeriesProps<StackedLineSeriesProps<unknown>>>;
   BarSeries?: ComponentType<Record<string, unknown>>;
   BarMarks?: ComponentType<Record<string, unknown>>;
   PieSeries?: ComponentType<MotionSeriesProps<PieSeriesProps<unknown>>>;

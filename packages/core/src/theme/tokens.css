@@ -11,10 +11,13 @@
   --chart-empty-foreground: var(--muted-foreground);
   --chart-focus-ring: var(--ring);
   --chart-reference-line: var(--chart-axis);
+  --chart-reference-area: color-mix(in oklab, var(--chart-2) 22%, transparent);
+  --chart-reference-point: var(--chart-2);
 }
 
 .dark {
   --chart-grid: color-mix(in oklab, var(--border) 65%, transparent);
+  --chart-reference-area: color-mix(in oklab, var(--chart-2) 28%, transparent);
 }
 
 [data-kamod-chart-surface] {

@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { P as PieChartProps } from '../types-rXUpLNcG.js';
+import { P as PieChartProps } from '../types-rWItxzD0.js';
 import '../types-vhy5Wa3f.js';
 import '../types-Doyfwbln.js';
 import '../tooltip-placement-DZrqa8Zt.js';

@@ -46,7 +46,7 @@ interface ChartPointerPosition {
     plotX: number;
     plotY: number;
 }
-declare const getPointerPosition: (event: JSX.TargetedPointerEvent<SVGSVGElement>, plotArea: ChartRect) => ChartPointerPosition;
+declare const getPointerPosition: (event: JSX.TargetedPointerEvent<Element>, plotArea: ChartRect) => ChartPointerPosition;
 /**
  * Maps plot X to a datum index assuming equal spacing across the plot width.
  * Intended only for explicitly index-spaced domains. Continuous numeric/time
