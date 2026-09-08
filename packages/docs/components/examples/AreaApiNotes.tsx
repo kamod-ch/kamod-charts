@@ -33,9 +33,9 @@ export function AreaApiNotes(): JSX.Element {
           label: "Step curves",
           children: (
             <>
-              <code class={apiNoteCode}>stepBefore</code> and <code class={apiNoteCode}>stepAfter</code>{" "}
-              map to step-start and step-end conventions. Use <code class={apiNoteCode}>step</code> for
-              centered steps.
+              <code class={apiNoteCode}>stepBefore</code> and{" "}
+              <code class={apiNoteCode}>stepAfter</code> map to step-start and step-end conventions.
+              Use <code class={apiNoteCode}>step</code> for centered steps.
             </>
           ),
         },
@@ -45,8 +45,8 @@ export function AreaApiNotes(): JSX.Element {
           children: (
             <>
               Enable <code class={apiNoteCode}>showPoints</code> — there is no separate{" "}
-              <code class={apiNoteCode}>markers</code> prop. Markers accent finite values and are not
-              individual tab stops.
+              <code class={apiNoteCode}>markers</code> prop. Markers accent finite values and are
+              not individual tab stops.
             </>
           ),
         },
@@ -77,9 +77,9 @@ export function AreaApiNotes(): JSX.Element {
           label: "Stacked tooltips",
           children: (
             <>
-              Axis tooltips report each series’ <strong class="font-medium text-foreground">raw value</strong>,
-              not cumulative stack geometry (<code class={apiNoteCode}>y0</code> /{" "}
-              <code class={apiNoteCode}>y1</code>).
+              Axis tooltips report each series’{" "}
+              <strong class="font-medium text-foreground">raw value</strong>, not cumulative stack
+              geometry (<code class={apiNoteCode}>y0</code> / <code class={apiNoteCode}>y1</code>).
             </>
           ),
         },

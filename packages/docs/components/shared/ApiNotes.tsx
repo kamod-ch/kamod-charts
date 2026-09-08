@@ -12,13 +12,10 @@ type ApiNotesProps = {
   items: ApiNoteItem[];
 };
 
-const inlineCode = "rounded-md bg-background px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground ring-1 ring-border/60";
+const inlineCode =
+  "rounded-md bg-background px-1.5 py-0.5 font-mono text-[0.8125rem] text-foreground ring-1 ring-border/60";
 
-export function ApiNotes({
-  title = "API notes",
-  description,
-  items,
-}: ApiNotesProps): JSX.Element {
+export function ApiNotes({ title = "API notes", description, items }: ApiNotesProps): JSX.Element {
   return (
     <section
       id="api-notes"

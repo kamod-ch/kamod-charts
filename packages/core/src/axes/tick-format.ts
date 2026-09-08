@@ -16,11 +16,7 @@ export interface TickFormatOptions<TValue extends TickValue = TickValue> {
 export const inferNumericTickFormatSpecifier = (
   domain: readonly [number, number],
 ): string | undefined => {
-  const span = Math.max(
-    Math.abs(domain[0]),
-    Math.abs(domain[1]),
-    Math.abs(domain[1] - domain[0]),
-  );
+  const span = Math.max(Math.abs(domain[0]), Math.abs(domain[1]), Math.abs(domain[1] - domain[0]));
 
   return span >= 1_000 ? "~s" : undefined;
 };

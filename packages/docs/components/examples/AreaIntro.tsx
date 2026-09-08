@@ -21,8 +21,8 @@ export function AreaIntro(): JSX.Element {
         <div class="space-y-1.5 bg-muted/30 px-4 py-4 sm:px-5">
           <dt class="text-sm font-medium text-foreground">Static bundle</dt>
           <dd class="text-sm leading-relaxed text-muted-foreground">
-            Import from <code class={apiNoteCode}>@kamod-ch/charts/area</code> for charts without the
-            motion runtime.
+            Import from <code class={apiNoteCode}>@kamod-ch/charts/area</code> for charts without
+            the motion runtime.
           </dd>
         </div>
         <div class="space-y-1.5 bg-muted/30 px-4 py-4 sm:px-5">
