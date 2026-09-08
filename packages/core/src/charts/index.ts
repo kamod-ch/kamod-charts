@@ -6,6 +6,11 @@ export { ScatterChart } from "./scatter-chart";
 export type {
   AreaChartProps,
   BarChartProps,
+  BarDatumContext,
+  BarFill,
+  BarSeriesConfig,
+  BarValueLabelContext,
+  BarValueLabelOptions,
   CartesianReferenceLine,
   CartesianReferenceArea,
   CartesianReferencePoint,

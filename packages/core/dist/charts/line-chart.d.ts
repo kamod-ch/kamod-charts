@@ -1,9 +1,8 @@
 import * as preact from 'preact';
-import { L as LineChartProps } from '../types-rWItxzD0.js';
+import { L as LineChartProps } from '../types-ma1QyXzC.js';
 import '../types-vhy5Wa3f.js';
 import '../types-Doyfwbln.js';
 import '../tooltip-placement-DZrqa8Zt.js';
-import '../paths-iUYISIqv.js';
 import 'd3-shape';
 
 declare const LineChart: <TDatum>({ data, xKey, xScale, series, width, height, initialWidth, responsive, title, description, id, showGrid, showLegend, tooltip, stacked, curve, connectNulls, strokeWidth, strokeDasharray, showPoints, pointRadius, referenceLines, referenceAreas, referencePoints, animate, }: LineChartProps<TDatum>) => preact.JSX.Element;

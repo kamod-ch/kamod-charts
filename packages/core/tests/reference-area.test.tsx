@@ -1,8 +1,9 @@
 import renderToString from "preact-render-to-string";
 import { describe, expect, it } from "vitest";
 import { render } from "./testing-library";
-import { Chart, LineChart, ReferenceArea } from "../src";
+import { Chart, LineChart, ReferenceArea, BarChart } from "../src";
 import { resolvePlotAreaFromSize } from "../src/charts/cartesian-interaction";
+import { resolveBarReferenceAreaProps } from "../src/charts/bar-reference-area";
 import type { CartesianReferenceArea } from "../src/charts/types";
 import {
   clampReferenceSpan,
@@ -237,5 +238,214 @@ describe("ReferenceArea exports", () => {
     const primitives = await import("../src/primitives");
     expect(root.ReferenceArea).toBeTypeOf("function");
     expect(primitives.ReferenceArea).toBe(root.ReferenceArea);
+  });
+});
+
+describe("BarChart referenceAreas", () => {
+  const series = [{ key: "revenue" as const, id: "revenue" }];
+  const yDomain = [0, 30] as const;
+
+  it("maps semantic category intervals on vertical and horizontal charts", () => {
+    const vertical = resolveBarReferenceAreaProps(
+      { x1: "Feb", x2: "Mar" },
+      { xKey: "month", xScale: "band", yDomain, horizontal: false },
+    );
+    const horizontal = resolveBarReferenceAreaProps(
+      { x1: "Feb", x2: "Mar" },
+      { xKey: "month", xScale: "band", yDomain, horizontal: true },
+    );
+
+    expect(vertical.x1).toBe("Feb");
+    expect(vertical.x2).toBe("Mar");
+    expect(horizontal.y1).toBe("Feb");
+    expect(horizontal.y2).toBe("Mar");
+    expect(horizontal.x1).toBeUndefined();
+  });
+
+  it("maps semantic value intervals on vertical and horizontal charts", () => {
+    const vertical = resolveBarReferenceAreaProps(
+      { y1: 10, y2: 20 },
+      { xKey: "month", xScale: "band", yDomain, horizontal: false },
+    );
+    const horizontal = resolveBarReferenceAreaProps(
+      { y1: 10, y2: 20 },
+      { xKey: "month", xScale: "band", yDomain, horizontal: true },
+    );
+
+    expect(vertical.y1).toBe(10);
+    expect(vertical.y2).toBe(20);
+    expect(horizontal.x1).toBe(10);
+    expect(horizontal.x2).toBe(20);
+    expect(horizontal.y1).toBeUndefined();
+  });
+
+  it("renders a vertical category interval with full band coverage", () => {
+    const { container } = render(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        referenceAreas={[{ x1: "Feb", x2: "Mar", label: "Mid quarter" }]}
+      />,
+    );
+    const rect = container.querySelector("[data-kamod-chart-reference-area] rect");
+    const plot = resolvePlotAreaFromSize(CHART_WIDTH, CHART_HEIGHT);
+    const scale = createBandScale({
+      domain: data.map((entry) => entry.month),
+      range: [0, plot.width],
+    });
+    const expectedWidth = scale("Mar")! + scale.bandwidth() - scale("Feb")!;
+
+    expect(Number(rect?.getAttribute("width"))).toBeCloseTo(expectedWidth, 4);
+    expect(container.innerHTML).toContain("Mid quarter");
+  });
+
+  it("renders the same semantic category interval on horizontal bars", () => {
+    const { container } = render(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        orientation="horizontal"
+        referenceAreas={[{ x1: "Jan", x2: "Feb", label: "Opening" }]}
+      />,
+    );
+    const rect = container.querySelector("[data-kamod-chart-reference-area] rect");
+    const plot = resolvePlotAreaFromSize(CHART_WIDTH, CHART_HEIGHT);
+    const scale = createBandScale({
+      domain: data.map((entry) => entry.month),
+      range: [0, plot.height],
+    });
+    const expectedHeight = scale("Feb")! + scale.bandwidth() - scale("Jan")!;
+
+    expect(Number(rect?.getAttribute("height"))).toBeCloseTo(expectedHeight, 4);
+    expect(container.innerHTML).toContain("Opening");
+  });
+
+  it("renders numeric value ranges in both orientations", () => {
+    const vertical = renderToString(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        referenceAreas={[{ y1: 12, y2: 22 }]}
+      />,
+    );
+    const horizontal = renderToString(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        orientation="horizontal"
+        referenceAreas={[{ y1: 12, y2: 22 }]}
+      />,
+    );
+
+    expect(vertical).toMatch(/width="[0-9.]+"/);
+    expect(vertical).toMatch(/height="[0-9.]+"/);
+    expect(horizontal).toMatch(/width="[0-9.]+"/);
+    expect(horizontal).toMatch(/height="[0-9.]+"/);
+    expect(vertical).not.toContain("NaN");
+    expect(horizontal).not.toContain("NaN");
+  });
+
+  it("renders behind grid and bars with custom styling", () => {
+    const { container } = render(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        showGrid
+        referenceAreas={[
+          {
+            id: "highlight",
+            class: "highlight-band",
+            x1: "Mar",
+            x2: "Apr",
+            label: "Forecast",
+            fill: "var(--chart-4)",
+            fillOpacity: 0.5,
+          },
+        ]}
+      />,
+    );
+    const area = container.querySelector("[data-kamod-chart-reference-area]");
+    const grid = container.querySelector("[data-kamod-chart-grid]");
+    const bars = container.querySelector("[data-kamod-chart-bars]");
+
+    expect(area).not.toBeNull();
+    expect(grid).not.toBeNull();
+    expect(bars).not.toBeNull();
+    expect(area!.compareDocumentPosition(grid!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(grid!.compareDocumentPosition(bars!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.innerHTML).toContain('id="highlight"');
+    expect(container.innerHTML).toContain('class="highlight-band"');
+    expect(container.innerHTML).toContain('fill="var(--chart-4)"');
+    expect(container.innerHTML).toContain('fill-opacity="0.5"');
+    expect(container.innerHTML).toContain("Forecast");
+  });
+
+  it("ignores reversed, invalid, and out-of-domain areas without NaN output", () => {
+    const reversed = renderToString(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        referenceAreas={[{ x1: "Mar", x2: "Jan" }]}
+      />,
+    );
+    const invalid = renderToString(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        referenceAreas={[{ x1: "Missing", x2: "AlsoMissing" }]}
+      />,
+    );
+    const incomplete = renderToString(
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        referenceAreas={[{ x1: "Jan" }, { y1: 1000, y2: 2000 }]}
+      />,
+    );
+
+    expect(reversed).toContain("data-kamod-chart-reference-area");
+    expect(invalid).not.toContain("<rect");
+    expect(incomplete).not.toContain("<rect");
+    expect(reversed).not.toContain("NaN");
+    expect(invalid).not.toContain("NaN");
+    expect(incomplete).not.toContain("NaN");
+  });
+
+  it("renders deterministically through SSR", () => {
+    const chart = (
+      <BarChart
+        data={data}
+        xKey="month"
+        series={series}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        referenceAreas={[{ x1: "Feb", x2: "Mar", label: "Stable" }]}
+      />
+    );
+    expect(renderToString(chart)).toBe(renderToString(chart));
   });
 });

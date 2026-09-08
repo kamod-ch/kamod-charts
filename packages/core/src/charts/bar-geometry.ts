@@ -8,12 +8,12 @@ import {
 import { getStackedValues } from "../series";
 import type { CartesianTooltipMode } from "./types";
 import { getSeriesId } from "./series-identity";
-import type { CartesianSeriesConfig } from "./types";
+import type { BarSeriesConfig } from "./types";
 
 export type BarGeometry<TDatum> = {
   datum: TDatum;
   index: number;
-  series: CartesianSeriesConfig<TDatum>;
+  series: BarSeriesConfig<TDatum>;
   seriesId: string;
   seriesIndex: number;
   value: number | null;
@@ -32,15 +32,29 @@ export type BarGeometry<TDatum> = {
 
 export type ResolveBarGeometryOptions<TDatum> = {
   data: readonly TDatum[];
-  series: readonly CartesianSeriesConfig<TDatum>[];
+  series: readonly BarSeriesConfig<TDatum>[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   yDomain: NumericDomain;
   stacked?: boolean;
   grouped?: boolean;
   horizontal?: boolean;
   minBarSize?: number;
+  /** Caps bar width (vertical) or bar height (horizontal). Ignored when not finite or <= 0. */
+  maxBarSize?: number;
   plotWidth: number;
   plotHeight: number;
+};
+
+/**
+ * Applies an optional max size cap on the category axis dimension.
+ * Non-finite and non-positive limits are ignored so SVG output never receives NaN.
+ */
+export const resolveMaxBarCategorySize = (naturalSize: number, maxBarSize?: number): number => {
+  if (maxBarSize == null || !Number.isFinite(maxBarSize) || maxBarSize <= 0) {
+    return naturalSize;
+  }
+
+  return Math.min(naturalSize, maxBarSize);
 };
 
 export const categoryOf = (
@@ -66,6 +80,7 @@ export const resolveBarGeometry = <TDatum>({
   grouped = true,
   horizontal = false,
   minBarSize = 0,
+  maxBarSize,
   plotWidth,
   plotHeight,
 }: ResolveBarGeometryOptions<TDatum>): BarGeometry<TDatum>[] => {
@@ -95,6 +110,20 @@ export const resolveBarGeometry = <TDatum>({
         series.map((entry, index) => ({ id: getSeriesId(entry, index), value: entry.key })),
       )
     : [];
+  const categoryBandwidth = categoryScale.bandwidth();
+  const naturalSlotSize = stacked ? categoryBandwidth : innerScale.bandwidth();
+  const barCategorySize = resolveMaxBarCategorySize(naturalSlotSize, maxBarSize);
+  const groupedLayout =
+    !stacked && grouped && series.length > 1
+      ? (() => {
+          const firstId = getSeriesId(series[0]!, 0);
+          const groupStart = innerScale(firstId) ?? 0;
+          return {
+            groupStart,
+            groupCenterOffset: groupStart + (naturalSlotSize - barCategorySize) / 2,
+          };
+        })()
+      : null;
 
   const bars: BarGeometry<TDatum>[] = [];
 
@@ -118,13 +147,21 @@ export const resolveBarGeometry = <TDatum>({
       const valueEnd = stacked ? (stackValue?.y1 ?? value ?? 0) : (value ?? 0);
       const scaledStart = valueScale(valueStart);
       const scaledEnd = valueScale(valueEnd);
-      const groupOffset = stacked ? 0 : (innerScale(seriesId) ?? 0);
-      const bandSize = stacked ? categoryScale.bandwidth() : innerScale.bandwidth();
-      const x = horizontal ? Math.min(scaledStart, scaledEnd) : categoryPosition + groupOffset;
-      const y = horizontal ? categoryPosition + groupOffset : Math.min(scaledStart, scaledEnd);
-      const width = horizontal ? Math.max(Math.abs(scaledEnd - scaledStart), minBarSize) : bandSize;
+      const slotOffset = stacked ? 0 : (innerScale(seriesId) ?? 0);
+      const categoryOffset = stacked
+        ? (categoryBandwidth - barCategorySize) / 2
+        : groupedLayout
+          ? groupedLayout.groupCenterOffset + (slotOffset - groupedLayout.groupStart)
+          : series.length === 1
+            ? (categoryBandwidth - barCategorySize) / 2
+            : slotOffset + (naturalSlotSize - barCategorySize) / 2;
+      const x = horizontal ? Math.min(scaledStart, scaledEnd) : categoryPosition + categoryOffset;
+      const y = horizontal ? categoryPosition + categoryOffset : Math.min(scaledStart, scaledEnd);
+      const width = horizontal
+        ? Math.max(Math.abs(scaledEnd - scaledStart), minBarSize)
+        : barCategorySize;
       const height = horizontal
-        ? bandSize
+        ? barCategorySize
         : Math.max(Math.abs(scaledEnd - scaledStart), minBarSize);
       const anchorX = horizontal ? scaledEnd : x + width / 2;
       const anchorY = horizontal ? y + height / 2 : scaledEnd;

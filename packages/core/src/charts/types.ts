@@ -12,6 +12,38 @@ export interface CartesianSeriesConfig<TDatum> {
   hidden?: boolean;
 }
 
+export interface BarDatumContext<TDatum> {
+  datum: TDatum;
+  index: number;
+  value: number;
+  valueStart: number;
+  valueEnd: number;
+  seriesId: string;
+  seriesIndex: number;
+  orientation: "vertical" | "horizontal";
+  stacked: boolean;
+  active: boolean;
+}
+
+export type BarFill<TDatum> = string | ((context: BarDatumContext<TDatum>) => string | undefined);
+
+export interface BarSeriesConfig<TDatum> extends CartesianSeriesConfig<TDatum> {
+  fill?: BarFill<TDatum>;
+  valueLabels?: boolean | BarValueLabelOptions<TDatum>;
+}
+
+export interface BarValueLabelContext<TDatum> extends BarDatumContext<TDatum> {
+  defaultLabel: string;
+}
+
+export interface BarValueLabelOptions<TDatum> {
+  position?: "auto" | "inside" | "outside" | "center";
+  format?: (value: number, context: BarValueLabelContext<TDatum>) => ComponentChildren;
+  color?: string;
+  class?: string;
+  offset?: number;
+}
+
 export interface LineSeriesConfig<TDatum> extends CartesianSeriesConfig<TDatum> {
   strokeWidth?: number;
   strokeDasharray?: string;
@@ -144,14 +176,16 @@ export interface AreaChartProps<TDatum> extends CommonCartesianChartProps<TDatum
 }
 
 export interface BarChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {
-  series: readonly CartesianSeriesConfig<TDatum>[];
+  series: readonly BarSeriesConfig<TDatum>[];
   orientation?: "vertical" | "horizontal";
   stacked?: boolean;
   grouped?: boolean;
   radius?: number;
   minBarSize?: number;
-  valueLabels?: boolean;
+  maxBarSize?: number;
+  valueLabels?: boolean | BarValueLabelOptions<TDatum>;
   referenceLines?: readonly CartesianReferenceLine<TDatum>[];
+  referenceAreas?: readonly CartesianReferenceArea<TDatum>[];
   onBarClick?: (datum: TDatum, seriesId: string, index: number, value: number) => void;
 }
 

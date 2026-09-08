@@ -4,16 +4,27 @@ description: Compare values across categories with vertical or horizontal bars.
 ---
 
 import { Badge } from "@kamod-ch/ui";
+import { BarApiNotes } from "../components/examples/BarApiNotes";
 import { BarExamples, BarHeroDemo } from "../components/examples/BarExamples";
+import { BarIntro } from "../components/examples/BarIntro";
 import { PropsTable } from "../components/shared/PropsTable";
-import { barSpecificProps, commonCartesianProps } from "../data/props";
+import {
+  barCartesianProps,
+  barDatumContextProps,
+  barFillTypeProps,
+  barReferenceAreaProps,
+  barSeriesConfigProps,
+  barSpecificProps,
+  barValueLabelOptionsProps,
+} from "../data/props";
 
 <p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Bar Chart</p>
 
 <div class="not-prose mb-6 flex flex-wrap gap-2">
-  <Badge variant="outline">Grouped</Badge>
-  <Badge variant="outline">Stacked</Badge>
-  <Badge variant="outline">Click handlers</Badge>
+  <Badge variant="outline">Preact native</Badge>
+  <Badge variant="outline">Grouped & stacked</Badge>
+  <Badge variant="outline">Typed fill accessors</Badge>
+  <Badge variant="outline">Reference areas</Badge>
 </div>
 
 ## Overview
@@ -22,23 +33,56 @@ import { barSpecificProps, commonCartesianProps } from "../data/props";
   <BarHeroDemo />
 </div>
 
-```ts
-import { BarChart } from "@kamod-ch/charts/bar";
-```
+<BarIntro />
 
-## Variants
+<BarApiNotes />
+
+## Gallery
+
+Eight functional patterns covering sizing, orientation, stacking, signed fills, value labels, and reference bands. Each preview uses Kamod’s real BarChart API — no copied option objects.
 
 <BarExamples />
 
 ## Props
 
-<PropsTable rows={[...commonCartesianProps, ...barSpecificProps]} caption="BarChart props" />
+<PropsTable rows={[...barCartesianProps, ...barSpecificProps]} caption="BarChart props" />
 
-## Orientation and reference lines
+### BarSeriesConfig
 
-Vertical bars (default) use a categorical X axis and numeric Y axis. Horizontal bars swap those roles: values extend along X and categories along Y.
+<PropsTable rows={barSeriesConfigProps} caption="Fields on each series entry" />
 
-Reference lines follow chart coordinates, not data column names:
+### BarFill
 
-- `referenceLine.x` draws a vertical line at a value on the horizontal axis (numeric thresholds on horizontal charts).
-- `referenceLine.y` draws a horizontal line at a value on the vertical axis (numeric thresholds on vertical charts, or a category string such as `"Mon"` on horizontal charts).
+<PropsTable rows={barFillTypeProps} caption="BarFill type alias" />
+
+### BarDatumContext
+
+Passed to `fill` accessors and extended by `BarValueLabelContext` for `valueLabels.format`.
+
+<PropsTable rows={barDatumContextProps} caption="BarDatumContext fields" />
+
+### BarValueLabelOptions
+
+Chart-level via `valueLabels` or per-series via `BarSeriesConfig.valueLabels`. Series options override chart defaults.
+
+<PropsTable rows={barValueLabelOptionsProps} caption="BarValueLabelOptions fields" />
+
+### referenceAreas entries
+
+<PropsTable rows={barReferenceAreaProps} caption="CartesianReferenceArea fields used by BarChart" />
+
+## Label placement
+
+Value labels follow the value axis regardless of orientation:
+
+- **Vertical:** `outside` sits above positive bars and below negative bars; `inside` tucks into the bar end; `center` uses the bar midpoint.
+- **Horizontal:** `outside` extends past the bar along X; `inside` sits inset from the bar tip; `center` stays at the bar center.
+- **Stacked + auto:** inner segments use `center`; the outermost positive (or negative) segment uses `outside` so totals are not duplicated.
+
+## Orientation and reference geometry
+
+Vertical bars (default) use a categorical X axis and numeric Y axis. Horizontal bars swap those roles — categories align on Y so long labels stay readable.
+
+Reference areas always use semantic coordinates: `x1` / `x2` refer to category keys and `y1` / `y2` to numeric values. BarChart maps them to the visible axes when `orientation="horizontal"`.
+
+Reference lines follow the same axis mapping as LineChart: `referenceLine.y` is a numeric threshold on vertical charts (or a category string on horizontal charts).

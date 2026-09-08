@@ -3,7 +3,7 @@ import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
 import { Chart, useChartContext } from "../core";
 import { createChartKeyboardHandler } from "../interaction";
-import { Grid, Legend, ReferenceLine } from "../primitives";
+import { Grid, Legend, ReferenceArea, ReferenceLine } from "../primitives";
 import { inferGroupedDomain, inferStackedDomain } from "../series";
 import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
 import type { CartesianActivePoint } from "./cartesian-interaction";
@@ -16,6 +16,7 @@ import {
   type BarGeometry,
 } from "./bar-geometry";
 import { BarMarks as StaticBarMarks } from "./bar-marks";
+import { resolveBarReferenceAreaProps } from "./bar-reference-area";
 import { resolvePointerPlot } from "./chart-pointer";
 import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled, resolveTooltipOptions } from "./tooltip-options";
@@ -41,8 +42,10 @@ export const BarChart = <TDatum,>({
   grouped = true,
   radius = 0,
   minBarSize = 0,
+  maxBarSize,
   valueLabels = false,
   referenceLines = [],
+  referenceAreas = [],
   onBarClick,
   animate,
 }: BarChartProps<TDatum>) => {
@@ -106,6 +109,7 @@ export const BarChart = <TDatum,>({
                 grouped,
                 horizontal: isHorizontal,
                 minBarSize,
+                maxBarSize,
                 plotWidth: plot.width,
                 plotHeight: plot.height,
               });
@@ -138,6 +142,7 @@ export const BarChart = <TDatum,>({
             grouped,
             horizontal: isHorizontal,
             minBarSize,
+            maxBarSize,
             plotWidth: plot.width,
             plotHeight: plot.height,
           });
@@ -171,6 +176,7 @@ export const BarChart = <TDatum,>({
             grouped,
             horizontal: isHorizontal,
             minBarSize,
+            maxBarSize,
             plotWidth: plot.width,
             plotHeight: plot.height,
           });
@@ -218,6 +224,7 @@ export const BarChart = <TDatum,>({
             grouped={grouped}
             horizontal={isHorizontal}
             minBarSize={minBarSize}
+            maxBarSize={maxBarSize}
             activeIndex={activeIndex}
             activeSeries={activeSeries}
             resolvedSeriesIndex={resolvedSeriesIndex}
@@ -226,6 +233,17 @@ export const BarChart = <TDatum,>({
         </>
       }
     >
+      {referenceAreas.map((area, index) => (
+        <ReferenceArea
+          key={area.id ?? `reference-area-${index}`}
+          {...resolveBarReferenceAreaProps(area, {
+            xKey,
+            xScale,
+            yDomain,
+            horizontal: isHorizontal,
+          })}
+        />
+      ))}
       {showGrid ? (
         isHorizontal ? (
           <Grid xScale="linear" xDomain={yDomain} yKey={xKey} yScale={xScale} />
@@ -242,6 +260,7 @@ export const BarChart = <TDatum,>({
         grouped={grouped}
         horizontal={isHorizontal}
         minBarSize={minBarSize}
+        maxBarSize={maxBarSize}
         activeIndex={activeIndex}
         activeSeries={activeSeries}
         resolvedSeriesIndex={resolvedSeriesIndex}
@@ -268,6 +287,7 @@ export const BarChart = <TDatum,>({
         horizontal={isHorizontal}
         radius={radius}
         minBarSize={minBarSize}
+        maxBarSize={maxBarSize}
         valueLabels={valueLabels}
         activeIndex={activeIndex}
         activeSeriesIndex={resolvedSeriesIndex}
@@ -302,6 +322,7 @@ type BarActiveProps<TDatum> = {
   grouped: boolean;
   horizontal: boolean;
   minBarSize: number;
+  maxBarSize?: number;
   activeIndex: number | null;
   activeSeries?: BarChartProps<TDatum>["series"][number];
   resolvedSeriesIndex: number;
@@ -323,6 +344,7 @@ const useBarActivePoint = <TDatum,>(props: BarActiveProps<TDatum>): CartesianAct
     grouped: props.grouped,
     horizontal: props.horizontal,
     minBarSize: props.minBarSize,
+    maxBarSize: props.maxBarSize,
     plotWidth: plotArea.width,
     plotHeight: plotArea.height,
   });

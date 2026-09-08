@@ -1,7 +1,9 @@
 import { barKey } from "../animation/keys";
 import { useChartContext } from "../core";
+import { resolveBarGeometryFill } from "./bar-fill";
 import { resolveBarGeometry } from "./bar-geometry";
 import { roundedRectPath } from "./bar-path";
+import { resolveBarValueLabelPresentation } from "./bar-value-label";
 import type { BarChartProps } from "./types";
 
 export interface BarMarksProps<TDatum> {
@@ -14,7 +16,8 @@ export interface BarMarksProps<TDatum> {
   horizontal: boolean;
   radius: number;
   minBarSize: number;
-  valueLabels: boolean;
+  maxBarSize?: number;
+  valueLabels: BarChartProps<TDatum>["valueLabels"];
   activeIndex: number | null;
   activeSeriesIndex: number;
   onBarClick?: BarChartProps<TDatum>["onBarClick"];
@@ -31,6 +34,7 @@ export const BarMarks = <TDatum,>({
   horizontal,
   radius,
   minBarSize,
+  maxBarSize,
   valueLabels,
   activeIndex,
   activeSeriesIndex,
@@ -46,6 +50,7 @@ export const BarMarks = <TDatum,>({
     grouped,
     horizontal,
     minBarSize,
+    maxBarSize,
     plotWidth: plotArea.width,
     plotHeight: plotArea.height,
   });
@@ -59,14 +64,23 @@ export const BarMarks = <TDatum,>({
 
         const key = barKey(bar.seriesId, bar.category);
         const isActive = activeIndex === bar.index && activeSeriesIndex === bar.seriesIndex;
-        const labelX = horizontal ? bar.x + bar.width + 4 : bar.x + bar.width / 2;
-        const labelY = horizontal ? bar.y + bar.height / 2 : bar.y - 4;
+        const fill = resolveBarGeometryFill(bar, {
+          orientation: horizontal ? "horizontal" : "vertical",
+          stacked,
+          active: isActive,
+        });
+        const label = resolveBarValueLabelPresentation(bar, bars, bar, {
+          chartValueLabels: valueLabels,
+          horizontal,
+          stacked,
+          active: isActive,
+        });
 
         return (
           <g key={key} data-kamod-chart-key={key}>
             <path
               d={roundedRectPath(bar.x, bar.y, bar.width, bar.height, radius)}
-              fill={bar.series.color ?? `var(--chart-${(bar.seriesIndex % 4) + 1})`}
+              fill={fill}
               data-kamod-chart-bar=""
               data-kamod-chart-key={key}
               data-kamod-chart-series-id={bar.seriesId}
@@ -78,14 +92,17 @@ export const BarMarks = <TDatum,>({
                   : undefined
               }
             />
-            {valueLabels ? (
+            {label ? (
               <text
-                x={labelX}
-                y={labelY}
-                text-anchor={horizontal ? "start" : "middle"}
-                dominant-baseline="middle"
+                x={label.layout.x}
+                y={label.layout.y}
+                text-anchor={label.layout.textAnchor}
+                dominant-baseline={label.layout.dominantBaseline}
+                fill={label.color}
+                class={label.class}
+                data-kamod-chart-value-label=""
               >
-                {bar.value}
+                {label.content}
               </text>
             ) : null}
           </g>

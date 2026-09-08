@@ -19,6 +19,11 @@ All notable changes to `@kamod-ch/charts` are documented here.
 - **Area charts:** optional point markers (`showPoints`, `pointRadius`, `activeIndex`), dashed outlines (`strokeDasharray` with `outline`), and configurable stroke width.
 - **Area charts:** gradient `<defs>` with stable, SSR-safe IDs per chart and series.
 - Documentation: eight area chart examples, gallery/playground controls, and API notes on curves, fills, markers, and stacked tooltip semantics.
+- **Bar charts:** optional `maxBarSize` to cap bar thickness while keeping bars centered in each category band (shared by render, hit-test, tooltip, keyboard, clicks, and motion).
+- **Bar charts:** typed `BarSeriesConfig` extending the cartesian series config with per-bar `fill` (`BarFill`, `BarDatumContext`) and optional per-series `valueLabels` overrides.
+- **Bar charts:** formatable, positionable value labels via `BarValueLabelOptions` (`auto`, `inside`, `outside`, `center`) on chart or series; `valueLabels={true}` keeps prior auto/outside behaviour for simple positive vertical bars.
+- **Bar charts:** `referenceAreas` prop reusing the shared `ReferenceArea` primitive with semantic category/value coordinates that map correctly when `orientation="horizontal"`.
+- Documentation: eight BarChart gallery scenarios, API notes, and expanded props tables on `/charts/bar`.
 
 ### Fixed
 
@@ -29,6 +34,7 @@ All notable changes to `@kamod-ch/charts` are documented here.
 ### Notes
 
 - **Backward compatible / additive:** existing `LineChart` usage requires no migration. New props (`stacked`, `referenceAreas`, `referencePoints`, per-series styles) are optional; defaults preserve prior behaviour (`stacked` defaults to `false`, curve defaults to `linear`).
+- **Backward compatible / additive:** existing `BarChart` usage requires no migration. New props (`maxBarSize`, `referenceAreas`, typed `fill`, `BarValueLabelOptions`) are optional; `valueLabels={true}`, `radius`, `minBarSize`, `stacked`, `grouped`, `orientation`, and `onBarClick` behave as before. `BarSeriesConfig` is a superset of `CartesianSeriesConfig` — existing `series` entries remain valid.
 - Shared stack helpers (`getStackedValues`, `inferStackedDomain`) are reused by Area and Line charts; AreaChart behaviour is unchanged.
 - Default area curve remains `linear`; `showPoints` defaults to `false` for backward compatibility.
 - `@kamod-ch/charts/line` and `@kamod-ch/charts/area` stay motion-free; animation props delegate to optional motion slots when a provider is present.

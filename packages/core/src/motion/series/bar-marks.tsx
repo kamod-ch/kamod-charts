@@ -1,7 +1,12 @@
 import { barKey, type ChartAnimate } from "../../animation";
+import { resolveBarGeometryFill } from "../../charts/bar-fill";
 import { type BarGeometry, resolveBarGeometry } from "../../charts/bar-geometry";
 import { BarMarks, type BarMarksProps } from "../../charts/bar-marks";
 import { roundedRectPath } from "../../charts/bar-path";
+import {
+  resolveBarValueLabelPresentation,
+  barValueLabelUsesFormat,
+} from "../../charts/bar-value-label";
 import { useChartContext } from "../../core";
 import { AnimatedValue } from "../animated-value";
 import { lerp } from "../interpolate";
@@ -44,6 +49,7 @@ const AnimatedBarMarks = <TDatum,>({
   horizontal,
   radius,
   minBarSize,
+  maxBarSize,
   valueLabels,
   activeIndex,
   activeSeriesIndex,
@@ -62,6 +68,7 @@ const AnimatedBarMarks = <TDatum,>({
     grouped,
     horizontal,
     minBarSize,
+    maxBarSize,
     plotWidth: plotArea.width,
     plotHeight: plotArea.height,
   });
@@ -124,14 +131,28 @@ const AnimatedBarMarks = <TDatum,>({
       {displayed.map((entry) => {
         const { bar } = entry;
         const isActive = activeIndex === bar.index && activeSeriesIndex === bar.seriesIndex;
-        const labelX = horizontal ? entry.x + entry.width + 4 : entry.x + entry.width / 2;
-        const labelY = horizontal ? entry.y + entry.height / 2 : entry.y - 4;
+        const fill = resolveBarGeometryFill(bar, {
+          orientation: horizontal ? "horizontal" : "vertical",
+          stacked,
+          active: isActive,
+        });
+        const label = resolveBarValueLabelPresentation(
+          bar,
+          bars,
+          { x: entry.x, y: entry.y, width: entry.width, height: entry.height },
+          {
+            chartValueLabels: valueLabels,
+            horizontal,
+            stacked,
+            active: isActive,
+          },
+        );
 
         return (
           <g key={entry.key} data-kamod-chart-key={entry.key} data-kamod-chart-phase={entry.phase}>
             <path
               d={roundedRectPath(entry.x, entry.y, entry.width, entry.height, entry.radius)}
-              fill={bar.series.color ?? `var(--chart-${(bar.seriesIndex % 4) + 1})`}
+              fill={fill}
               data-kamod-chart-bar=""
               data-kamod-chart-key={entry.key}
               data-kamod-chart-phase={entry.phase}
@@ -144,14 +165,21 @@ const AnimatedBarMarks = <TDatum,>({
                   : undefined
               }
             />
-            {valueLabels ? (
+            {label ? (
               <text
-                x={labelX}
-                y={labelY}
-                text-anchor={horizontal ? "start" : "middle"}
-                dominant-baseline="middle"
+                x={label.layout.x}
+                y={label.layout.y}
+                text-anchor={label.layout.textAnchor}
+                dominant-baseline={label.layout.dominantBaseline}
+                fill={label.color}
+                class={label.class}
+                data-kamod-chart-value-label=""
               >
-                <AnimatedValue value={bar.value} animate={animate} />
+                {barValueLabelUsesFormat(valueLabels, bar) ? (
+                  label.content
+                ) : (
+                  <AnimatedValue value={label.animateValue} animate={animate} />
+                )}
               </text>
             ) : null}
           </g>

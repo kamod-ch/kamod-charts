@@ -1,5 +1,7 @@
 import { useMemo } from "preact/hooks";
 import { barKey } from "../animation/keys";
+import { resolveBarFill } from "../charts/bar-fill";
+import { resolveMaxBarCategorySize } from "../charts/bar-geometry";
 import { roundedRectPath } from "../charts/bar-path";
 import { normalizeAccessor, useChartContext, type DataAccessor } from "../core";
 import {
@@ -8,6 +10,7 @@ import {
   inferCategoricalDomain,
   inferNumericDomain,
 } from "../scales";
+import type { BarFill } from "../charts/types";
 
 export interface BarSeriesProps<TDatum> {
   dataKey: DataAccessor<TDatum, number | null | undefined>;
@@ -15,8 +18,10 @@ export interface BarSeriesProps<TDatum> {
   yDomain?: readonly [number, number];
   id?: string;
   color?: string;
+  fill?: BarFill<TDatum>;
   radius?: number;
   minBarSize?: number;
+  maxBarSize?: number;
   horizontal?: boolean;
   class?: string;
   onBarClick?: (datum: TDatum, index: number, value: number) => void;
@@ -39,8 +44,10 @@ export const BarSeries = <TDatum,>({
   yDomain,
   id,
   color = "var(--chart-1)",
+  fill,
   radius = 0,
   minBarSize = 0,
+  maxBarSize,
   horizontal = false,
   class: className,
   onBarClick,
@@ -65,6 +72,7 @@ export const BarSeries = <TDatum,>({
     range: horizontal ? [0, plotArea.width] : [plotArea.height, 0],
   });
   const zero = valueScale(0);
+  const seriesId = id ?? "series";
 
   return (
     <g class={className} data-kamod-chart-bar-series="" data-kamod-chart-series-id={id}>
@@ -82,17 +90,34 @@ export const BarSeries = <TDatum,>({
 
         const scaled = valueScale(raw);
         const bandwidth = categoryScale.bandwidth();
-        const x = horizontal ? Math.min(zero, scaled) : categoryPosition;
-        const y = horizontal ? categoryPosition : Math.min(zero, scaled);
-        const width = horizontal ? Math.max(Math.abs(scaled - zero), minBarSize) : bandwidth;
-        const height = horizontal ? bandwidth : Math.max(Math.abs(scaled - zero), minBarSize);
-        const key = barKey(id ?? "series", category);
+        const barCategorySize = resolveMaxBarCategorySize(bandwidth, maxBarSize);
+        const categoryOffset = (bandwidth - barCategorySize) / 2;
+        const x = horizontal ? Math.min(zero, scaled) : categoryPosition + categoryOffset;
+        const y = horizontal ? categoryPosition + categoryOffset : Math.min(zero, scaled);
+        const width = horizontal ? Math.max(Math.abs(scaled - zero), minBarSize) : barCategorySize;
+        const height = horizontal ? barCategorySize : Math.max(Math.abs(scaled - zero), minBarSize);
+        const key = barKey(seriesId, category);
+        const barFill = resolveBarFill(
+          { key: dataKey, id, color, fill },
+          {
+            datum,
+            index,
+            value: raw,
+            valueStart: 0,
+            valueEnd: raw,
+            seriesId,
+            seriesIndex: 0,
+            orientation: horizontal ? "horizontal" : "vertical",
+            stacked: false,
+            active: false,
+          },
+        );
 
         return (
           <path
             key={key}
             d={roundedRectPath(x, y, width, height, radius)}
-            fill={color}
+            fill={barFill}
             data-kamod-chart-bar=""
             data-kamod-chart-key={key}
             onClick={onBarClick ? () => onBarClick(datum, index, raw) : undefined}

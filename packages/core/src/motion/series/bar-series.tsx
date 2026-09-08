@@ -1,5 +1,7 @@
 import { useMemo } from "preact/hooks";
 import { barKey, type ChartAnimate } from "../../animation";
+import { resolveBarFill } from "../../charts/bar-fill";
+import { resolveMaxBarCategorySize } from "../../charts/bar-geometry";
 import { roundedRectPath } from "../../charts/bar-path";
 import { normalizeAccessor, useChartContext } from "../../core";
 import {
@@ -27,7 +29,7 @@ interface MotionBar {
   baselineX: number;
   baselineY: number;
   radius: number;
-  color: string;
+  fill: string;
   datum: unknown;
   index: number;
   value: number;
@@ -60,8 +62,10 @@ const AnimatedBarSeries = <TDatum,>({
   yDomain,
   id,
   color = "var(--chart-1)",
+  fill,
   radius = 0,
   minBarSize = 0,
+  maxBarSize,
   horizontal = false,
   class: className,
   onBarClick,
@@ -106,10 +110,27 @@ const AnimatedBarSeries = <TDatum,>({
 
     const scaled = valueScale(raw);
     const bandwidth = categoryScale.bandwidth();
-    const x = horizontal ? Math.min(zero, scaled) : categoryPosition;
-    const y = horizontal ? categoryPosition : Math.min(zero, scaled);
-    const width = horizontal ? Math.max(Math.abs(scaled - zero), minBarSize) : bandwidth;
-    const height = horizontal ? bandwidth : Math.max(Math.abs(scaled - zero), minBarSize);
+    const barCategorySize = resolveMaxBarCategorySize(bandwidth, maxBarSize);
+    const categoryOffset = (bandwidth - barCategorySize) / 2;
+    const x = horizontal ? Math.min(zero, scaled) : categoryPosition + categoryOffset;
+    const y = horizontal ? categoryPosition + categoryOffset : Math.min(zero, scaled);
+    const width = horizontal ? Math.max(Math.abs(scaled - zero), minBarSize) : barCategorySize;
+    const height = horizontal ? barCategorySize : Math.max(Math.abs(scaled - zero), minBarSize);
+    const barFill = resolveBarFill(
+      { key: dataKey, id, color, fill },
+      {
+        datum,
+        index,
+        value: raw,
+        valueStart: 0,
+        valueEnd: raw,
+        seriesId,
+        seriesIndex: 0,
+        orientation: horizontal ? "horizontal" : "vertical",
+        stacked: false,
+        active: false,
+      },
+    );
     bars.push({
       key: barKey(seriesId, category),
       x,
@@ -119,7 +140,7 @@ const AnimatedBarSeries = <TDatum,>({
       baselineX: horizontal ? zero : x,
       baselineY: horizontal ? y : zero,
       radius,
-      color,
+      fill: barFill,
       datum,
       index,
       value: raw,
@@ -159,7 +180,7 @@ const AnimatedBarSeries = <TDatum,>({
         <path
           key={bar.key}
           d={roundedRectPath(bar.x, bar.y, bar.width, bar.height, bar.radius)}
-          fill={bar.color}
+          fill={bar.fill}
           data-kamod-chart-bar=""
           data-kamod-chart-key={bar.key}
           data-kamod-chart-phase={bar.phase}
