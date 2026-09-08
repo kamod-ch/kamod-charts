@@ -117,7 +117,7 @@
     "d3-time-format": "^4.1.0"
   },
   "devDependencies": {
-    "@kamod-ch/motion": "file:../../../kamod-motion/packages/core",
+    "@kamod-ch/motion": "^0.1.0",
     "@testing-library/dom": "^8.20.1",
     "@testing-library/preact": "^3.2.4",
     "@types/d3-array": "^3.2.2",

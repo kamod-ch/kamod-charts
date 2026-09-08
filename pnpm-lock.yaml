@@ -43,8 +43,8 @@ importers:
         version: 4.1.0
     devDependencies:
       '@kamod-ch/motion':
-        specifier: file:../../../kamod-motion/packages/core
-        version: file:../kamod-motion/packages/core(motion@13.1.1)(preact@10.29.8)
+        specifier: ^0.1.0
+        version: 0.1.0(motion@13.1.1)(preact@10.29.8)
       '@testing-library/dom':
         specifier: ^8.20.1
         version: 8.20.1
@@ -100,8 +100,8 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3(preact@10.29.8)
       '@kamod-ch/motion':
-        specifier: file:../../../kamod-motion/packages/core
-        version: file:../kamod-motion/packages/core(motion@13.1.1)(preact@10.29.8)
+        specifier: ^0.1.0
+        version: 0.1.0(motion@13.1.1)(preact@10.29.8)
       '@kamod-ch/themes':
         specifier: ^0.2.1
         version: 0.2.1(@preact/signals@2.11.0(preact@10.29.8))(preact@10.29.8)
@@ -501,8 +501,8 @@ packages:
     peerDependencies:
       preact: '>=10'
 
-  '@kamod-ch/motion@file:../kamod-motion/packages/core':
-    resolution: {directory: ../kamod-motion/packages/core, type: directory}
+  '@kamod-ch/motion@0.1.0':
+    resolution: {integrity: sha512-2JL+SIjrW0pncJ7wwFTY+w84hBEvJSAry0LgSCnjtdAfx/p8EefFpNpmgWizkTaRRc0EhnCfUaDHUL2Sy6YPHQ==}
     engines: {node: '>=20'}
     peerDependencies:
       motion: ^13.1.1
@@ -3570,7 +3570,7 @@ snapshots:
     dependencies:
       preact: 10.29.8(preact-render-to-string@6.7.0)
 
-  '@kamod-ch/motion@file:../kamod-motion/packages/core(motion@13.1.1)(preact@10.29.8)':
+  '@kamod-ch/motion@0.1.0(motion@13.1.1)(preact@10.29.8)':
     dependencies:
       motion: 13.1.1
       preact: 10.29.8(preact-render-to-string@6.7.0)
