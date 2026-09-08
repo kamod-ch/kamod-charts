@@ -96,3 +96,10 @@ export const chartColors = {
   tertiary: "var(--chart-3)",
   quaternary: "var(--chart-4)",
 } as const;
+
+/** Extended monthly rows used for forecast-style area examples. */
+export const projectedRevenueMetrics: MonthlyMetric[] = [
+  ...halfYearMetrics,
+  { month: "Jul", date: month(2024, 6), revenue: 50_500, customers: 1_850, costs: 20_100 },
+  { month: "Aug", date: month(2024, 7), revenue: 53_800, customers: 1_920, costs: 20_600 },
+];

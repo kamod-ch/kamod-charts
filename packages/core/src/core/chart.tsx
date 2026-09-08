@@ -92,6 +92,21 @@ export const ChartRoot = <TDatum,>({
             >
               <g data-kamod-chart-plot="" transform={`translate(${plotArea.x} ${plotArea.y})`}>
                 {context.isEmpty ? emptyState : children}
+                {!context.isEmpty && onPointerMove ? (
+                  <rect
+                    data-kamod-chart-plot-capture=""
+                    x={0}
+                    y={0}
+                    width={plotArea.width}
+                    height={plotArea.height}
+                    fill="transparent"
+                    aria-hidden="true"
+                    onPointerMove={onPointerMove as JSX.PointerEventHandler<SVGRectElement>}
+                    onPointerLeave={
+                      onPointerLeave as JSX.PointerEventHandler<SVGRectElement> | undefined
+                    }
+                  />
+                ) : null}
               </g>
             </ChartSurface>
             {overlay}

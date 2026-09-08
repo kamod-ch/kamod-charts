@@ -1,5 +1,6 @@
 export { inferCombinedNumericDomain } from "./cartesian";
 export type { CartesianPoint, CartesianScaleOptions } from "./cartesian";
+export type { AreaFill, AreaGradientDirection, AreaGradientFill } from "./area-fill";
 export { AreaSeries } from "./area-series";
 export type { AreaSeriesProps } from "./area-series";
 export { BarSeries } from "./bar-series";

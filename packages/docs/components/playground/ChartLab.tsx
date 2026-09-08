@@ -34,7 +34,8 @@ import {
 import type { ChartKind } from "../../data/gallery";
 import { CodePreview } from "../shared/CodePreview";
 
-type CurveOption = "linear" | "monotoneX" | "basis";
+type CurveOption = "linear" | "monotoneX" | "basis" | "step" | "stepBefore" | "stepAfter";
+type AreaFillOption = "solid" | "gradient";
 
 type PlaygroundState = {
   chart: ChartKind;
@@ -46,6 +47,7 @@ type PlaygroundState = {
   stacked: boolean;
   curve: CurveOption;
   showPoints: "auto" | "true" | "false";
+  areaFill: AreaFillOption;
   height: number;
   innerRadius: number;
 };
@@ -60,6 +62,7 @@ const defaults: PlaygroundState = {
   stacked: false,
   curve: "monotoneX",
   showPoints: "auto",
+  areaFill: "solid",
   height: 320,
   innerRadius: 56,
 };
@@ -115,6 +118,8 @@ function generateCode(state: PlaygroundState): string {
         ? `  curve="${state.curve}"
   stacked={${state.stacked}}
   outline
+  fill={${state.areaFill === "gradient" ? '{ type: "gradient" }' : '"solid"'}}
+  showPoints={${JSON.stringify(showPointsValue(state.showPoints))}}
 `
         : state.chart === "bar"
           ? `  stacked={${state.stacked}}
@@ -201,6 +206,8 @@ export function ChartLab(): JSX.Element {
             curve={state.curve}
             stacked={state.stacked}
             outline
+            fill={state.areaFill === "gradient" ? { type: "gradient" } : "solid"}
+            showPoints={showPointsValue(state.showPoints)}
             description="Interactive area chart playground."
           />
         );
@@ -325,6 +332,46 @@ export function ChartLab(): JSX.Element {
               <SelectItem value="linear">linear</SelectItem>
               <SelectItem value="monotoneX">monotoneX</SelectItem>
               <SelectItem value="basis">basis</SelectItem>
+              <SelectItem value="step">step</SelectItem>
+              <SelectItem value="stepBefore">stepBefore</SelectItem>
+              <SelectItem value="stepAfter">stepAfter</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {(state.chart === "line" || state.chart === "area") && (
+        <div class="space-y-2">
+          <Label for="points-select">Show points</Label>
+          <Select
+            value={state.showPoints}
+            onValueChange={(value) => patch({ showPoints: value as PlaygroundState["showPoints"] })}
+          >
+            <SelectTrigger id="points-select" class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="auto">Auto</SelectItem>
+              <SelectItem value="true">Always</SelectItem>
+              <SelectItem value="false">Never</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {state.chart === "area" && (
+        <div class="space-y-2">
+          <Label for="area-fill-select">Fill</Label>
+          <Select
+            value={state.areaFill}
+            onValueChange={(value) => patch({ areaFill: value as AreaFillOption })}
+          >
+            <SelectTrigger id="area-fill-select" class="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="solid">Solid</SelectItem>
+              <SelectItem value="gradient">Gradient</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -339,24 +386,6 @@ export function ChartLab(): JSX.Element {
               checked={state.connectNulls}
               onCheckedChange={(checked) => patch({ connectNulls: Boolean(checked) })}
             />
-          </div>
-          <div class="space-y-2">
-            <Label for="points-select">Show points</Label>
-            <Select
-              value={state.showPoints}
-              onValueChange={(value) =>
-                patch({ showPoints: value as PlaygroundState["showPoints"] })
-              }
-            >
-              <SelectTrigger id="points-select" class="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="auto">Auto</SelectItem>
-                <SelectItem value="true">Always</SelectItem>
-                <SelectItem value="false">Never</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </>
       )}

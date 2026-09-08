@@ -2,13 +2,13 @@ import { useMemo, useState } from "preact/hooks";
 import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
 import { Chart } from "../core";
-import { createChartKeyboardHandler, getPointerPosition } from "../interaction";
+import { createChartKeyboardHandler } from "../interaction";
 import { Grid, Legend, ReferenceLine } from "../primitives";
 import { inferCombinedNumericDomain, LineSeries as StaticLineSeries } from "../series";
 import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
-import { findNearestCartesianIndexByX, resolvePlotAreaFromSize } from "./cartesian-interaction";
 import { isTooltipEnabled } from "./tooltip-options";
 import type { LineChartProps } from "./types";
+import { useCartesianPointerState } from "./use-cartesian-pointer-state";
 
 export const LineChart = <TDatum,>({
   data,
@@ -37,7 +37,6 @@ export const LineChart = <TDatum,>({
   const visibleSeries = series.filter(
     (entry) => !entry.hidden && !hiddenSeries.includes(entry.id ?? String(entry.key)),
   );
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
   const yDomain = useMemo(
     () =>
@@ -52,6 +51,21 @@ export const LineChart = <TDatum,>({
   const activeSeries = visibleSeries[resolvedSeriesIndex];
   const tooltipEnabled = isTooltipEnabled(tooltip);
   const fallbackWidth = width ?? initialWidth ?? 640;
+  const chartHeight = height ?? 320;
+  const {
+    activeIndex,
+    setActiveIndex,
+    pointerPlot,
+    onPointerMove,
+    onPointerLeave,
+    resetPointerPlot,
+  } = useCartesianPointerState({
+    data,
+    xKey,
+    xScale,
+    fallbackWidth,
+    height: chartHeight,
+  });
 
   return (
     <Chart
@@ -67,38 +81,22 @@ export const LineChart = <TDatum,>({
       id={id}
       tabIndex={0}
       style={tooltipEnabled ? { cursor: "crosshair" } : undefined}
-      onPointerMove={
-        tooltipEnabled
-          ? (event) => {
-              const size = {
-                width: event.currentTarget.viewBox.baseVal.width || fallbackWidth,
-                height: event.currentTarget.viewBox.baseVal.height || height,
-              };
-              const nextPlot = resolvePlotAreaFromSize(size.width, size.height);
-              const position = getPointerPosition(event, nextPlot);
-              setActiveIndex(
-                findNearestCartesianIndexByX({
-                  data,
-                  xKey,
-                  xScale,
-                  plotWidth: nextPlot.width,
-                  plotX: position.plotX,
-                }),
-              );
-            }
-          : undefined
-      }
-      onPointerLeave={tooltipEnabled ? () => setActiveIndex(null) : undefined}
+      onPointerMove={tooltipEnabled ? onPointerMove : undefined}
+      onPointerLeave={tooltipEnabled ? onPointerLeave : undefined}
       onKeyDown={createChartKeyboardHandler({
         pointCount: data.length,
         seriesCount: Math.max(visibleSeries.length, 1),
         activeIndex: activeIndex ?? 0,
         activeSeriesIndex: resolvedSeriesIndex,
         onChange: (state) => {
+          resetPointerPlot();
           setActiveIndex(state.activeIndex);
           setActiveSeriesIndex(state.activeSeriesIndex);
         },
-        onEscape: () => setActiveIndex(null),
+        onEscape: () => {
+          resetPointerPlot();
+          setActiveIndex(null);
+        },
       })}
       overlay={
         <>
@@ -128,6 +126,7 @@ export const LineChart = <TDatum,>({
             yDomain={yDomain}
             tooltip={tooltip}
             defaultMode="axis"
+            pointerPlot={pointerPlot}
           />
         </>
       }
@@ -142,6 +141,7 @@ export const LineChart = <TDatum,>({
         yDomain={yDomain}
         tooltip={tooltip}
         defaultMode="axis"
+        pointerPlot={pointerPlot}
       />
       <XAxis dataKey={xKey} scale={xScale} />
       <YAxis domain={yDomain} />

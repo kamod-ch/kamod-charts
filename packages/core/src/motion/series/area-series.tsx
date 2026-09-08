@@ -2,6 +2,15 @@ import { useMemo } from "preact/hooks";
 import { pointKey, uniquifyKeys, type ChartAnimate } from "../../animation";
 import { useChartContext } from "../../core";
 import { AreaSeries, type AreaSeriesProps } from "../../series/area-series";
+import { isAreaGradientFill } from "../../series/area-fill";
+import {
+  AreaGradientDef,
+  AreaPointMarkers,
+  createAreaGradientId,
+  resolveAreaPathFill,
+  resolveAreaStrokeStyle,
+  shouldShowAreaPoints,
+} from "../../series/area-style";
 import {
   getCartesianPoints,
   useCartesianScales,
@@ -42,16 +51,23 @@ const AnimatedAreaSeries = <TDatum,>({
   id,
   color = "var(--chart-1)",
   opacity = 0.2,
+  fill = "solid",
   curve = "linear",
   outline = false,
+  strokeWidth,
+  strokeDasharray,
+  showPoints = false,
+  pointRadius = 2.5,
+  activeIndex = null,
   class: className,
   animate,
 }: MotionAreaSeriesProps<TDatum>) => {
   const resolved = useResolvedAnimate(animate);
   const suppressed = useMotionSuppressed(resolved);
-  const { data, plotArea, xKey: contextXKey } = useChartContext<TDatum>();
+  const { data, plotArea, xKey: contextXKey, ids } = useChartContext<TDatum>();
   const resolvedXKey = xKey ?? contextXKey;
   const seriesId = id ?? "series";
+  const gradientId = createAreaGradientId(ids.root, seriesId);
   const scales = useCartesianScales({
     xKey: resolvedXKey,
     yKey: dataKey,
@@ -93,6 +109,16 @@ const AnimatedAreaSeries = <TDatum,>({
     easing: resolved.easing,
     path,
   });
+  const pathFill = resolveAreaPathFill(fill, color, opacity, gradientId);
+  const strokeStyle = resolveAreaStrokeStyle(outline, color, strokeWidth, strokeDasharray);
+  const markerPoints = displayed.flatMap((point) => {
+    if (!point.defined || point.x == null || point.y == null) {
+      return [];
+    }
+
+    return [{ key: point.key, index: point.index, x: point.x, y: point.y }];
+  });
+  const renderPoints = shouldShowAreaPoints(showPoints, points.length);
 
   return (
     <g
@@ -101,13 +127,28 @@ const AnimatedAreaSeries = <TDatum,>({
       data-kamod-chart-series-id={id}
       data-kamod-chart-motion=""
     >
+      {isAreaGradientFill(fill) ? (
+        <defs>
+          <AreaGradientDef id={gradientId} color={color} fill={fill} opacity={opacity} />
+        </defs>
+      ) : null}
       <path
         ref={pathRef}
         d={path}
-        fill={color}
-        fill-opacity={opacity}
-        stroke={outline ? color : "none"}
+        fill={pathFill.fill}
+        fill-opacity={pathFill.fillOpacity}
+        stroke={strokeStyle.stroke}
+        stroke-width={strokeStyle.strokeWidth}
+        stroke-dasharray={strokeStyle.strokeDasharray}
       />
+      {renderPoints ? (
+        <AreaPointMarkers
+          points={markerPoints}
+          color={color}
+          pointRadius={pointRadius}
+          activeIndex={activeIndex}
+        />
+      ) : null}
     </g>
   );
 };

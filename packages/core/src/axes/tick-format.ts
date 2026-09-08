@@ -12,6 +12,19 @@ export interface TickFormatOptions<TValue extends TickValue = TickValue> {
   formatSpecifier?: string;
 }
 
+/** SI-style compact labels (e.g. 52k) when magnitudes exceed typical left-margin width. */
+export const inferNumericTickFormatSpecifier = (
+  domain: readonly [number, number],
+): string | undefined => {
+  const span = Math.max(
+    Math.abs(domain[0]),
+    Math.abs(domain[1]),
+    Math.abs(domain[1] - domain[0]),
+  );
+
+  return span >= 1_000 ? "~s" : undefined;
+};
+
 export const formatTick = <TValue extends TickValue>(
   value: TValue,
   index: number,

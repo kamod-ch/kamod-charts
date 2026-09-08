@@ -1,7 +1,13 @@
+import { useMemo } from "preact/hooks";
 import { useChartContext, type DataAccessor } from "../core";
 import type { DomainPadding, ScaleKind } from "../scales";
 import { useAxisScale } from "./axis-scale";
-import { formatTick, type TickFormatter, type TickValue } from "./tick-format";
+import {
+  formatTick,
+  inferNumericTickFormatSpecifier,
+  type TickFormatter,
+  type TickValue,
+} from "./tick-format";
 import { getScalePosition, getTicks } from "./ticks";
 
 export interface YAxisProps<TDatum> {
@@ -40,6 +46,26 @@ export const YAxis = <TDatum,>({
     orientation: "y",
   });
   const ticks = getTicks(axisScale, tickCount);
+  const resolvedFormatSpecifier = useMemo(() => {
+    if (formatSpecifier || tickFormatter) {
+      return formatSpecifier;
+    }
+
+    if (scale === "band" || scale === "point") {
+      return formatSpecifier;
+    }
+
+    const scaleDomain = "domain" in axisScale ? axisScale.domain() : [];
+    if (
+      scaleDomain.length >= 2 &&
+      typeof scaleDomain[0] === "number" &&
+      typeof scaleDomain[1] === "number"
+    ) {
+      return inferNumericTickFormatSpecifier([scaleDomain[0], scaleDomain[1]]);
+    }
+
+    return formatSpecifier;
+  }, [axisScale, formatSpecifier, scale, tickFormatter]);
 
   return (
     <g class={className} data-kamod-chart-y-axis="">
@@ -52,7 +78,7 @@ export const YAxis = <TDatum,>({
 
         const labelText = formatTick(tick as TickValue, index, {
           formatter: tickFormatter,
-          formatSpecifier,
+          formatSpecifier: resolvedFormatSpecifier,
         });
 
         return (

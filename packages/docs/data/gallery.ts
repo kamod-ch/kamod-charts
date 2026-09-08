@@ -28,10 +28,10 @@ export const galleryExamples: GalleryExample[] = [
   },
   {
     id: "area-basic",
-    title: "Usage area",
-    description: "Filled area showing growth over months.",
+    title: "Smooth revenue area",
+    description: "Filled area with monotoneX smoothing.",
     kind: "area",
-    href: "/charts/area#basic",
+    href: "/charts/area#basic-smooth",
     tags: ["basic"],
   },
   {
@@ -40,7 +40,23 @@ export const galleryExamples: GalleryExample[] = [
     description: "Stacked areas for revenue and costs.",
     kind: "area",
     href: "/charts/area#stacked",
-    tags: ["series"],
+    tags: ["series", "tooltip"],
+  },
+  {
+    id: "area-gradient",
+    title: "Gradient fill",
+    description: "Theme-aware vertical gradient fade.",
+    kind: "area",
+    href: "/charts/area#gradient-fill",
+    tags: ["colors"],
+  },
+  {
+    id: "area-markers",
+    title: "Point markers",
+    description: "Area series with showPoints enabled.",
+    kind: "area",
+    href: "/charts/area#markers-on",
+    tags: ["tooltip"],
   },
   {
     id: "bar-basic",

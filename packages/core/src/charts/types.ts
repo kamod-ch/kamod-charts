@@ -2,7 +2,7 @@ import type { ComponentChildren } from "preact";
 import type { ChartAnimate } from "../animation";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import type { TooltipPlacement } from "../primitives/tooltip-placement";
-import type { LineCurve } from "../series";
+import type { LineCurve, AreaFill } from "../series";
 
 export interface CartesianSeriesConfig<TDatum> {
   key: DataAccessor<TDatum, number | null | undefined>;
@@ -88,7 +88,12 @@ export interface AreaChartProps<TDatum> extends CommonCartesianChartProps<TDatum
   stacked?: boolean;
   baseline?: number;
   opacity?: number;
+  fill?: AreaFill;
   outline?: boolean;
+  strokeWidth?: number;
+  strokeDasharray?: string;
+  showPoints?: boolean | "auto";
+  pointRadius?: number;
   curve?: LineCurve;
   referenceLines?: readonly CartesianReferenceLine<TDatum>[];
 }

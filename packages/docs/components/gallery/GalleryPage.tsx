@@ -106,7 +106,38 @@ function GalleryPreview({ id }: { id: string }): JSX.Element {
           showGrid
           stacked
           outline
+          tooltip
           title="Stacked costs"
+        />
+      );
+    case "area-gradient":
+      return (
+        <AreaChart
+          data={monthlyMetrics.slice(0, 8)}
+          xKey="month"
+          xScale="point"
+          series={[{ key: "revenue", label: "Revenue", color: chartColors.primary }]}
+          height={180}
+          initialWidth={420}
+          responsive
+          fill={{ type: "gradient", fromOpacity: 0.4, toOpacity: 0 }}
+          title="Gradient fill"
+        />
+      );
+    case "area-markers":
+      return (
+        <AreaChart
+          data={halfYearMetrics}
+          xKey="month"
+          xScale="point"
+          series={[{ key: "revenue", label: "Revenue", color: chartColors.primary }]}
+          height={180}
+          initialWidth={420}
+          responsive
+          showPoints
+          outline
+          tooltip
+          title="Markers on"
         />
       );
     case "bar-basic":

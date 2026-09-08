@@ -123,7 +123,6 @@ export default defineConfig({
   },
   themeConfig: {
     outline: true,
-    search: true,
     lastUpdated: true,
     footer: "Released under the MIT License.\n\nCopyright © 2026 Klaus Zahiragic - www.kamod.ch",
     editLink: {

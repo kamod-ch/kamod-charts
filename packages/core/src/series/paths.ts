@@ -1,30 +1,44 @@
-import { area, curveBasis, curveLinear, curveMonotoneX, line, type CurveFactory } from "d3-shape";
+import {
+  area,
+  curveBasis,
+  curveLinear,
+  curveMonotoneX,
+  curveStep,
+  curveStepAfter,
+  curveStepBefore,
+  line,
+  type CurveFactory,
+} from "d3-shape";
 import type { CartesianPoint } from "./cartesian";
 
-export type LineCurve = "linear" | "monotoneX" | "basis" | CurveFactory;
+export type LineCurve =
+  | "linear"
+  | "monotoneX"
+  | "basis"
+  | "step"
+  | "stepBefore"
+  | "stepAfter"
+  | CurveFactory;
 
-export const resolveLineCurve = (curve: LineCurve = "linear"): CurveFactory => {
+export const resolveCurve = (curve: LineCurve = "linear"): CurveFactory => {
   if (typeof curve === "function") {
     return curve;
   }
 
-  if (curve === "monotoneX") {
-    return curveMonotoneX;
+  switch (curve) {
+    case "monotoneX":
+      return curveMonotoneX;
+    case "basis":
+      return curveBasis;
+    case "step":
+      return curveStep;
+    case "stepBefore":
+      return curveStepBefore;
+    case "stepAfter":
+      return curveStepAfter;
+    default:
+      return curveLinear;
   }
-
-  if (curve === "basis") {
-    return curveBasis;
-  }
-
-  return curveLinear;
-};
-
-export const resolveAreaCurve = (curve: LineCurve = "linear"): CurveFactory => {
-  if (typeof curve === "function") {
-    return curve;
-  }
-
-  return curve === "monotoneX" ? curveMonotoneX : curveLinear;
 };
 
 export const buildLinePath = <TDatum>(
@@ -36,7 +50,7 @@ export const buildLinePath = <TDatum>(
     .defined((point) => connectNulls || point.defined)
     .x((point) => point.x ?? 0)
     .y((point) => point.y ?? 0)
-    .curve(resolveLineCurve(curve));
+    .curve(resolveCurve(curve));
 
   return generator(points as (typeof points)[number][]) ?? "";
 };
@@ -51,7 +65,7 @@ export const buildAreaPath = <TDatum>(
     .x((point) => point.x ?? 0)
     .y0(baselineY)
     .y1((point) => point.y ?? baselineY)
-    .curve(resolveAreaCurve(curve));
+    .curve(resolveCurve(curve));
 
   return generator(points as (typeof points)[number][]) ?? "";
 };

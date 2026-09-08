@@ -4,7 +4,7 @@ export const defaultChartMargin: ChartMargin = {
   top: 16,
   right: 16,
   bottom: 32,
-  left: 40,
+  left: 48,
 };
 
 export const normalizeMargin = (margin?: Partial<ChartMargin>): ChartMargin => ({

@@ -192,6 +192,33 @@ describe("AreaChart and BarChart", () => {
     );
   });
 
+  it("formats large Y-axis values compactly to avoid label clipping", () => {
+    const largeData: Datum[] = [
+      { month: "Jan", revenue: 28_400, costs: 14_200, losses: 0 },
+      { month: "Feb", revenue: 31_200, costs: 15_100, losses: 0 },
+      { month: "Mar", revenue: 36_800, costs: 16_400, losses: 0 },
+    ];
+    const { container } = render(
+      <AreaChart
+        data={largeData}
+        xKey="month"
+        xScale="point"
+        series={[{ key: "revenue", label: "Revenue" }]}
+        width={CHART_WIDTH}
+        height={CHART_HEIGHT}
+        showGrid
+      />,
+    );
+
+    const yLabels = getAxisTicks(container, "y")
+      .map((tick) => tick.label)
+      .filter(Boolean);
+
+    expect(yLabels.length).toBeGreaterThan(1);
+    expect(yLabels.some((label) => /k$/.test(label) || label === "0")).toBe(true);
+    expect(yLabels.every((label) => !/^0+$/.test(label) || label === "0")).toBe(true);
+  });
+
   it("aligns horizontal numeric reference lines with the value axis", () => {
     const plot = resolvePlotAreaFromSize(CHART_WIDTH, CHART_HEIGHT);
     const threshold = 12;

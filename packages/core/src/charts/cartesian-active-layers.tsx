@@ -7,6 +7,7 @@ import type { NumericDomain } from "../scales";
 import { resolveCartesianActivePoint, type CartesianActivePoint } from "./cartesian-interaction";
 import { getSeriesId } from "./series-identity";
 import { resolveTooltipOptions } from "./tooltip-options";
+import type { CartesianPointerPlot } from "./use-cartesian-pointer-state";
 import type {
   CartesianTooltipContext,
   CartesianTooltipMode,
@@ -25,7 +26,10 @@ type ActiveLayersProps<TDatum> = {
   tooltip?: boolean | CartesianTooltipOptions<TDatum>;
   defaultMode: CartesianTooltipMode;
   activePoint?: CartesianActivePoint | null;
+  pointerPlot?: CartesianPointerPlot | null;
 };
+
+const clampPlotCoord = (value: number, max: number): number => Math.min(Math.max(value, 0), max);
 
 const tooltipNumberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
 const tooltipDateFormatter = new Intl.DateTimeFormat(undefined, {
@@ -93,12 +97,17 @@ const useActiveInteraction = <TDatum,>({
   xScale,
   yDomain,
   activePoint: activePointOverride,
+  pointerPlot,
+  tooltip,
+  defaultMode,
 }: ActiveLayersProps<TDatum>): {
   interaction: ChartInteraction<TDatum> | null;
   plotInteraction: ChartInteraction<TDatum> | null;
   context: CartesianTooltipContext<TDatum> | null;
 } => {
   const { data, plotArea } = useChartContext<TDatum>();
+  const tooltipMode = resolveTooltipOptions(tooltip, defaultMode)?.mode ?? defaultMode;
+  const useSmoothPointer = pointerPlot != null && tooltipMode === "axis";
   const activeDatum = activeIndex == null ? undefined : data[activeIndex];
   const activeValue =
     activeDatum && activeSeries && activeIndex != null
@@ -146,19 +155,28 @@ const useActiveInteraction = <TDatum,>({
   }
 
   const seriesId = getSeriesId(activeSeries, Math.max(visibleSeries.indexOf(activeSeries), 0));
+  const plotX = useSmoothPointer
+    ? clampPlotCoord(pointerPlot.plotX, plotArea.width)
+    : activePoint.plotX;
+  const plotY = useSmoothPointer
+    ? clampPlotCoord(pointerPlot.plotY, plotArea.height)
+    : activePoint.plotY;
+  const surfaceX = useSmoothPointer ? plotArea.x + plotX : activePoint.surfaceX;
+  const surfaceY = useSmoothPointer ? plotArea.y + plotY : activePoint.surfaceY;
+
   const interaction: ChartInteraction<TDatum> = {
     datum: activeDatum,
     seriesId,
     label: activeSeries.label,
     index: activeIndex,
     value: typeof activeValue === "number" ? activeValue : null,
-    x: activePoint.surfaceX,
-    y: activePoint.surfaceY,
+    x: surfaceX,
+    y: surfaceY,
   };
 
   return {
     interaction,
-    plotInteraction: { ...interaction, x: activePoint.plotX, y: activePoint.plotY },
+    plotInteraction: { ...interaction, x: plotX, y: plotY },
     context: {
       datum: activeDatum,
       index: activeIndex,
@@ -167,8 +185,8 @@ const useActiveInteraction = <TDatum,>({
       seriesId,
       seriesLabel: activeSeries.label,
       seriesValues,
-      x: activePoint.surfaceX,
-      y: activePoint.surfaceY,
+      x: surfaceX,
+      y: surfaceY,
     },
   };
 };

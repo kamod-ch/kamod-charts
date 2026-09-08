@@ -1,10 +1,8 @@
 import type { LayoutProps } from "@kamod-ch/preactpress/client";
-import { ExternalLinkIcon, GithubIcon, MenuIcon, SearchIcon, XIcon } from "@kamod-ch/icons/shadcn";
+import { ExternalLinkIcon, GithubIcon, MenuIcon, XIcon } from "@kamod-ch/icons/shadcn";
 import { syncThemeFromStorage } from "@kamod-ch/themes";
 import {
   Button,
-  Input,
-  Kbd,
   Sheet,
   SheetContent,
   SheetHeader,
@@ -14,7 +12,7 @@ import {
 } from "@kamod-ch/ui";
 import { cn } from "@kamod-ch/ui/lib/utils";
 import type { ComponentChildren, FunctionalComponent, JSX } from "preact";
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { ChartLab } from "../../components/playground/ChartLab";
 import { GalleryPage } from "../../components/gallery/GalleryPage";
 import { BrandLogo } from "../../components/shared/BrandLogo";
@@ -139,7 +137,6 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
   const title = page?.title ? `${page.title} | ${site.title}` : site.title;
   const nav = (themeConfig.nav ?? []) as NavItem[];
   const sidebar = (themeConfig.sidebar ?? []) as SidebarGroup[];
-  const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeHeading, setActiveHeading] = useState<string | undefined>();
 
@@ -149,22 +146,10 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
   const showOutline =
     showDocsChrome && themeConfig.outline !== false && Boolean(page?.headings?.length);
 
-  const visibleSidebar = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return sidebar;
-    return sidebar
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((item) => item.text.toLowerCase().includes(normalized)),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [query, sidebar]);
-
   const MdxComponent = page?.kind === "mdx" ? page.Component : undefined;
   const mdxComponents = createMdxHeadingComponents();
 
   useEffect(() => {
-    setQuery("");
     setMenuOpen(false);
   }, [routePath]);
 
@@ -215,7 +200,6 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
           <a href={withBase(site.base, "/")} class="shrink-0" aria-label={site.title}>
             <BrandLogo label={site.title} base={site.base} />
           </a>
-          <BadgeVersion />
           <nav class="ml-4 hidden items-center gap-1 lg:flex" aria-label="Primary">
             {nav.map((item) => {
               const active = isActive(routePath, item.link);
@@ -238,24 +222,6 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
           </nav>
 
           <div class="ml-auto flex items-center gap-2">
-            {themeConfig.search !== false ? (
-              <div class="relative hidden md:block">
-                <SearchIcon class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={query}
-                  onInput={(event) => setQuery((event.currentTarget as HTMLInputElement).value)}
-                  placeholder="Search documentation..."
-                  aria-label="Search documentation"
-                  class="w-56 pl-9 lg:w-72"
-                />
-                <Kbd class="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2">⌘K</Kbd>
-              </div>
-            ) : null}
-            <Button variant="outline" size="icon" class="hit-target md:hidden" asChild>
-              <a href="#content" aria-label="Search on page">
-                <SearchIcon class="size-4" />
-              </a>
-            </Button>
             <Button variant="outline" size="icon" class="hit-target" asChild>
               <a
                 href="https://github.com/kamod-ch/charts"
@@ -299,7 +265,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
                   </nav>
                   {showDocsChrome ? (
                     <SidebarNav
-                      groups={visibleSidebar}
+                      groups={sidebar}
                       routePath={routePath}
                       base={site.base}
                       onNavigate={() => setMenuOpen(false)}
@@ -322,7 +288,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
       >
         {showDocsChrome ? (
           <aside class="sticky top-[var(--docs-header-height)] hidden h-[calc(100vh-var(--docs-header-height))] overflow-y-auto border-r border-border p-4 lg:block">
-            <SidebarNav groups={visibleSidebar} routePath={routePath} base={site.base} />
+            <SidebarNav groups={sidebar} routePath={routePath} base={site.base} />
           </aside>
         ) : null}
 
@@ -384,13 +350,5 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
     </div>
   );
 };
-
-function BadgeVersion(): JSX.Element {
-  return (
-    <span class="hidden rounded-full border border-border px-2 py-0.5 text-[0.7rem] font-medium text-muted-foreground sm:inline-flex">
-      v0.1 alpha
-    </span>
-  );
-}
 
 export default Layout;

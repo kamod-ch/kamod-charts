@@ -125,19 +125,51 @@ export const areaSpecificProps: PropRow[] = [
     name: "opacity",
     type: "number",
     defaultValue: "0.2",
-    description: "Fill opacity for the area series.",
+    description: "Fill opacity for solid fills and the default gradient fromOpacity.",
+  },
+  {
+    name: "fill",
+    type: '"solid" | AreaGradientFill',
+    defaultValue: '"solid"',
+    description:
+      'Fill style. Use `{ type: "gradient", direction?, fromOpacity?, toOpacity? }` for SVG linear gradients that follow CSS chart tokens in light and dark themes.',
   },
   {
     name: "outline",
     type: "boolean",
     defaultValue: "false",
-    description: "Draw a stroke along the area edge.",
+    description: "Draw a stroke along the area edge. Required for strokeWidth and strokeDasharray.",
+  },
+  {
+    name: "strokeWidth",
+    type: "number",
+    description: "Outline stroke width in pixels. Only applies when outline is true.",
+  },
+  {
+    name: "strokeDasharray",
+    type: "string",
+    description:
+      'SVG dash pattern for the outline, e.g. "6 4". Kamod uses strokeDasharray instead of a dashed boolean.',
   },
   {
     name: "curve",
-    type: '"linear" | "monotoneX" | "basis" | CurveFactory',
+    type: '"linear" | "monotoneX" | "basis" | "step" | "stepBefore" | "stepAfter" | CurveFactory',
     defaultValue: '"linear"',
-    description: "Interpolation used for the area path.",
+    description:
+      "Path interpolation. linear remains the default for predictable dashboards; monotoneX is the smooth curve. stepBefore and stepAfter correspond to step-start and step-end style charts elsewhere.",
+  },
+  {
+    name: "showPoints",
+    type: 'boolean | "auto"',
+    defaultValue: "false",
+    description:
+      "Render point markers on defined values. Kamod uses showPoints instead of a separate markers prop. Markers are visual accents, not individual tab stops.",
+  },
+  {
+    name: "pointRadius",
+    type: "number",
+    defaultValue: "2.5",
+    description: "Marker radius in pixels when showPoints is enabled.",
   },
 ];
 
