@@ -469,45 +469,289 @@ export const pieSpecificProps: PropRow[] = [
   {
     name: "valueKey",
     type: "DataAccessor<TDatum, number | null | undefined>",
-    description: "Numeric value for each slice.",
+    description:
+      "Numeric value for each slice. Only finite values strictly greater than zero render as slices.",
   },
   {
     name: "labelKey",
     type: "DataAccessor<TDatum, string | number | null | undefined>",
-    description: "Label accessor for slices.",
+    description: "Label accessor for slices, legend items, and tooltips.",
   },
   {
     name: "innerRadius",
     type: "number",
     defaultValue: "0",
-    description: "Inner radius for donut charts.",
+    description:
+      "Inner radius in pixels. Values above zero create a donut hole; pair with centerContent for KPI summaries.",
   },
   {
     name: "outerRadius",
     type: "number",
-    description: "Outer radius. Defaults to available plot size.",
+    description:
+      "Outer radius in pixels. Defaults to the available plot size; outside labels auto-shrink the radius to leave gutter space.",
+  },
+  {
+    name: "padAngle",
+    type: "number",
+    description: "Gap between adjacent slices in radians.",
+  },
+  {
+    name: "cornerRadius",
+    type: "number",
+    description: "Rounded outer corners for slice arcs.",
+  },
+  {
+    name: "sort",
+    type: "boolean | PieSortComparator<TDatum>",
+    defaultValue: "false",
+    description:
+      "When true, sorts slices by descending value. Pass a comparator for custom ordering.",
   },
   {
     name: "labels",
-    type: '"none" | "inside" | "outside"',
+    type: "PieLabelPosition | PieLabelOptions<TDatum>",
     defaultValue: '"inside"',
-    description: "Slice label placement.",
+    description:
+      'Shorthand: "none", "inside", or "outside". Outside enables leader lines and defaults collision to shift.',
+  },
+  {
+    name: "rose",
+    type: "boolean | PieRoseOptions",
+    description:
+      "Nightingale layout: equal slice angles with value mapped to radius. Default scale is sqrt when rose is true.",
   },
   {
     name: "colors",
     type: "readonly string[]",
-    description: "Explicit palette for slices.",
+    description: "Explicit palette for slices. Colors stay stable by original data index.",
   },
   {
     name: "centerContent",
     type: "ComponentChildren",
-    description: "Content rendered in the donut hole.",
+    description: "Content rendered in the donut hole when innerRadius is set.",
+  },
+  {
+    name: "emptyContent",
+    type: "ComponentChildren",
+    description:
+      "Fallback when data exists but no slice has a finite value greater than zero, or when every slice is hidden via legend.",
+  },
+  {
+    name: "activeOffset",
+    type: "number",
+    defaultValue: "6",
+    description:
+      "Pixel expansion applied to the active slice outer radius on pointer or keyboard focus.",
+  },
+  {
+    name: "tooltip",
+    type: "boolean | PieTooltipOptions<TDatum>",
+    defaultValue: "false",
+    description:
+      "Pointer and keyboard tooltips for the active slice. true uses default value and percentage formatting.",
+  },
+  {
+    name: "showLegend",
+    type: "boolean",
+    defaultValue: "false",
+    description:
+      "Render an HTML legend with per-slice visibility toggles keyed by stable slice keys.",
+  },
+  {
+    name: "legend",
+    type: "PieLegendOptions",
+    description: "Legend behavior. interactive defaults to true for segment toggling.",
+  },
+  {
+    name: "onSegmentClick",
+    type: "(datum, index, value) => void",
+    description: "Called when a slice is activated with pointer click or keyboard Enter/Space.",
   },
   {
     name: "animate",
     type: "boolean | ChartAnimateOptions",
     description:
       "Optional data animation. No-op on the static pie entry unless MotionConfig is present.",
+  },
+];
+
+export const pieSliceContextProps: PropRow[] = [
+  {
+    name: "datum",
+    type: "TDatum",
+    description: "Original data row for the slice.",
+  },
+  {
+    name: "index",
+    type: "number",
+    description: "Row index in the source data array.",
+  },
+  {
+    name: "key",
+    type: "string",
+    description: "Stable identifier used for legend toggles and React/Preact keys.",
+  },
+  {
+    name: "label",
+    type: "string",
+    description: "Resolved display label for the slice.",
+  },
+  {
+    name: "value",
+    type: "number",
+    description: "Normalized slice value (finite and greater than zero).",
+  },
+  {
+    name: "total",
+    type: "number",
+    description: "Sum of visible slice values; used for percentage calculation.",
+  },
+  {
+    name: "percentage",
+    type: "number",
+    description: "Slice value as a percentage of total visible slices (0–100).",
+  },
+  {
+    name: "color",
+    type: "string",
+    description: "Resolved fill color for the slice.",
+  },
+  {
+    name: "startAngle / endAngle",
+    type: "number",
+    description: "Slice arc bounds in radians.",
+  },
+  {
+    name: "innerRadius / outerRadius",
+    type: "number",
+    description: "Resolved radii for the slice, including activeOffset when active.",
+  },
+  {
+    name: "active",
+    type: "boolean",
+    description: "True when the slice is keyboard- or pointer-selected.",
+  },
+];
+
+export const pieTooltipOptionsProps: PropRow[] = [
+  {
+    name: "placement",
+    type: "TooltipPlacement",
+    description: "Tooltip placement relative to the slice anchor.",
+  },
+  {
+    name: "offset",
+    type: "number",
+    description: "Pixel gap between the anchor and tooltip content.",
+  },
+  {
+    name: "render",
+    type: "(context: PieSliceContext<TDatum>) => ComponentChildren",
+    description: "Fully custom tooltip body. Receives the active slice context.",
+  },
+  {
+    name: "formatValue",
+    type: "(value, context) => ComponentChildren | null | undefined",
+    description: "Format the numeric value. Return null to fall back to the default string.",
+  },
+  {
+    name: "formatPercentage",
+    type: "(percentage, context) => ComponentChildren | null | undefined",
+    description:
+      "Format the percentage (0–100). Return null to fall back to one decimal place with a percent sign.",
+  },
+];
+
+export const pieLabelOptionsProps: PropRow[] = [
+  {
+    name: "position",
+    type: '"none" | "inside" | "outside"',
+    defaultValue: '"inside"',
+    description: "Label placement. outside draws leader lines to gutter labels.",
+  },
+  {
+    name: "render",
+    type: "(context: PieSliceContext<TDatum>) => ComponentChildren | null | undefined",
+    description: "Custom label content per slice.",
+  },
+  {
+    name: "minAngle",
+    type: "number",
+    description: "Minimum slice span in degrees required to show a label and leader line.",
+  },
+  {
+    name: "collision",
+    type: '"none" | "shift" | "hide"',
+    description: "Outside-label overlap strategy. Defaults to shift for outside placement.",
+  },
+  {
+    name: "line",
+    type: "PieLabelLineOptions",
+    description: "Leader line geometry and styling for outside labels.",
+  },
+  {
+    name: "offset",
+    type: "number",
+    description: "Pixel gap between the leader line elbow and label text.",
+  },
+  {
+    name: "color / class",
+    type: "string",
+    description: "SVG fill color or class for label text.",
+  },
+];
+
+export const pieLabelLineOptionsProps: PropRow[] = [
+  {
+    name: "length",
+    type: "number",
+    description: "Radial segment length from the slice outer edge to the elbow.",
+  },
+  {
+    name: "horizontalLength",
+    type: "number",
+    description: "Horizontal segment length from the elbow to the label anchor.",
+  },
+  {
+    name: "color",
+    type: "string",
+    description: "Stroke color for leader lines.",
+  },
+  {
+    name: "strokeWidth",
+    type: "number",
+    description: "Stroke width for leader lines.",
+  },
+  {
+    name: "class",
+    type: "string",
+    description: "Optional class applied to leader line paths.",
+  },
+];
+
+export const pieRoseOptionsProps: PropRow[] = [
+  {
+    name: "scale",
+    type: '"sqrt" | "linear"',
+    defaultValue: '"sqrt"',
+    description:
+      "How slice values map to radius. sqrt compresses large outliers; linear is proportional.",
+  },
+  {
+    name: "minRadius",
+    type: "number",
+    description:
+      "Minimum outer radius for the smallest visible slice. Defaults to innerRadius plus 8% of the radius span.",
+  },
+];
+
+export const pieLegendOptionsProps: PropRow[] = [
+  {
+    name: "interactive",
+    type: "boolean",
+    defaultValue: "true",
+    description:
+      "When true, legend items toggle slice visibility. Hidden slices are excluded from totals and navigation.",
   },
 ];
 

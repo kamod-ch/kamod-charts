@@ -1,19 +1,29 @@
 ---
 title: Pie Chart
-description: Show parts of a whole with pie or donut layouts.
+description: Show parts of a whole with pie, donut, rose, and labeled slice layouts.
 ---
 
 import { Badge } from "@kamod-ch/ui";
+import { PieApiNotes } from "../components/examples/PieApiNotes";
 import { PieExamples, PieHeroDemo } from "../components/examples/PieExamples";
 import { PropsTable } from "../components/shared/PropsTable";
-import { pieSpecificProps } from "../data/props";
+import {
+  pieLabelLineOptionsProps,
+  pieLabelOptionsProps,
+  pieLegendOptionsProps,
+  pieRoseOptionsProps,
+  pieSliceContextProps,
+  pieSpecificProps,
+  pieTooltipOptionsProps,
+} from "../data/props";
 
 <p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Pie Chart</p>
 
 <div class="not-prose mb-6 flex flex-wrap gap-2">
-  <Badge variant="outline">Donut ready</Badge>
-  <Badge variant="outline">Custom colors</Badge>
-  <Badge variant="outline">Center content</Badge>
+  <Badge variant="outline">Donut via innerRadius</Badge>
+  <Badge variant="outline">Legend toggles</Badge>
+  <Badge variant="outline">Rose / Nightingale</Badge>
+  <Badge variant="outline">Outside labels</Badge>
 </div>
 
 ## Overview
@@ -26,10 +36,77 @@ import { pieSpecificProps } from "../data/props";
 import { PieChart } from "@kamod-ch/charts/pie";
 ```
 
-## Variants
+PieChart renders proportional slices from a single value column. Use `innerRadius` for donuts, `rose` for equal-angle Nightingale layouts, and `labels="outside"` when category names need gutter space with leader lines.
+
+<PieApiNotes />
+
+## Gallery
+
+Six functional patterns covering legend tooltips, donuts, center KPIs, rose geometry, outside labels, and a carrier capacity snapshot. Each preview uses Kamod’s real PieChart API — no copied option objects.
 
 <PieExamples />
 
 ## Props
 
 <PropsTable rows={pieSpecificProps} caption="PieChart props" />
+
+### PieSliceContext
+
+Passed to `tooltip.render`, `tooltip.formatValue`, `tooltip.formatPercentage`, and `PieLabelOptions.render`.
+
+<PropsTable rows={pieSliceContextProps} caption="PieSliceContext fields" />
+
+### PieTooltipOptions
+
+Chart-level via `tooltip`. Defaults show numeric value and percentage of **visible** slices.
+
+<PropsTable rows={pieTooltipOptionsProps} caption="PieTooltipOptions fields" />
+
+### PieLabelOptions
+
+Chart-level via `labels` when not using the `"inside" | "outside" | "none"` shorthand.
+
+<PropsTable rows={pieLabelOptionsProps} caption="PieLabelOptions fields" />
+
+### PieLabelLineOptions
+
+Nested under `PieLabelOptions.line` for outside placement.
+
+<PropsTable rows={pieLabelLineOptionsProps} caption="PieLabelLineOptions fields" />
+
+### PieRoseOptions
+
+Nested under `rose` when not passing `rose={true}`.
+
+<PropsTable rows={pieRoseOptionsProps} caption="PieRoseOptions fields" />
+
+### PieLegendOptions
+
+Nested under `legend`. Legend items key off stable slice `key` values from the data row index.
+
+<PropsTable rows={pieLegendOptionsProps} caption="PieLegendOptions fields" />
+
+## Value policy and percentages
+
+- Only **finite values strictly greater than zero** become slices. Zero, negative, and non-finite entries are treated as non-visible.
+- When every value is non-positive, render `emptyContent` instead of an blank chart.
+- `PieSliceContext.percentage` divides each visible slice by the sum of **currently visible** slices. Legend toggles remove hidden keys from that total, so tooltips and announcements stay aligned with what is on screen.
+- `activeOffset` expands the active slice radius on pointer hover or keyboard focus (default `6` px).
+
+## Pie vs rose and when to pick another chart
+
+| Layout        | Angle                 | Radius                        | Best for                                                     |
+| ------------- | --------------------- | ----------------------------- | ------------------------------------------------------------ |
+| Standard pie  | proportional to value | fixed (minus donut hole)      | three to six categories, familiar part-to-whole              |
+| Rose (`rose`) | equal per category    | proportional (`sqrt` default) | many categories where small values would vanish as thin arcs |
+| Bar / table   | —                     | —                             | more than ~six categories or when exact rank order matters   |
+
+Rose charts default to **sqrt** scaling so one large category does not swallow the plot; use `scale: "linear"` only when radius should track value linearly.
+
+Do not use color as the only signal — pair fills with labels, legend text, tooltips, or explicit `description` copy. For dense comparisons, prefer [Bar Chart](/charts/bar) or a sorted table.
+
+## Donut and empty states
+
+Set `innerRadius` to any pixel value above zero to open a donut hole. `centerContent` accepts Preact children for KPIs or status text. There is no separate `donut` boolean.
+
+When all slices are hidden through the legend, the chart shows `emptyContent` while the legend remains so users can restore segments.

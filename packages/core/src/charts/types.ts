@@ -2,7 +2,14 @@ import type { ComponentChildren } from "preact";
 import type { ChartAnimate } from "../animation";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import type { TooltipPlacement } from "../primitives/tooltip-placement";
-import type { LineCurve, AreaFill } from "../series";
+import type {
+  LineCurve,
+  AreaFill,
+  PieLabels,
+  PieRose,
+  PieSliceContext,
+  PieSortComparator,
+} from "../series";
 
 export interface CartesianSeriesConfig<TDatum> {
   key: DataAccessor<TDatum, number | null | undefined>;
@@ -204,12 +211,49 @@ export interface PieChartProps<TDatum> {
   outerRadius?: number;
   padAngle?: number;
   cornerRadius?: number;
-  sort?: boolean;
-  labels?: "none" | "inside" | "outside";
+  sort?: boolean | PieSortComparator<TDatum>;
+  labels?: PieLabels<TDatum>;
+  rose?: PieRose;
   colors?: readonly string[];
   centerContent?: ComponentChildren;
+  /** Shown when data exists but no slice has a finite value > 0. Omit for no fallback text. */
+  emptyContent?: ComponentChildren;
+  activeOffset?: number;
+  tooltip?: boolean | PieTooltipOptions<TDatum>;
+  showLegend?: boolean;
+  legend?: PieLegendOptions;
   onSegmentClick?: (datum: TDatum, index: number, value: number) => void;
   animate?: ChartAnimate;
+}
+
+export interface PieLegendOptions {
+  /** When `false`, legend items render without toggle behavior. Defaults to interactive toggling. */
+  interactive?: boolean;
+}
+
+export type { PieSliceContext };
+
+export type {
+  PieLabelCollision,
+  PieLabelLineOptions,
+  PieLabelOptions,
+  PieLabels,
+  PieRose,
+  PieRoseOptions,
+} from "../series";
+
+export interface PieTooltipOptions<TDatum> {
+  placement?: TooltipPlacement;
+  offset?: number;
+  render?: (context: PieSliceContext<TDatum>) => ComponentChildren;
+  formatValue?: (
+    value: number,
+    context: PieSliceContext<TDatum>,
+  ) => ComponentChildren | null | undefined;
+  formatPercentage?: (
+    percentage: number,
+    context: PieSliceContext<TDatum>,
+  ) => ComponentChildren | null | undefined;
 }
 
 export interface ScatterChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {

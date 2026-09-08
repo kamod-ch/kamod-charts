@@ -17,6 +17,7 @@ import {
   trafficSources,
   weeklyDeployments,
 } from "../../data/datasets";
+import { carrierCapacityMix, regionalParcelVolumes } from "../../data/pie-datasets";
 import { type ChartKind, galleryExamples } from "../../data/gallery";
 import { ChartCard } from "../shared/ChartCard";
 
@@ -183,7 +184,9 @@ function GalleryPreview({ id }: { id: string }): JSX.Element {
           initialWidth={420}
           responsive
           colors={palette}
-          title="Traffic sources"
+          showLegend
+          tooltip
+          title="Regional parcel share"
         />
       );
     case "pie-donut":
@@ -197,9 +200,40 @@ function GalleryPreview({ id }: { id: string }): JSX.Element {
           responsive
           colors={palette}
           innerRadius={42}
+          labels="outside"
+          title="Acquisition mix"
+        />
+      );
+    case "pie-rose":
+      return (
+        <PieChart
+          data={regionalParcelVolumes}
+          valueKey="value"
+          labelKey="name"
+          height={180}
+          initialWidth={420}
+          responsive
+          colors={palette}
+          rose
+          labels="outside"
+          title="Regional volumes"
+        />
+      );
+    case "pie-carrier":
+      return (
+        <PieChart
+          data={carrierCapacityMix}
+          valueKey="parcels"
+          labelKey="lane"
+          height={180}
+          initialWidth={420}
+          responsive
+          colors={[chartColors.primary, chartColors.tertiary, chartColors.secondary]}
+          innerRadius={36}
           labels="none"
-          title="Donut summary"
-          centerContent={<span class="text-xs font-semibold">24.8k</span>}
+          showLegend
+          title="Hub capacity"
+          centerContent={<span class="text-xs font-semibold">79%</span>}
         />
       );
     case "scatter-basic":

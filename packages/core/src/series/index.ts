@@ -9,7 +9,33 @@ export { LineSeries } from "./line-series";
 export type { LineSeriesProps } from "./line-series";
 export type { LineCurve } from "./paths";
 export { PieSeries } from "./pie-series";
-export type { PieDatum, PieSeriesProps } from "./pie-series";
+export type { PieDatum, PieSeriesProps, PieSortComparator } from "./pie-series";
+export type {
+  PieLabelCollision,
+  PieLabelLineOptions,
+  PieLabelOptions,
+  PieLabels,
+} from "./pie-label";
+export type { PieRose, PieRoseOptions } from "./pie-rose";
+export type { PieSliceContext } from "./pie-geometry";
+export {
+  computeOutsideLabelGeometry,
+  computeOutsideLabelGutter,
+  layoutPieLabels,
+  resolvePieLabelOptions,
+  resolvePieOuterRadius,
+} from "./pie-label";
+export {
+  computeRoseOuterRadius,
+  normalizeRoseScale,
+  resolvePieRoseOptions,
+  resolveRoseMinRadius,
+} from "./pie-rose";
+export {
+  normalizePieData,
+  normalizePieValue,
+  resolveNextActiveIndexAfterHide,
+} from "./pie-geometry";
 export { ScatterSeries } from "./scatter-series";
 export type { ScatterSeriesProps } from "./scatter-series";
 export { inferGroupedDomain, inferStackedDomain, getStackedValues } from "./stack";

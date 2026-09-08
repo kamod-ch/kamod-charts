@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { L as LineChartProps } from '../types-ma1QyXzC.js';
+import { L as LineChartProps } from '../types-BiWZpRgV.js';
 import '../types-vhy5Wa3f.js';
 import '../types-Doyfwbln.js';
 import '../tooltip-placement-DZrqa8Zt.js';

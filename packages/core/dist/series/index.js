@@ -1,4 +1,4 @@
-export { AreaSeries, BarSeries, LineSeries, PieSeries, ScatterSeries, StackedAreaSeries, StackedLineSeries, getStackedSeriesValueAt, getStackedValues, inferCombinedNumericDomain, inferGroupedDomain, inferStackedDomain, stackedLayerToCartesianPoints } from '../chunk-YHJROUHJ.js';
+export { AreaSeries, BarSeries, LineSeries, PieSeries, ScatterSeries, StackedAreaSeries, StackedLineSeries, computeOutsideLabelGeometry, computeOutsideLabelGutter, computeRoseOuterRadius, getStackedSeriesValueAt, getStackedValues, inferCombinedNumericDomain, inferGroupedDomain, inferStackedDomain, layoutPieLabels, normalizePieData, normalizePieValue, normalizeRoseScale, resolveNextActiveIndexAfterHide, resolvePieLabelOptions, resolvePieOuterRadius, resolvePieRoseOptions, resolveRoseMinRadius, stackedLayerToCartesianPoints } from '../chunk-NCSVZ7E7.js';
 import '../chunk-YLMQXC4X.js';
 import '../chunk-VEGKGV6X.js';
 import '../chunk-EVJMQVJE.js';
