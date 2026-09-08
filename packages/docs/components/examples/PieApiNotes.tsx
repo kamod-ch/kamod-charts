@@ -1,5 +1,6 @@
 import type { JSX } from "preact";
 import { ApiNotes, apiNoteCode } from "../shared/ApiNotes";
+import { docsUrl } from "../shared/docs-url";
 
 export function PieApiNotes(): JSX.Element {
   return (
@@ -93,7 +94,7 @@ export function PieApiNotes(): JSX.Element {
             <>
               Do not rely on slice color alone — pair fills with labels, legend text, and tooltips.
               Pie charts work best for roughly three to six categories; beyond that prefer a{" "}
-              <a href="/charts/bar" class="text-foreground underline underline-offset-2">
+              <a href={docsUrl("/charts/bar")} class="text-foreground underline underline-offset-2">
                 BarChart
               </a>{" "}
               or a sorted table for exact comparisons.

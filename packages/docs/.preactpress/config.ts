@@ -7,7 +7,7 @@ import tailwindcss from "@tailwindcss/vite";
 const configDir = dirname(fileURLToPath(import.meta.url));
 const chartsSrc = resolve(configDir, "../../core/src");
 const chartsRoot = resolve(configDir, "../../core");
-const base = "/";
+const base = "/kamod-charts/";
 
 function publicUrl(assetPath: string): string {
   const prefix = base.endsWith("/") ? base.slice(0, -1) : base;
@@ -29,7 +29,7 @@ export default defineConfig({
     title: "kamod charts",
     description:
       "Preact-native, SVG-first chart components. Accessible, composable, and ready for production dashboards.",
-    url: "https://kamod-ch.github.io/charts/",
+    url: "https://kamod-ch.github.io",
     base,
   },
   markdown: {
@@ -131,12 +131,12 @@ export default defineConfig({
     footer: "Released under the MIT License.\n\nCopyright © 2026 Klaus Zahiragic - www.kamod.ch",
     editLink: {
       text: "Edit this page",
-      pattern: "https://github.com/kamod-ch/charts/edit/main/packages/docs/:path",
+      pattern: "https://github.com/kamod-ch/kamod-charts/edit/main/packages/docs/:path",
     },
     socialLinks: [
       {
         icon: "github",
-        link: "https://github.com/kamod-ch/charts",
+        link: "https://github.com/kamod-ch/kamod-charts",
         ariaLabel: "kamod charts on GitHub",
       },
     ],

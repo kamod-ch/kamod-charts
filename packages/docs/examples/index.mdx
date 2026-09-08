@@ -4,6 +4,7 @@ description: Jump to live gallery examples for each chart type.
 ---
 
 import { galleryExamples } from "../data/gallery";
+import { docsUrl } from "../components/shared/docs-url";
 
 ## Gallery examples
 
@@ -16,7 +17,7 @@ All kitchen-sink cards render real chart components — no screenshots.
         <div>
           <a
             class="font-medium text-foreground underline-offset-4 hover:underline"
-            href={example.href}
+            href={docsUrl(example.href)}
           >
             {example.title}
           </a>

@@ -65,7 +65,7 @@ function slugify(text: string): string {
   return slug || "section";
 }
 
-function createMdxHeadingComponents() {
+function createMdxComponents(base: string) {
   const used = new Map<string, number>();
   const heading =
     (Tag: "h2" | "h3") =>
@@ -82,6 +82,12 @@ function createMdxHeadingComponents() {
     };
 
   return {
+    a: ({ href, ...props }: JSX.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+      <a
+        href={typeof href === "string" && href.startsWith("/") ? withBase(base, href) : href}
+        {...props}
+      />
+    ),
     h2: heading("h2"),
     h3: heading("h3"),
   };
@@ -147,7 +153,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
     showDocsChrome && themeConfig.outline !== false && Boolean(page?.headings?.length);
 
   const MdxComponent = page?.kind === "mdx" ? page.Component : undefined;
-  const mdxComponents = createMdxHeadingComponents();
+  const mdxComponents = createMdxComponents(site.base);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -224,7 +230,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
           <div class="ml-auto flex items-center gap-2">
             <Button variant="outline" size="icon" class="hit-target" asChild>
               <a
-                href="https://github.com/kamod-ch/charts"
+                href="https://github.com/kamod-ch/kamod-charts"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="GitHub repository"

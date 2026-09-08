@@ -1,5 +1,6 @@
 import type { JSX } from "preact";
 import { ApiNotes, apiNoteCode } from "../shared/ApiNotes";
+import { docsUrl } from "../shared/docs-url";
 
 export function DonutApiNotes(): JSX.Element {
   return (
@@ -14,7 +15,7 @@ export function DonutApiNotes(): JSX.Element {
             <>
               Use <code class={apiNoteCode}>DonutChart</code> when the hole size should scale with
               plot size via <code class={apiNoteCode}>innerRadiusRatio</code>.{" "}
-              <a href="/charts/pie" class="text-foreground underline underline-offset-2">
+              <a href={docsUrl("/charts/pie")} class="text-foreground underline underline-offset-2">
                 PieChart
               </a>{" "}
               keeps pixel <code class={apiNoteCode}>innerRadius</code> for legacy callers and

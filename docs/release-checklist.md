@@ -4,7 +4,6 @@ Do not publish until explicitly approved.
 
 ## Required checks
 
-- [ ] GitHub Actions CI succeeded on the release commit (`.github/workflows/ci.yml`)
 - [ ] `pnpm release:check` (full CI gate including docs build and bundle-size report)
 - [ ] `pnpm check` (typecheck, lint, format, test, build, export verification)
 - [ ] README and CHANGELOG reviewed
@@ -39,5 +38,5 @@ pnpm --filter @kamod-ch/charts publish --access public
 ## After publish
 
 - [ ] Verify [npm package page](https://www.npmjs.com/package/@kamod-ch/charts)
-- [ ] Verify [docs site](https://kamod-ch.github.io/charts/) if redeploy is needed
+- [ ] Verify [docs site](https://kamod-ch.github.io/kamod-charts/) — `.github/workflows/gh-pages.yml` deploys on every push to `main`
 - [ ] Create GitHub release notes from `CHANGELOG.md`

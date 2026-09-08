@@ -9,11 +9,11 @@ Preact-native, SVG-first chart components for dashboards and data apps. High-lev
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@kamod-ch/charts"><img src="https://img.shields.io/npm/v/@kamod-ch/charts" alt="npm version" /></a>
-  <a href="https://github.com/kamod-ch/charts/actions/workflows/ci.yml"><img src="https://github.com/kamod-ch/charts/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
-  <a href="https://github.com/kamod-ch/charts/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/kamod-ch/charts" alt="license" /></a>
+  <a href="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml"><img src="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml/badge.svg" alt="Docs deploy" /></a>
+  <a href="https://github.com/kamod-ch/kamod-charts/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/kamod-ch/kamod-charts" alt="license" /></a>
 </p>
 
-**[Docs](https://kamod-ch.github.io/charts/)** · **[Gallery](https://kamod-ch.github.io/charts/)** · **[npm](https://www.npmjs.com/package/@kamod-ch/charts)** · **[GitHub](https://github.com/kamod-ch/charts)** · **[Issues](https://github.com/kamod-ch/charts/issues)**
+**[Docs](https://kamod-ch.github.io/kamod-charts/)** · **[Gallery](https://kamod-ch.github.io/kamod-charts/)** · **[npm](https://www.npmjs.com/package/@kamod-ch/charts)** · **[GitHub](https://github.com/kamod-ch/kamod-charts)** · **[Issues](https://github.com/kamod-ch/kamod-charts/issues)**
 
 ## Why Kamod Charts?
 
@@ -78,7 +78,7 @@ export function RevenueChart() {
 }
 ```
 
-Browse the [live docs](https://kamod-ch.github.io/charts/charts/line) for tooltips, formatters, motion, and playground examples.
+Browse the [live docs](https://kamod-ch.github.io/kamod-charts/charts/line) for tooltips, formatters, motion, and playground examples.
 
 ## Composable API
 
@@ -112,7 +112,7 @@ High-level charts accept `tooltip` as a boolean or structured options:
 />
 ```
 
-See [Bar chart docs](https://kamod-ch.github.io/charts/charts/bar) for horizontal orientation and reference-line semantics.
+See [Bar chart docs](https://kamod-ch.github.io/kamod-charts/charts/bar) for horizontal orientation and reference-line semantics.
 
 ## Subpath exports
 

@@ -9,15 +9,15 @@
     "svg",
     "typescript"
   ],
-  "homepage": "https://kamod-ch.github.io/charts/",
+  "homepage": "https://kamod-ch.github.io/kamod-charts/",
   "bugs": {
-    "url": "https://github.com/kamod-ch/charts/issues"
+    "url": "https://github.com/kamod-ch/kamod-charts/issues"
   },
   "license": "MIT",
   "author": "Klaus Zahiragic <watzak>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kamod-ch/charts.git",
+    "url": "git+https://github.com/kamod-ch/kamod-charts.git",
     "directory": "packages/core"
   },
   "files": [

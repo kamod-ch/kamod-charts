@@ -18,6 +18,7 @@ import {
   trafficSources,
   weeklyDeployments,
 } from "../../data/datasets";
+import { docsUrl } from "../shared/docs-url";
 import { airCargoLanes, airCargoRegions } from "../../data/scatter-datasets";
 import { carrierCapacityMix, regionalParcelVolumes } from "../../data/pie-datasets";
 import { halfYearProgress, revenueSegments, storageQuota } from "../../data/donut-datasets";
@@ -428,10 +429,10 @@ export function GalleryPage(): JSX.Element {
                 asChild
                 class="bg-[color:var(--brand)] text-[color:var(--brand-foreground)] hover:bg-[color:var(--brand-hover)]"
               >
-                <a href="/getting-started/">Get started</a>
+                <a href={docsUrl("/getting-started/")}>Get started</a>
               </Button>
               <Button variant="outline" asChild>
-                <a href="/playground/">Open playground</a>
+                <a href={docsUrl("/playground/")}>Open playground</a>
               </Button>
             </div>
           </div>
@@ -501,7 +502,7 @@ export function GalleryPage(): JSX.Element {
             title={example.title}
             description={example.description}
             kind={example.kind}
-            href={example.href}
+            href={docsUrl(example.href)}
           >
             <GalleryPreview id={example.id} />
           </ChartCard>
