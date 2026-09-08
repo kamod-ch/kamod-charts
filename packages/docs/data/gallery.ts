@@ -6,7 +6,18 @@ export type GalleryExample = {
   description: string;
   kind: ChartKind;
   href: string;
-  tags: Array<"basic" | "series" | "colors" | "responsive" | "tooltip" | "legend" | "empty">;
+  tags: Array<
+    | "basic"
+    | "series"
+    | "colors"
+    | "responsive"
+    | "tooltip"
+    | "legend"
+    | "empty"
+    | "sizeKey"
+    | "categoryKey"
+    | "referenceAreas"
+  >;
 };
 
 export const galleryExamples: GalleryExample[] = [
@@ -156,11 +167,27 @@ export const galleryExamples: GalleryExample[] = [
   },
   {
     id: "scatter-basic",
-    title: "Conversion scatter",
-    description: "Relationship between visitors and conversion.",
+    title: "Basic scatter",
+    description: "Default markers with grid and tooltip.",
     kind: "scatter",
     href: "/charts/scatter#basic",
     tags: ["basic"],
+  },
+  {
+    id: "scatter-bubble",
+    title: "Sized bubbles",
+    description: "sqrt-scaled radius from a third numeric field.",
+    kind: "scatter",
+    href: "/charts/scatter#bubble-sized",
+    tags: ["sizeKey"],
+  },
+  {
+    id: "scatter-cargo",
+    title: "Air cargo lanes",
+    description: "Rate vs transit with tonnage and region color.",
+    kind: "scatter",
+    href: "/charts/scatter#air-cargo-rate",
+    tags: ["categoryKey", "referenceAreas"],
   },
   {
     id: "line-empty",

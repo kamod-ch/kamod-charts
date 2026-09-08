@@ -757,14 +757,131 @@ export const pieLegendOptionsProps: PropRow[] = [
 
 export const scatterSpecificProps: PropRow[] = [
   {
-    name: "pointSize",
+    name: "pointRadius",
     type: "number | ((datum, index) => number)",
     defaultValue: "4",
-    description: "Marker radius in pixels.",
+    description:
+      "Fixed marker radius in pixels when sizeKey is not set. Values are radii, not diameters.",
+  },
+  {
+    name: "pointSize",
+    type: "number | ((datum, index) => number)",
+    description: "Legacy alias for pointRadius. Prefer pointRadius in new code.",
+  },
+  {
+    name: "sizeKey",
+    type: "DataAccessor<TDatum, number | null | undefined>",
+    description:
+      "Numeric field mapped to marker radius via pointRadiusRange. Invalid or negative values hide the marker.",
+  },
+  {
+    name: "sizeScale",
+    type: '"sqrt" | "linear"',
+    defaultValue: '"sqrt"',
+    description:
+      "Scaling from data value to radius. sqrt (default) maps value to area; linear maps value directly to radius.",
+  },
+  {
+    name: "sizeDomain",
+    type: "[number, number]",
+    description: "Optional override for the inferred size domain. Defaults to data min/max.",
+  },
+  {
+    name: "pointRadiusRange",
+    type: "[number, number]",
+    defaultValue: "[4, 18]",
+    description: "Pixel radius range used when sizeKey is set.",
+  },
+  {
+    name: "categoryKey",
+    type: "DataAccessor<TDatum, string | number | null | undefined>",
+    description:
+      "Field that drives categorical color and category legend. Prefer a single Y series in category mode.",
+  },
+  {
+    name: "categories",
+    type: "readonly ScatterCategoryConfig[]",
+    description:
+      "Optional category metadata (label, color, hidden). IDs are stable encodings of value type.",
   },
   {
     name: "referenceLines",
     type: "readonly CartesianReferenceLine<TDatum>[]",
-    description: "Optional x/y reference markers.",
+    description:
+      "Optional horizontal or vertical reference lines with label, color, strokeWidth, and strokeDasharray.",
+  },
+  {
+    name: "referenceSegments",
+    type: "readonly CartesianReferenceSegment<TDatum>[]",
+    description:
+      "Diagonal segments between explicit start/end coordinates. Kamod renders provided endpoints — no regression.",
+  },
+  {
+    name: "referenceAreas",
+    type: "readonly CartesianReferenceArea<TDatum>[]",
+    description: "Vertical x1/x2 or horizontal y1/y2 highlight bands clipped to the plot area.",
+  },
+  {
+    name: "referencePoints",
+    type: "readonly CartesianReferencePoint<TDatum>[]",
+    description:
+      "Explicit x/y markers for outliers or SLA points with shape, label, and labelPosition.",
+  },
+];
+
+export const scatterPointContextProps: PropRow[] = [
+  {
+    name: "datum",
+    type: "TDatum",
+    description: "Active data row.",
+  },
+  {
+    name: "index",
+    type: "number",
+    description: "Row index in data.",
+  },
+  {
+    name: "xValue / yValue",
+    type: "mixed",
+    description: "Raw axis values for the active marker.",
+  },
+  {
+    name: "sizeValue",
+    type: "number | null",
+    description: "Raw sizeKey value when bubble sizing is enabled.",
+  },
+  {
+    name: "categoryValue / categoryId / categoryLabel",
+    type: "mixed",
+    description: "Resolved category fields when categoryKey is set.",
+  },
+  {
+    name: "color",
+    type: "string",
+    description: "Resolved marker fill used for tooltip swatches in category mode.",
+  },
+  {
+    name: "radius",
+    type: "number",
+    description: "Rendered pixel radius including active-state offset when focused.",
+  },
+];
+
+export const scatterReferenceSegmentProps: PropRow[] = [
+  {
+    name: "start / end",
+    type: "{ x, y }",
+    description: "Segment endpoints in data coordinates, projected through chart scales.",
+  },
+  {
+    name: "labelPosition",
+    type: '"start" | "middle" | "end"',
+    defaultValue: '"middle"',
+    description: "Label placement along the segment with a perpendicular offset.",
+  },
+  {
+    name: "strokeWidth / strokeDasharray / class / id",
+    type: "mixed",
+    description: "Forwarded to the SVG segment group and line.",
   },
 ];

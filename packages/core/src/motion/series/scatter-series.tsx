@@ -1,5 +1,11 @@
 import { useMemo } from "preact/hooks";
 import { pointKey, uniquifyKeys, type ChartAnimate } from "../../animation";
+import {
+  ACTIVE_SCATTER_STROKE_WIDTH,
+  buildScatterSeriesLayout,
+  DEFAULT_SCATTER_STROKE_WIDTH,
+  renderedScatterRadius,
+} from "../../charts/scatter-series-layout";
 import { useChartContext } from "../../core";
 import { getCartesianPoints, useCartesianScales } from "../../series/cartesian";
 import { ScatterSeries, type ScatterSeriesProps } from "../../series/scatter-series";
@@ -18,10 +24,11 @@ interface MotionScatterPoint<TDatum> {
   index: number;
   cx: number;
   cy: number;
-  r: number;
+  baseRadius: number;
   opacity: number;
   fill: string;
   active: boolean;
+  categoryId: string | null;
 }
 
 export const MotionScatterSeries = <TDatum,>(props: MotionScatterSeriesProps<TDatum>) => {
@@ -42,8 +49,19 @@ const AnimatedScatterSeries = <TDatum,>({
   yDomain,
   id,
   color = "var(--chart-1)",
+  radius,
   size = 4,
+  pointOpacity,
+  sizeKey,
+  sizeScale,
+  sizeDomain,
+  pointRadiusRange,
+  pointRadius,
+  pointSize,
+  seriesPointRadius,
+  sortByRadius,
   activeIndex = null,
+  categoryContext = null,
   class: className,
   animate,
 }: MotionScatterSeriesProps<TDatum>) => {
@@ -73,29 +91,65 @@ const AnimatedScatterSeries = <TDatum,>({
       ),
     ),
   );
-  const motionPoints: MotionScatterPoint<TDatum>[] = points.flatMap((point, index) => {
-    if (!point.defined || point.x == null || point.y == null) {
-      return [];
-    }
-
-    const fill = typeof color === "function" ? color(point.datum, point.index) : color;
-    const radius = typeof size === "function" ? size(point.datum, point.index) : size;
-    return [
-      {
-        key: keys[index] ?? pointKey(seriesId, point.xValue, point.index),
-        datum: point.datum,
-        index: point.index,
-        cx: point.x,
-        cy: point.y,
-        r: activeIndex === point.index ? radius + 2 : radius,
-        opacity: 1,
-        fill,
-        active: activeIndex === point.index,
-      },
-    ];
-  });
+  const layouts = useMemo(
+    () =>
+      buildScatterSeriesLayout({
+        points,
+        seriesId,
+        keys,
+        color,
+        activeIndex,
+        pointOpacity,
+        data,
+        sizeKey,
+        sizeScale,
+        sizeDomain,
+        pointRadiusRange,
+        pointRadius,
+        pointSize,
+        seriesPointRadius,
+        radius,
+        size,
+        categoryContext,
+        sortByRadius,
+      }),
+    [
+      points,
+      seriesId,
+      keys,
+      color,
+      activeIndex,
+      pointOpacity,
+      data,
+      sizeKey,
+      sizeScale,
+      sizeDomain,
+      pointRadiusRange,
+      pointRadius,
+      pointSize,
+      seriesPointRadius,
+      radius,
+      size,
+      categoryContext,
+      sortByRadius,
+    ],
+  );
+  const motionPoints: MotionScatterPoint<TDatum>[] = layouts
+    .filter((point) => point.visible)
+    .map((point) => ({
+      key: point.key,
+      datum: point.datum,
+      index: point.index,
+      cx: point.cx,
+      cy: point.cy,
+      baseRadius: point.baseRadius,
+      opacity: point.opacity,
+      fill: point.fill,
+      active: point.active,
+      categoryId: point.categoryId,
+    }));
   const targetKey = `${plotArea.width}x${plotArea.height}::${motionPoints
-    .map((point) => `${point.key}:${point.cx}:${point.cy}:${point.r}`)
+    .map((point) => `${point.key}:${point.cx}:${point.cy}:${point.baseRadius}`)
     .join("|")}`;
   const displayed = useKeyedTransition(motionPoints, {
     enabled: resolved.enabled,
@@ -103,13 +157,13 @@ const AnimatedScatterSeries = <TDatum,>({
     duration: resolved.duration,
     ease: easingFn(resolved.easing),
     targetKey,
-    enterOrigin: (point) => ({ ...point, r: 0, opacity: 0 }),
-    exitTarget: (point) => ({ ...point, r: 0, opacity: 0 }),
+    enterOrigin: (point) => ({ ...point, baseRadius: 0, opacity: 0 }),
+    exitTarget: (point) => ({ ...point, baseRadius: 0, opacity: 0 }),
     interpolate: (from, to, t) => ({
       ...to,
       cx: lerp(from.cx, to.cx, t),
       cy: lerp(from.cy, to.cy, t),
-      r: lerp(from.r, to.r, t),
+      baseRadius: lerp(from.baseRadius, to.baseRadius, t),
       opacity: lerp(from.opacity, to.opacity, t),
     }),
   });
@@ -126,13 +180,15 @@ const AnimatedScatterSeries = <TDatum,>({
           key={point.key}
           cx={point.cx}
           cy={point.cy}
-          r={point.r}
+          r={renderedScatterRadius(point.baseRadius, point.active)}
           fill={point.fill}
           fill-opacity={point.opacity}
           stroke="var(--chart-tooltip-background)"
-          stroke-width={point.active ? 2 : 1}
+          stroke-width={point.active ? ACTIVE_SCATTER_STROKE_WIDTH : DEFAULT_SCATTER_STROKE_WIDTH}
           stroke-opacity={point.opacity}
           data-kamod-chart-key={point.key}
+          data-kamod-chart-base-radius={point.baseRadius}
+          data-kamod-chart-category-id={point.categoryId ?? undefined}
           data-kamod-chart-phase={point.phase}
           data-kamod-chart-active={point.active ? "true" : undefined}
         />

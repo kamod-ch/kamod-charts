@@ -16,6 +16,12 @@ export type {
   ReferencePointLabelPosition,
   ReferencePointShape,
 } from "./reference-point";
+export { ReferenceSegment } from "./reference-segment";
+export type {
+  ReferenceSegmentProps,
+  ReferenceSegmentEndpoint,
+  ReferenceSegmentLabelPosition,
+} from "./reference-segment";
 export { Tooltip } from "./tooltip";
 export type { TooltipProps } from "./tooltip";
 export {

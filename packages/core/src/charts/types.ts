@@ -68,6 +68,25 @@ export interface CartesianReferenceLine<TDatum> {
   yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
 }
 
+export interface CartesianReferenceSegmentPoint {
+  x: string | number | Date;
+  y: number | Date | string;
+}
+
+export interface CartesianReferenceSegment<TDatum> {
+  id?: string;
+  start: CartesianReferenceSegmentPoint;
+  end: CartesianReferenceSegmentPoint;
+  label?: string;
+  labelPosition?: "start" | "middle" | "end";
+  color?: string;
+  strokeWidth?: number;
+  strokeDasharray?: string;
+  class?: string;
+  xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+  yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+}
+
 export interface CartesianReferencePoint<TDatum> {
   id?: string;
   x: string | number | Date;
@@ -119,6 +138,7 @@ export interface CartesianTooltipContext<TDatum> {
   seriesValues: readonly CartesianTooltipSeriesValue<TDatum>[];
   x: number;
   y: number;
+  scatterPoint?: ScatterPointContext<TDatum>;
 }
 
 export interface CartesianTooltipOptions<TDatum> {
@@ -256,8 +276,55 @@ export interface PieTooltipOptions<TDatum> {
   ) => ComponentChildren | null | undefined;
 }
 
+export type ScatterSizeScale = "sqrt" | "linear";
+
+export type ScatterCategoryValue = string | number;
+
+export interface ScatterCategoryConfig {
+  value: ScatterCategoryValue;
+  id?: string;
+  label?: string;
+  color?: string;
+  hidden?: boolean;
+}
+
+export interface ScatterSeriesConfig<TDatum> extends CartesianSeriesConfig<TDatum> {
+  pointRadius?: number | ((datum: TDatum, index: number) => number);
+  pointOpacity?: number | ((datum: TDatum, index: number) => number);
+}
+
+export interface ScatterPointContext<TDatum> {
+  datum: TDatum;
+  index: number;
+  seriesId: string;
+  seriesLabel: string | undefined;
+  xValue: string | number | Date | null;
+  yValue: number | null;
+  sizeValue: number | null;
+  radius: number;
+  categoryValue: ScatterCategoryValue | null;
+  categoryId: string | null;
+  categoryLabel: string | null;
+  color: string;
+  active: boolean;
+}
+
 export interface ScatterChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {
-  series: readonly CartesianSeriesConfig<TDatum>[];
+  series: readonly ScatterSeriesConfig<TDatum>[];
+  /**
+   * Legacy alias for a fixed marker radius when `sizeKey` is not set.
+   * Prefer `pointRadius` for new code.
+   */
   pointSize?: number | ((datum: TDatum, index: number) => number);
+  pointRadius?: number | ((datum: TDatum, index: number) => number);
+  sizeKey?: DataAccessor<TDatum, number | null | undefined>;
+  sizeScale?: ScatterSizeScale;
+  sizeDomain?: readonly [number, number];
+  pointRadiusRange?: readonly [number, number];
+  categoryKey?: DataAccessor<TDatum, ScatterCategoryValue | null | undefined>;
+  categories?: readonly ScatterCategoryConfig[];
   referenceLines?: readonly CartesianReferenceLine<TDatum>[];
+  referenceSegments?: readonly CartesianReferenceSegment<TDatum>[];
+  referenceAreas?: readonly CartesianReferenceArea<TDatum>[];
+  referencePoints?: readonly CartesianReferencePoint<TDatum>[];
 }

@@ -18,6 +18,7 @@ import type {
   CartesianTooltipOptions,
   CartesianTooltipSeriesValue,
   CartesianSeriesConfig,
+  ScatterPointContext,
 } from "./types";
 import type { StackSeries } from "../series/stack";
 import { getStackedSeriesValueAt } from "../series/stacked-line-points";
@@ -35,6 +36,8 @@ type ActiveLayersProps<TDatum> = {
   pointerPlot?: CartesianPointerPlot | null;
   stacked?: boolean;
   stackSeries?: readonly StackSeries<TDatum>[];
+  scatterPoint?: ScatterPointContext<TDatum> | null;
+  scatterPlotPosition?: { plotX: number; plotY: number } | null;
 };
 
 const clampPlotCoord = (value: number, max: number): number => Math.min(Math.max(value, 0), max);
@@ -110,6 +113,8 @@ const useActiveInteraction = <TDatum,>({
   defaultMode,
   stacked = false,
   stackSeries = [],
+  scatterPoint = null,
+  scatterPlotPosition = null,
 }: ActiveLayersProps<TDatum>): {
   interaction: ChartInteraction<TDatum> | null;
   plotInteraction: ChartInteraction<TDatum> | null;
@@ -126,37 +131,44 @@ const useActiveInteraction = <TDatum,>({
   const activePoint =
     activePointOverride !== undefined
       ? activePointOverride
-      : activeIndex == null || !activeSeries
-        ? null
-        : stacked && stackSeries.length > 0
-          ? resolveStackedCartesianActivePoint({
-              data,
-              index: activeIndex,
-              stackSeries,
-              activeSeriesId: getSeriesId(
-                activeSeries,
-                Math.max(visibleSeries.indexOf(activeSeries), 0),
-              ),
-              xKey,
-              xScale,
-              yDomain,
-              plotWidth: plotArea.width,
-              plotHeight: plotArea.height,
-              plotOffsetX: plotArea.x,
-              plotOffsetY: plotArea.y,
-            })
-          : resolveCartesianActivePoint({
-              data,
-              index: activeIndex,
-              seriesKey: activeSeries.key,
-              xKey,
-              xScale,
-              yDomain,
-              plotWidth: plotArea.width,
-              plotHeight: plotArea.height,
-              plotOffsetX: plotArea.x,
-              plotOffsetY: plotArea.y,
-            });
+      : scatterPlotPosition
+        ? {
+            plotX: scatterPlotPosition.plotX,
+            plotY: scatterPlotPosition.plotY,
+            surfaceX: plotArea.x + scatterPlotPosition.plotX,
+            surfaceY: plotArea.y + scatterPlotPosition.plotY,
+          }
+        : activeIndex == null || !activeSeries
+          ? null
+          : stacked && stackSeries.length > 0
+            ? resolveStackedCartesianActivePoint({
+                data,
+                index: activeIndex,
+                stackSeries,
+                activeSeriesId: getSeriesId(
+                  activeSeries,
+                  Math.max(visibleSeries.indexOf(activeSeries), 0),
+                ),
+                xKey,
+                xScale,
+                yDomain,
+                plotWidth: plotArea.width,
+                plotHeight: plotArea.height,
+                plotOffsetX: plotArea.x,
+                plotOffsetY: plotArea.y,
+              })
+            : resolveCartesianActivePoint({
+                data,
+                index: activeIndex,
+                seriesKey: activeSeries.key,
+                xKey,
+                xScale,
+                yDomain,
+                plotWidth: plotArea.width,
+                plotHeight: plotArea.height,
+                plotOffsetX: plotArea.x,
+                plotOffsetY: plotArea.y,
+              });
 
   const readX = normalizeAccessor(xKey ?? ((_datum: TDatum, index: number) => index));
   const xValue =
@@ -221,9 +233,35 @@ const useActiveInteraction = <TDatum,>({
       seriesValues,
       x: surfaceX,
       y: surfaceY,
+      ...(scatterPoint ? { scatterPoint } : {}),
     },
   };
 };
+
+const formatScatterSeriesValue = (
+  value: number | null,
+  scatterPoint: ScatterPointContext<unknown> | null | undefined,
+): string => {
+  const formattedValue = formatDefaultValue(value);
+  if (
+    scatterPoint?.sizeValue == null ||
+    typeof scatterPoint.sizeValue !== "number" ||
+    !Number.isFinite(scatterPoint.sizeValue)
+  ) {
+    return formattedValue;
+  }
+
+  return `${formattedValue} · ${tooltipNumberFormatter.format(scatterPoint.sizeValue)}`;
+};
+
+const resolveScatterTooltipRow = <TDatum,>(
+  series: CartesianTooltipSeriesValue<TDatum>,
+  scatterPoint: ScatterPointContext<TDatum> | null | undefined,
+): { label: string; color?: string; value: string } => ({
+  label: scatterPoint?.categoryLabel ?? series.label,
+  color: scatterPoint?.categoryLabel ? scatterPoint.color : series.color,
+  value: formatScatterSeriesValue(series.value, scatterPoint),
+});
 
 const resolveFormattedChild = (
   formatted: ComponentChildren | null | undefined,
@@ -248,12 +286,13 @@ const DefaultTooltipContent = <TDatum,>({
     <div data-kamod-chart-tooltip-content="">
       {formattedLabel ? <div data-kamod-chart-tooltip-label="">{formattedLabel}</div> : null}
       {rows.map((series) => {
+        const row = resolveScatterTooltipRow(series, context.scatterPoint);
         const formattedValue = options.formatValue ? (
           resolveFormattedChild(options.formatValue(series.value, context), missingValue)
-        ) : AnimatedNumber ? (
+        ) : AnimatedNumber && context.scatterPoint?.sizeValue == null ? (
           <AnimatedNumber value={series.value} />
         ) : (
-          formatDefaultValue(series.value)
+          row.value
         );
 
         return (
@@ -261,10 +300,10 @@ const DefaultTooltipContent = <TDatum,>({
             <span
               aria-hidden="true"
               data-kamod-chart-tooltip-swatch=""
-              style={{ background: series.color ?? "currentColor" }}
+              style={{ background: row.color ?? "currentColor" }}
             />
             <span>
-              {series.label}: {formattedValue}
+              {row.label}: {formattedValue}
             </span>
           </div>
         );
@@ -287,10 +326,11 @@ const announceTooltip = <TDatum,>(
     : null;
   const rowText = rows
     .map((series) => {
+      const row = resolveScatterTooltipRow(series, context.scatterPoint);
       const formattedValue = options.formatValue
         ? resolveFormattedChild(options.formatValue(series.value, context), missingValue)
-        : formatDefaultValue(series.value);
-      return `${series.label}: ${toAnnouncementText(formattedValue, formatDefaultValue(series.value))}`;
+        : row.value;
+      return `${row.label}: ${toAnnouncementText(formattedValue, row.value)}`;
     })
     .join(", ");
 

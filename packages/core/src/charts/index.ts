@@ -14,6 +14,8 @@ export type {
   CartesianReferenceLine,
   CartesianReferenceArea,
   CartesianReferencePoint,
+  CartesianReferenceSegment,
+  CartesianReferenceSegmentPoint,
   CartesianSeriesConfig,
   CartesianTooltipContext,
   CartesianTooltipMode,
@@ -31,6 +33,11 @@ export type {
   PieSliceContext,
   PieTooltipOptions,
   ScatterChartProps,
+  ScatterCategoryConfig,
+  ScatterCategoryValue,
+  ScatterPointContext,
+  ScatterSeriesConfig,
+  ScatterSizeScale,
   TooltipPlacement,
 } from "./types";
 export type { ChartAnimate, ChartAnimateOptions } from "../animation";

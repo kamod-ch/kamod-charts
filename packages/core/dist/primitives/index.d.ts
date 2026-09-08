@@ -114,6 +114,33 @@ interface ReferencePointProps<TDatum> {
 }
 declare const ReferencePoint: <TDatum>({ x, y, xKey, yKey, xScale, yScale, xDomain, yDomain, xPadding, yPadding, id, label, color, size, shape, labelPosition, class: className, }: ReferencePointProps<TDatum>) => preact.JSX.Element | null;
 
+type ReferenceSegmentLabelPosition = "start" | "middle" | "end";
+
+interface ReferenceSegmentEndpoint {
+    x: string | number | Date;
+    y: string | number | Date;
+}
+interface ReferenceSegmentProps<TDatum> {
+    start: ReferenceSegmentEndpoint;
+    end: ReferenceSegmentEndpoint;
+    xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    yKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
+    xScale?: ScaleKind;
+    yScale?: ScaleKind;
+    xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
+    yDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
+    xPadding?: number | DomainPadding;
+    yPadding?: number | DomainPadding;
+    id?: string;
+    label?: string;
+    labelPosition?: ReferenceSegmentLabelPosition;
+    color?: string;
+    strokeWidth?: number;
+    strokeDasharray?: string;
+    class?: string;
+}
+declare const ReferenceSegment: <TDatum>({ start, end, xKey, yKey, xScale, yScale, xDomain, yDomain, xPadding, yPadding, id, label, labelPosition, color, strokeWidth, strokeDasharray, class: className, }: ReferenceSegmentProps<TDatum>) => preact.JSX.Element | null;
+
 interface TooltipProps<TDatum> {
     interaction?: ChartInteraction<TDatum> | null;
     visible?: boolean;
@@ -123,4 +150,4 @@ interface TooltipProps<TDatum> {
 }
 declare const Tooltip: <TDatum>({ interaction, visible, children, placement, offset, }: TooltipProps<TDatum>) => preact.JSX.Element | null;
 
-export { Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceArea, type ReferenceAreaProps, ReferenceLine, type ReferenceLineProps, ReferencePoint, type ReferencePointLabelPosition, type ReferencePointProps, type ReferencePointShape, Tooltip, TooltipPlacement, type TooltipProps };
+export { Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceArea, type ReferenceAreaProps, ReferenceLine, type ReferenceLineProps, ReferencePoint, type ReferencePointLabelPosition, type ReferencePointProps, type ReferencePointShape, ReferenceSegment, type ReferenceSegmentEndpoint, type ReferenceSegmentLabelPosition, type ReferenceSegmentProps, Tooltip, TooltipPlacement, type TooltipProps };

@@ -17,6 +17,7 @@ import {
   trafficSources,
   weeklyDeployments,
 } from "../../data/datasets";
+import { airCargoLanes, airCargoRegions } from "../../data/scatter-datasets";
 import { carrierCapacityMix, regionalParcelVolumes } from "../../data/pie-datasets";
 import { type ChartKind, galleryExamples } from "../../data/gallery";
 import { ChartCard } from "../shared/ChartCard";
@@ -248,7 +249,43 @@ function GalleryPreview({ id }: { id: string }): JSX.Element {
           responsive
           showGrid
           tooltip
-          title="Conversion scatter"
+          title="Basic scatter"
+        />
+      );
+    case "scatter-bubble":
+      return (
+        <ScatterChart
+          data={conversionPoints}
+          xKey="visitors"
+          xScale="linear"
+          series={[{ key: "conversion", label: "Conversion", color: chartColors.primary }]}
+          sizeKey="visitors"
+          pointRadiusRange={[4, 14]}
+          height={180}
+          initialWidth={420}
+          responsive
+          showGrid
+          tooltip
+          title="Sized bubbles"
+        />
+      );
+    case "scatter-cargo":
+      return (
+        <ScatterChart
+          data={airCargoLanes}
+          xKey="transitDays"
+          xScale="linear"
+          series={[{ key: "rateUsdPerKg", label: "Rate", color: chartColors.primary }]}
+          sizeKey="tonnage"
+          categoryKey="region"
+          categories={[...airCargoRegions]}
+          height={180}
+          initialWidth={420}
+          responsive
+          showGrid
+          showLegend
+          tooltip
+          title="Air cargo lanes"
         />
       );
     case "line-empty":

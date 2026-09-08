@@ -1,18 +1,26 @@
 ---
 title: Scatter Chart
-description: Discover relationships between numeric variables.
+description: Discover relationships between numeric variables with optional bubble size and categorical color.
 ---
 
 import { Badge } from "@kamod-ch/ui";
+import { ScatterApiNotes } from "../components/examples/ScatterApiNotes";
 import { ScatterExamples, ScatterHeroDemo } from "../components/examples/ScatterExamples";
+import { ScatterIntro } from "../components/examples/ScatterIntro";
 import { PropsTable } from "../components/shared/PropsTable";
-import { commonCartesianProps, scatterSpecificProps } from "../data/props";
+import {
+  commonCartesianProps,
+  scatterPointContextProps,
+  scatterReferenceSegmentProps,
+  scatterSpecificProps,
+} from "../data/props";
 
 <p class="not-prose mb-4 text-sm text-muted-foreground">Charts / Scatter Chart</p>
 
 <div class="not-prose mb-6 flex flex-wrap gap-2">
-  <Badge variant="outline">Linear scales</Badge>
-  <Badge variant="outline">Reference lines</Badge>
+  <Badge variant="outline">Bubble sizing</Badge>
+  <Badge variant="outline">Category legend</Badge>
+  <Badge variant="outline">Reference segments</Badge>
   <Badge variant="outline">Keyboard accessible</Badge>
 </div>
 
@@ -22,11 +30,13 @@ import { commonCartesianProps, scatterSpecificProps } from "../data/props";
   <ScatterHeroDemo />
 </div>
 
-```ts
-import { ScatterChart } from "@kamod-ch/charts/scatter";
-```
+<ScatterIntro />
 
-## Variants
+<ScatterApiNotes />
+
+## Gallery
+
+Six functional patterns covering basic markers, bubble size, categorical color, custom tooltips, guide segments, and operational air-cargo lanes. Each preview uses Kamod’s real ScatterChart API — no copied option objects.
 
 <ScatterExamples />
 
@@ -36,3 +46,23 @@ import { ScatterChart } from "@kamod-ch/charts/scatter";
   rows={[...commonCartesianProps, ...scatterSpecificProps]}
   caption="ScatterChart props"
 />
+
+### ScatterPointContext
+
+Available on `CartesianTooltipContext.scatterPoint` when a marker is active.
+
+<PropsTable rows={scatterPointContextProps} caption="ScatterPointContext fields" />
+
+### referenceSegments entries
+
+<PropsTable rows={scatterReferenceSegmentProps} caption="CartesianReferenceSegment fields" />
+
+### referenceAreas & referencePoints
+
+ScatterChart accepts the same `CartesianReferenceArea` and `CartesianReferencePoint` shapes as LineChart. Areas render behind grid and markers; points render above series. See the [Line chart reference props](/charts/line#props) for field details.
+
+## Interaction
+
+- **Tooltip mode** defaults to `nearest` with bubble-aware hit-testing (edge distance, then center distance).
+- **Keyboard** walks valid markers with Arrow, Home, and End; Escape clears the active state.
+- **Legend** toggles series in multi-series mode or categories when `categoryKey` is set.
