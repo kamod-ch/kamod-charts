@@ -110,6 +110,7 @@
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
+    "pretest": "pnpm build",
     "test": "vitest run"
   },
   "dependencies": {
