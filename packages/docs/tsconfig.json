@@ -4,7 +4,15 @@
     "noEmit": true,
     "types": ["vite/client"],
     "paths": {
+      "@kamod-ch/charts": ["../core/src/index.ts"],
+      "@kamod-ch/charts/accessibility": ["../core/src/accessibility/index.ts"],
+      "@kamod-ch/charts/area": ["../core/src/charts/area-chart.tsx"],
+      "@kamod-ch/charts/bar": ["../core/src/charts/bar-chart.tsx"],
+      "@kamod-ch/charts/donut": ["../core/src/charts/donut-chart.tsx"],
+      "@kamod-ch/charts/line": ["../core/src/charts/line-chart.tsx"],
       "@kamod-ch/charts/motion": ["../core/src/motion/index.ts"],
+      "@kamod-ch/charts/pie": ["../core/src/charts/pie-chart.tsx"],
+      "@kamod-ch/charts/scatter": ["../core/src/charts/scatter-chart.tsx"],
       "@kamod-ch/preactpress/client": ["./types/preactpress-client.d.ts"],
       "@kamod-ch/preactpress/config": ["./types/preactpress-config.ts"]
     }
