@@ -1,3 +1,4 @@
+import type { JSX } from "preact";
 import { useId, useMemo } from "preact/hooks";
 import { calculatePlotArea, normalizeMargin, resolveChartSize } from "./chart-layout";
 import { ChartProvider } from "./chart-context";
@@ -101,9 +102,13 @@ export const ChartRoot = <TDatum,>({
                     height={plotArea.height}
                     fill="transparent"
                     aria-hidden="true"
-                    onPointerMove={onPointerMove as JSX.PointerEventHandler<SVGRectElement>}
+                    onPointerMove={
+                      onPointerMove as unknown as JSX.PointerEventHandler<SVGRectElement>
+                    }
                     onPointerLeave={
-                      onPointerLeave as JSX.PointerEventHandler<SVGRectElement> | undefined
+                      onPointerLeave as unknown as
+                        | JSX.PointerEventHandler<SVGRectElement>
+                        | undefined
                     }
                   />
                 ) : null}
