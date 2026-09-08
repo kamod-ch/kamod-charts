@@ -1,10 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
     "noEmit": true,
     "types": ["vite/client"],
     "paths": {
+      "@kamod-ch/charts/motion": ["../core/src/motion/index.ts"],
       "@kamod-ch/preactpress/client": ["./types/preactpress-client.d.ts"],
       "@kamod-ch/preactpress/config": ["./types/preactpress-config.ts"]
     }
