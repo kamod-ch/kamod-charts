@@ -215,7 +215,7 @@ describe("AreaChart and BarChart", () => {
       .filter(Boolean);
 
     expect(yLabels.length).toBeGreaterThan(1);
-    expect(yLabels.some((label) => /k$/.test(label) || label === "0")).toBe(true);
+    expect(yLabels.some((label) => label.endsWith("k") || label === "0")).toBe(true);
     expect(yLabels.every((label) => !/^0+$/.test(label) || label === "0")).toBe(true);
   });
 
