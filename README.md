@@ -11,6 +11,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/@kamod-ch/charts"><img src="https://img.shields.io/npm/v/@kamod-ch/charts" alt="npm version" /></a>
+  <a href="https://github.com/kamod-ch/kamod-charts/actions/workflows/ci.yml"><img src="https://github.com/kamod-ch/kamod-charts/actions/workflows/ci.yml/badge.svg" alt="CI status" /></a>
   <a href="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml"><img src="https://github.com/kamod-ch/kamod-charts/actions/workflows/gh-pages.yml/badge.svg" alt="Documentation build" /></a>
   <a href="https://github.com/kamod-ch/kamod-charts/blob/main/LICENSE.md"><img src="https://img.shields.io/github/license/kamod-ch/kamod-charts" alt="MIT license" /></a>
 </p>
@@ -21,6 +22,10 @@
   <strong><a href="https://kamod-ch.github.io/kamod-charts/api/">API</a></strong> ·
   <strong><a href="https://kamod-ch.github.io/kamod-charts/playground/">Playground</a></strong>
 </p>
+
+## Why another chart library?
+
+Many chart libraries are React-specific or depend on `preact/compat`, while generic wrappers often do not feel native in Preact applications. Kamod Charts uses D3 only for calculations and geometry; Preact renders regular SVG elements directly. SSR, hydration, and accessibility are architectural foundations rather than afterthoughts.
 
 ## Features
 
