@@ -26,7 +26,7 @@
     "docs:preview": "pnpm --filter @kamod-ch/charts-docs preview",
     "ci": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs && pnpm docs:build && pnpm size:report && git diff --exit-code -- docs/bundle-size.md",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs",
-    "release:check": "pnpm ci",
+    "release:check": "pnpm run ci",
     "release:auth": "npm whoami --registry=https://registry.npmjs.org || (echo 'Authenticate with: npm login (or set NODE_AUTH_TOKEN)' >&2; exit 1)",
     "release:publish": "pnpm --filter @kamod-ch/charts publish --access public --provenance --no-git-checks"
   },

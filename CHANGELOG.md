@@ -2,7 +2,7 @@
 
 All notable changes to `@kamod-ch/charts` are documented here.
 
-## Unreleased
+## 0.2.0 — 2026-09-09
 
 ### Added
 
@@ -32,6 +32,15 @@ All notable changes to `@kamod-ch/charts` are documented here.
 - **Pie charts:** `activeOffset` for pointer and keyboard highlight expansion.
 - **Series:** pie geometry helpers exported from `@kamod-ch/charts/series` (`normalizePieData`, `layoutPieLabels`, `resolvePieRoseOptions`, and related types).
 - Documentation: six PieChart gallery scenarios, API notes, and expanded props tables on `/charts/pie`.
+- **Scatter charts:** optional bubble sizing through `sizeKey`, configurable radius domains/ranges, and `sqrt` or `linear` size scales.
+- **Scatter charts:** category-based colors and legend filtering via `categoryKey` and typed category configuration.
+- **Scatter charts:** richer tooltip context, keyboard and pointer interaction, animated updates, and `referenceAreas`, `referencePoints`, and `referenceSegments` annotations.
+- **Primitives:** `ReferenceSegment` and its geometry helpers exported from `@kamod-ch/charts/primitives`.
+- Documentation: expanded ScatterChart gallery, API notes, datasets, and props tables on `/charts/scatter`.
+- **Donut charts:** dedicated `DonutChart` component with responsive `innerRadiusRatio` sizing and `full` or `half` variants.
+- **Donut charts:** automatic visible-slice totals, custom center content, rounded and padded segments, and the PieChart tooltip, legend, label, empty-state, and interaction features.
+- **Package exports:** tree-shakeable `@kamod-ch/charts/donut` subpath, with `DonutChart`, `DonutChartProps`, and `DonutCenterContext` also exported from the package root.
+- Documentation: DonutChart guide, four gallery examples, API notes, datasets, and props tables on `/charts/donut`.
 
 ### Changed
 

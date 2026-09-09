@@ -14,7 +14,12 @@ function withBase(base: string, link: string): string {
 
 const Footer: FunctionalComponent<FooterProps> = ({ base }) => (
   <footer class="docs-footer">
-    <a class="docs-footer-logo" href="https://www.kamod.ch" target="_blank" rel="noopener noreferrer">
+    <a
+      class="docs-footer-logo"
+      href="https://www.kamod.ch"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <KamodMarkLogo base={base} resolveAsset={(path) => withBase(base, path)} />
     </a>
 

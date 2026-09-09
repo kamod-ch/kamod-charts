@@ -1,6 +1,6 @@
 {
   "name": "@kamod-ch/charts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Preact-native, SVG-first chart components for dashboards and data apps.",
   "keywords": [
     "charts",

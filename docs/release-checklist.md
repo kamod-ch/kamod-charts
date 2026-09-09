@@ -1,4 +1,4 @@
-# Release checklist for @kamod-ch/charts v0.1.0
+# Release checklist for @kamod-ch/charts v0.2.0
 
 Do not publish until explicitly approved.
 
@@ -14,9 +14,9 @@ Do not publish until explicitly approved.
 
 ## Version and tag
 
-1. Ensure `packages/core/package.json` version matches the intended release (e.g. `0.1.0`).
+1. Ensure `packages/core/package.json` version matches the intended release (`0.2.0`).
 2. Update `CHANGELOG.md` with the release date and notes.
-3. Commit, then tag: `git tag v0.1.0` and push tags.
+3. Commit, then tag: `git tag v0.2.0` and push tags.
 
 ## Publish
 
