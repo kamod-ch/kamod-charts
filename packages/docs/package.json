@@ -19,7 +19,7 @@
     "format:check": "oxfmt --check ."
   },
   "dependencies": {
-    "@kamod-ch/brand": "^0.1.0",
+    "@kamod-ch/brand": "^0.1.12",
     "@kamod-ch/charts": "workspace:*",
     "@kamod-ch/icons": "^1.0.3",
     "@kamod-ch/motion": "^0.1.0",
