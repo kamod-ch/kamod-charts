@@ -4,8 +4,34 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>kamod charts</title>
-    <link rel="icon" href="%BASE_URL%favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="%BASE_URL%favicon.svg" />
+    <link
+      rel="icon"
+      href="%BASE_URL%favicon-light.svg"
+      type="image/svg+xml"
+      data-theme-favicon
+      data-light-href="%BASE_URL%favicon-light.svg"
+      data-dark-href="%BASE_URL%favicon-dark.svg"
+    />
+    <link rel="apple-touch-icon" href="%BASE_URL%favicon.png" />
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const favicon = document.querySelector("link[data-theme-favicon]");
+        if (!favicon) return;
+
+        const update = () => {
+          const attribute = root.classList.contains("dark") ? "data-dark-href" : "data-light-href";
+          const href = favicon.getAttribute(attribute);
+          if (href && favicon.getAttribute("href") !== href) favicon.setAttribute("href", href);
+        };
+
+        update();
+        new MutationObserver(update).observe(root, {
+          attributes: true,
+          attributeFilter: ["class"],
+        });
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

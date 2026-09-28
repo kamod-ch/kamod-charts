@@ -14,6 +14,21 @@ function publicUrl(assetPath: string): string {
   return `${prefix}/${assetPath.replace(/^\//, "")}`;
 }
 
+const faviconInitScript = `(() => {
+  const root = document.documentElement;
+  const favicon = document.querySelector('link[data-theme-favicon]');
+  if (!favicon) return;
+
+  const update = () => {
+    const attribute = root.classList.contains('dark') ? 'data-dark-href' : 'data-light-href';
+    const href = favicon.getAttribute(attribute);
+    if (href && favicon.getAttribute('href') !== href) favicon.setAttribute('href', href);
+  };
+
+  update();
+  new MutationObserver(update).observe(root, { attributes: true, attributeFilter: ['class'] });
+})();`;
+
 export default defineConfig({
   theme: "./theme/Layout.tsx",
   srcExclude: [
@@ -38,8 +53,18 @@ export default defineConfig({
     typographer: true,
   },
   head: [
-    ["link", { rel: "icon", href: `${base}favicon.svg`, type: "image/svg+xml" }],
-    ["link", { rel: "apple-touch-icon", href: `${base}favicon.svg` }],
+    [
+      "link",
+      {
+        rel: "icon",
+        href: publicUrl("favicon-light.svg"),
+        type: "image/svg+xml",
+        "data-theme-favicon": "",
+        "data-light-href": publicUrl("favicon-light.svg"),
+        "data-dark-href": publicUrl("favicon-dark.svg"),
+      },
+    ],
+    ["link", { rel: "apple-touch-icon", href: publicUrl("favicon.png") }],
     ["link", { rel: "stylesheet", href: publicUrl("styles/logo.css") }],
     [
       "link",
@@ -49,6 +74,7 @@ export default defineConfig({
       },
     ],
     ["script", { type: "text/javascript" }, getThemeInitScript({ defaultScheme: "system" })],
+    ["script", { type: "text/javascript" }, faviconInitScript],
   ],
   vite: {
     plugins: [tailwindcss()],
