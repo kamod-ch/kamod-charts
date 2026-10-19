@@ -1,0 +1,4 @@
+{
+  "summary": "Completed Prompt 6 release hardening: updated CHANGELOG.md (Unreleased section), regenerated docs/bundle-size.md via size:report (+12.7 KiB total dist, area static tree ~84 KiB), verified type exports on root and ./series, confirmed /area bundle has no motion/echarts/react imports, no forbidden runtime in new area source files. pnpm run ci passes all gates except final git diff --exit-code on docs/bundle-size.md (expected while uncommitted). Noted that pnpm release:check runs pnpm built-in ci (install only), not the ci script—use pnpm run ci.",
+  "current_status": "Area Chart extension release-ready at 0.2.0 candidate. 181 tests green, bundle report updated, CHANGELOG written. Pending: commit intended files (exclude tmp/, vitest cache), fix release:check script alias if desired. No publish/commit performed."
+}

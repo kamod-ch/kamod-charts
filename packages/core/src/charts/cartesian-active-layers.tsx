@@ -1,4 +1,5 @@
 import type { ComponentChildren } from "preact";
+import { useMemo } from "preact/hooks";
 import { useChartMotionContext } from "../animation/slots";
 import type { ChartCartesianScaleKind, ChartInteraction, DataAccessor } from "../core";
 import { normalizeAccessor, useChartContext } from "../core";
@@ -12,16 +13,22 @@ import {
 import { getSeriesId } from "./series-identity";
 import { resolveTooltipOptions } from "./tooltip-options";
 import type { CartesianPointerPlot } from "./use-cartesian-pointer-state";
+import {
+  createChartDateFormatter,
+  createChartNumberFormatter,
+  useChartFormat,
+} from "../formatting/chart-format-context";
 import type {
   CartesianTooltipContext,
   CartesianTooltipMode,
   CartesianTooltipOptions,
   CartesianTooltipSeriesValue,
   CartesianSeriesConfig,
+  ChartFormatOptions,
   ScatterPointContext,
 } from "./types";
 import type { StackSeries } from "../series/stack";
-import { getStackedSeriesValueAt } from "../series/stacked-line-points";
+import { buildStackLayers, getStackedSeriesValueFromLayers } from "../series/stacked-line-points";
 
 type ActiveLayersProps<TDatum> = {
   activeIndex: number | null;
@@ -38,41 +45,39 @@ type ActiveLayersProps<TDatum> = {
   stackSeries?: readonly StackSeries<TDatum>[];
   scatterPoint?: ScatterPointContext<TDatum> | null;
   scatterPlotPosition?: { plotX: number; plotY: number } | null;
+  format?: ChartFormatOptions;
 };
 
 const clampPlotCoord = (value: number, max: number): number => Math.min(Math.max(value, 0), max);
 
-const tooltipNumberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
-const tooltipDateFormatter = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
-
 const missingValue = "–";
 
-const formatDefaultXLabel = (value: string | number | Date | null): string | null => {
+const formatDefaultXLabel = (
+  value: string | number | Date | null,
+  dateFormatter: Intl.DateTimeFormat,
+  numberFormatter: Intl.NumberFormat,
+): string | null => {
   if (value == null) {
     return null;
   }
 
   if (value instanceof Date) {
-    return Number.isNaN(value.getTime()) ? null : tooltipDateFormatter.format(value);
+    return Number.isNaN(value.getTime()) ? null : dateFormatter.format(value);
   }
 
   if (typeof value === "number") {
-    return Number.isFinite(value) ? tooltipNumberFormatter.format(value) : null;
+    return Number.isFinite(value) ? numberFormatter.format(value) : null;
   }
 
   return String(value);
 };
 
-const formatDefaultValue = (value: number | null): string => {
+const formatDefaultValue = (value: number | null, numberFormatter: Intl.NumberFormat): string => {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return missingValue;
   }
 
-  return tooltipNumberFormatter.format(value);
+  return numberFormatter.format(value);
 };
 
 const toAnnouncementText = (value: ComponentChildren, fallback: string): string => {
@@ -115,12 +120,26 @@ const useActiveInteraction = <TDatum,>({
   stackSeries = [],
   scatterPoint = null,
   scatterPlotPosition = null,
+  format: formatOverride,
 }: ActiveLayersProps<TDatum>): {
   interaction: ChartInteraction<TDatum> | null;
   plotInteraction: ChartInteraction<TDatum> | null;
   context: CartesianTooltipContext<TDatum> | null;
 } => {
   const { data, plotArea } = useChartContext<TDatum>();
+  const formatOptions = useChartFormat(formatOverride);
+  const numberFormatter = useMemo(
+    () => createChartNumberFormatter(formatOptions),
+    [formatOptions.locale, formatOptions.number, formatOptions.timeZone],
+  );
+  const dateFormatter = useMemo(
+    () => createChartDateFormatter(formatOptions),
+    [formatOptions.locale, formatOptions.timeZone],
+  );
+  const stackLayers = useMemo(
+    () => (stacked && stackSeries.length > 0 ? buildStackLayers(data, stackSeries) : null),
+    [data, stacked, stackSeries],
+  );
   const tooltipMode = resolveTooltipOptions(tooltip, defaultMode)?.mode ?? defaultMode;
   const useSmoothPointer = pointerPlot != null && tooltipMode === "axis";
   const activeDatum = activeIndex == null ? undefined : data[activeIndex];
@@ -173,7 +192,7 @@ const useActiveInteraction = <TDatum,>({
   const readX = normalizeAccessor(xKey ?? ((_datum: TDatum, index: number) => index));
   const xValue =
     activeDatum && activeIndex != null ? (readX(activeDatum, activeIndex) ?? null) : null;
-  const xLabel = formatDefaultXLabel(xValue);
+  const xLabel = formatDefaultXLabel(xValue, dateFormatter, numberFormatter);
 
   const seriesValues: CartesianTooltipSeriesValue<TDatum>[] =
     activeDatum && activeIndex != null
@@ -181,8 +200,8 @@ const useActiveInteraction = <TDatum,>({
           const raw = normalizeAccessor(entry.key)(activeDatum, activeIndex);
           const seriesId = getSeriesId(entry, seriesIndex);
           const stackPoint =
-            stacked && stackSeries.length > 0
-              ? getStackedSeriesValueAt(data, stackSeries, seriesId, activeIndex)
+            stacked && stackLayers
+              ? getStackedSeriesValueFromLayers(stackLayers, stackSeries, seriesId, activeIndex)
               : null;
 
           return {
@@ -241,8 +260,9 @@ const useActiveInteraction = <TDatum,>({
 const formatScatterSeriesValue = (
   value: number | null,
   scatterPoint: ScatterPointContext<unknown> | null | undefined,
+  numberFormatter: Intl.NumberFormat,
 ): string => {
-  const formattedValue = formatDefaultValue(value);
+  const formattedValue = formatDefaultValue(value, numberFormatter);
   if (
     scatterPoint?.sizeValue == null ||
     typeof scatterPoint.sizeValue !== "number" ||
@@ -251,16 +271,17 @@ const formatScatterSeriesValue = (
     return formattedValue;
   }
 
-  return `${formattedValue} · ${tooltipNumberFormatter.format(scatterPoint.sizeValue)}`;
+  return `${formattedValue} · ${numberFormatter.format(scatterPoint.sizeValue)}`;
 };
 
 const resolveScatterTooltipRow = <TDatum,>(
   series: CartesianTooltipSeriesValue<TDatum>,
   scatterPoint: ScatterPointContext<TDatum> | null | undefined,
+  numberFormatter: Intl.NumberFormat,
 ): { label: string; color?: string; value: string } => ({
   label: scatterPoint?.categoryLabel ?? series.label,
   color: scatterPoint?.categoryLabel ? scatterPoint.color : series.color,
-  value: formatScatterSeriesValue(series.value, scatterPoint),
+  value: formatScatterSeriesValue(series.value, scatterPoint, numberFormatter),
 });
 
 const resolveFormattedChild = (
@@ -271,9 +292,11 @@ const resolveFormattedChild = (
 const DefaultTooltipContent = <TDatum,>({
   context,
   options,
+  numberFormatter,
 }: {
   context: CartesianTooltipContext<TDatum>;
   options: CartesianTooltipOptions<TDatum>;
+  numberFormatter: Intl.NumberFormat;
 }) => {
   const mode = options.mode ?? "axis";
   const rows = displayedSeriesValues(context.seriesValues, context.seriesId, mode);
@@ -286,7 +309,7 @@ const DefaultTooltipContent = <TDatum,>({
     <div data-kamod-chart-tooltip-content="">
       {formattedLabel ? <div data-kamod-chart-tooltip-label="">{formattedLabel}</div> : null}
       {rows.map((series) => {
-        const row = resolveScatterTooltipRow(series, context.scatterPoint);
+        const row = resolveScatterTooltipRow(series, context.scatterPoint, numberFormatter);
         const formattedValue = options.formatValue ? (
           resolveFormattedChild(options.formatValue(series.value, context), missingValue)
         ) : AnimatedNumber && context.scatterPoint?.sizeValue == null ? (
@@ -315,6 +338,7 @@ const DefaultTooltipContent = <TDatum,>({
 const announceTooltip = <TDatum,>(
   context: CartesianTooltipContext<TDatum>,
   options: CartesianTooltipOptions<TDatum>,
+  numberFormatter: Intl.NumberFormat,
 ): string => {
   const mode = options.mode ?? "axis";
   const rows = displayedSeriesValues(context.seriesValues, context.seriesId, mode);
@@ -326,7 +350,7 @@ const announceTooltip = <TDatum,>(
     : null;
   const rowText = rows
     .map((series) => {
-      const row = resolveScatterTooltipRow(series, context.scatterPoint);
+      const row = resolveScatterTooltipRow(series, context.scatterPoint, numberFormatter);
       const formattedValue = options.formatValue
         ? resolveFormattedChild(options.formatValue(series.value, context), missingValue)
         : row.value;
@@ -348,6 +372,11 @@ export const CartesianActiveCrosshair = <TDatum,>(props: ActiveLayersProps<TDatu
 export const CartesianActiveOverlay = <TDatum,>(props: ActiveLayersProps<TDatum>) => {
   const { interaction, context } = useActiveInteraction(props);
   const options = resolveTooltipOptions(props.tooltip, props.defaultMode);
+  const formatOptions = useChartFormat(props.format);
+  const numberFormatter = useMemo(
+    () => createChartNumberFormatter(formatOptions),
+    [formatOptions.locale, formatOptions.number, formatOptions.timeZone],
+  );
 
   return (
     <>
@@ -357,14 +386,20 @@ export const CartesianActiveOverlay = <TDatum,>(props: ActiveLayersProps<TDatum>
             options.render ? (
               options.render(context)
             ) : (
-              <DefaultTooltipContent context={context} options={options} />
+              <DefaultTooltipContent
+                context={context}
+                options={options}
+                numberFormatter={numberFormatter}
+              />
             )
           }
         </Tooltip>
       ) : null}
       <LiveRegion
         interaction={interaction}
-        format={() => (context && options ? announceTooltip(context, options) : "")}
+        format={() =>
+          context && options ? announceTooltip(context, options, numberFormatter) : ""
+        }
       />
     </>
   );

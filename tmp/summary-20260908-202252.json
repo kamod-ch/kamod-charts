@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 3 umgesetzt: Öffentlicher DonutChart als Preset über gemeinsamer Circular-Pipeline. Extrahiert useCircularChartController + CircularChartView; PieChart refaktoriert ohne API-/Verhaltensänderung. DonutChartProps, DonutCenterContext, Center-Rendering (showTotal/formatTotal/centerContent), innerRadiusRatio/variant via erweitertem resolvePieSeriesLayout. Export @kamod-ch/charts/donut + Motion DonutChart. 13 neue Donut-Tests, 109 Pie/Donut-Tests gesamt grün, typecheck/lint/format ok.",
+  "current_status": "DonutChart (full/half-ready via variant, Defaults, Center-Total, Legend-Sync) implementiert. PieChart unverändert nach außen. Bereit für Docs/Gallery in Folge-Prompt."
+}

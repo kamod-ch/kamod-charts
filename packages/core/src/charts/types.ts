@@ -156,10 +156,37 @@ export interface CartesianTooltipOptions<TDatum> {
   ) => ComponentChildren | null | undefined;
 }
 
+export interface ChartMargin {
+  top?: number;
+  right?: number;
+  bottom?: number;
+  left?: number;
+}
+
+export interface ChartFormatOptions {
+  locale?: string;
+  timeZone?: string;
+  number?: Intl.NumberFormatOptions;
+}
+
+export interface CartesianActiveSelection {
+  activeIndex: number | null;
+  activeSeriesId: string | null;
+  source?: "pointer" | "keyboard" | "external";
+}
+
 export interface CommonCartesianChartProps<TDatum> {
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  /** Fixed numeric Y domain; overrides inference when set. */
+  yDomain?: readonly [number, number];
+  margin?: ChartMargin;
+  class?: string;
+  style?: string | Record<string, string | number>;
+  /** Shown when `data` is empty (chart-level empty state). */
+  emptyContent?: ComponentChildren;
+  format?: ChartFormatOptions;
   width?: number;
   height: number;
   initialWidth?: number;
@@ -171,6 +198,13 @@ export interface CommonCartesianChartProps<TDatum> {
   showLegend?: boolean;
   tooltip?: boolean | CartesianTooltipOptions<TDatum>;
   animate?: ChartAnimate;
+  /** Controlled active datum index (cartesian row). */
+  activeIndex?: number | null;
+  /** Fires on user-driven selection changes only. */
+  onActiveChange?: (selection: CartesianActiveSelection) => void;
+  /** Controlled hidden series ids (legend toggles). */
+  hiddenSeriesIds?: readonly string[];
+  onHiddenSeriesChange?: (hiddenIds: readonly string[]) => void;
 }
 
 export interface LineChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {

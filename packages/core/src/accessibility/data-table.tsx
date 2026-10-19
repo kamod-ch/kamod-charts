@@ -19,7 +19,12 @@ const formatCell = (value: string | number | Date | null | undefined): string =>
     return "";
   }
 
-  return value instanceof Date ? value.toISOString() : String(value);
+  if (value instanceof Date) {
+    const time = value.getTime();
+    return Number.isFinite(time) ? value.toISOString() : "";
+  }
+
+  return String(value);
 };
 
 export const DataTable = <TDatum,>({

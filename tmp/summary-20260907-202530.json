@@ -1,0 +1,4 @@
+{
+  "summary": "Phase 4 Docs abgeschlossen: AreaExamples.tsx mit 8 Varianten (basic-smooth, multi-series, stacked, gradient-fill, stepped, linear-multi, markers-on, dashed-forecast), area.mdx mit API-Notes und UIpkge-Attribution, props.ts erweitert, Gallery/ChartLab aktualisiert. Docs typecheck/build, lint und format OK. Browser-Check auf Preview-Server: alle 8 Sections, Light/Dark, schmal/breit.",
+  "current_status": "Area-Chart-Erweiterung Phasen 1–4 vollständig (Core + Docs). dist/ durch Build aktualisiert, nicht committed."
+}

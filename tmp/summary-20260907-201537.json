@@ -1,0 +1,4 @@
+{
+  "summary": "Phase 1 der Area-Chart-Erweiterung umgesetzt: LineCurve um step, stepBefore und stepAfter erweitert; Kurvenauflösung in resolveCurve vereinheitlicht (LineSeries, AreaSeries, StackedAreaSeries); AreaChart reicht curve und outline an StackedAreaSeries weiter; Motion-StackedAreaSeries angepasst. Neue Tests in area-curve.test.tsx. Alle Validierungen bestanden (125 Tests, typecheck, oxlint, oxfmt).",
+  "current_status": "Phase 1 abgeschlossen. Nächste Phasen (Gradient/Marker-API, Docs) stehen noch aus. Kein Commit erstellt."
+}

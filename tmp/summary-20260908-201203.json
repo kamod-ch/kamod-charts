@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 1 umgesetzt: Neue pure Layout-Schicht packages/core/src/series/pie-layout.ts mit CircularVariant full/half, ResolvedPieLayout, resolvePieLayout. Full bewahrt exakt Legacy-Center und Auto-Outer-Radius; Half nutzt -PI/2..PI/2, CenterY ~68%, Auto-Radius mit activeOffset. buildPieSlices um startAngle/endAngle (normal + rose) erweitert. resolvePieOuterRadius delegiert an Layout. 21 neue Tests in pie-layout.test.ts, alle Pie-Regressionstests grün, typecheck/lint/format ok.",
+  "current_status": "Pie Full/Half-Layoutgeometrie als rendererunabhängige Schicht implementiert und exportiert. Bereit für Prompt 2 (Renderer-/Chart-Integration, ggf. DonutChart)."
+}

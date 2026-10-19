@@ -1,0 +1,34 @@
+---
+title: Devjobs analytics dashboard (recipe)
+description: Synthetic dashboard using @kamod-ch/charts with de-CH formatting and synchronized time selection.
+---
+
+import { DevjobsDashboard } from "../components/recipes/DevjobsDashboard";
+import { ExternalLegendExample } from "../components/recipes/ExternalLegendExample";
+
+This recipe shows a **synthetic** analytics layout inspired by Devjobs.ch KPIs. It is not wired to production tracking; metrics are clearly labeled.
+
+## Live example
+
+<DevjobsDashboard />
+
+## Copy-paste imports
+
+```tsx
+import { LineChart } from "@kamod-ch/charts/line-chart";
+import { BarChart } from "@kamod-ch/charts/bar-chart";
+import { useSynchronizedCartesianSelection } from "@kamod-ch/charts";
+import "@kamod-ch/charts/theme/tokens.css";
+```
+
+Use `format={{ locale: "de-CH", timeZone: "Europe/Zurich" }}` on cartesian charts for consistent tooltips. Lift selection with `useSynchronizedCartesianSelection` when two time series use different sampling.
+
+## External legend
+
+<ExternalLegendExample />
+
+`hiddenSeriesIds` and `onHiddenSeriesChange` on `LineChart` keep the chart in sync with your own legend UI.
+
+## Adapter contract
+
+Map your dashboard DTO to chart rows (`date`, numeric metrics, category keys). Keep backend-specific field names outside the chart components.

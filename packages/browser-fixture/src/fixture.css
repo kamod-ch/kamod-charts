@@ -1,0 +1,12 @@
+@import "../../core/src/theme/tokens.css";
+
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  margin: 1rem;
+  background: var(--chart-background, canvas);
+  color: var(--chart-foreground, canvastext);
+}

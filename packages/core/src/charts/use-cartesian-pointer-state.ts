@@ -1,8 +1,11 @@
 import type { JSX } from "preact";
 import { useCallback, useState } from "preact/hooks";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
+import type { NumericDomain } from "../scales";
 import { findNearestCartesianIndexByX } from "./cartesian-interaction";
+import type { CartesianXIndex } from "./cartesian-x-index";
 import { resolvePointerPlot } from "./chart-pointer";
+import { useCartesianPointerFrame } from "./use-cartesian-pointer-frame";
 
 export type CartesianPointerPlot = {
   plotX: number;
@@ -15,37 +18,74 @@ export const useCartesianPointerState = <TDatum>({
   xScale,
   fallbackWidth,
   height,
+  xIndex,
+  yDomain,
+  seriesKey,
+  controlledActiveIndex,
+  onActiveIndexChange,
 }: {
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
   fallbackWidth: number;
   height: number;
+  xIndex?: CartesianXIndex | null;
+  yDomain?: NumericDomain;
+  seriesKey?: DataAccessor<TDatum, number | null | undefined>;
+  controlledActiveIndex?: number | null;
+  onActiveIndexChange?: (index: number | null) => void;
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(null);
+  const activeIndex =
+    controlledActiveIndex !== undefined ? controlledActiveIndex : internalActiveIndex;
+  const setActiveIndex = useCallback(
+    (index: number | null) => {
+      if (controlledActiveIndex === undefined) {
+        setInternalActiveIndex(index);
+      }
+    },
+    [controlledActiveIndex],
+  );
   const [pointerPlot, setPointerPlot] = useState<CartesianPointerPlot | null>(null);
 
-  const onPointerMove = useCallback(
+  const applyPointer = useCallback(
     (event: JSX.TargetedPointerEvent<Element>) => {
       const { plot, position } = resolvePointerPlot(event, fallbackWidth, height);
       setPointerPlot({ plotX: position.plotX, plotY: position.plotY });
-      setActiveIndex(
-        findNearestCartesianIndexByX({
-          data,
-          xKey,
-          xScale,
-          plotWidth: plot.width,
-          plotX: position.plotX,
-        }),
-      );
+      const nextIndex = findNearestCartesianIndexByX({
+        data,
+        xKey,
+        xScale,
+        plotWidth: plot.width,
+        plotX: position.plotX,
+        xIndex,
+        yDomain,
+        seriesKey,
+      });
+      setActiveIndex(nextIndex);
+      onActiveIndexChange?.(nextIndex);
     },
-    [data, fallbackWidth, height, xKey, xScale],
+    [
+      data,
+      fallbackWidth,
+      height,
+      onActiveIndexChange,
+      seriesKey,
+      setActiveIndex,
+      xIndex,
+      xKey,
+      xScale,
+      yDomain,
+    ],
   );
+
+  const onPointerMove = useCartesianPointerFrame(applyPointer);
 
   const onPointerLeave = useCallback(() => {
     setPointerPlot(null);
     setActiveIndex(null);
-  }, []);
+    onActiveIndexChange?.(null);
+  }, [onActiveIndexChange, setActiveIndex]);
 
   const resetPointerPlot = useCallback(() => {
     setPointerPlot(null);

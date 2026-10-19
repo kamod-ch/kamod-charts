@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 2 abgeschlossen: Bubble-Größenlogik in ScatterChart, ScatterSeries und MotionScatterSeries verdrahtet. Gemeinsame Auflösung über scatter-series-layout.ts (buildScatterSeriesLayout) mit Priorität pointRadius > pointSize > sizeKey > series.pointRadius > 4, baseRadius/renderedRadius-Trennung, Opacity-Clamp, stabile Radius-Sortierung bei sizeKey. ScatterChart inferiert sizeDomain einmal. 12+11 neue/erweiterte Rendering-Tests plus bestehende Scatter/Motion-Suites grün; typecheck, lint, format:check grün.",
+  "current_status": "Scatter-Bubble-Rendering ist in statischen und Motion-Series produktiv verdrahtet; Kategorien/Tooltip folgen in späteren Prompts. Keine Docs-Änderungen in diesem Schritt."
+}

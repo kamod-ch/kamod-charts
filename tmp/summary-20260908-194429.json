@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 3 umgesetzt: Deklarativer Kategorienmodus für ScatterChart mit createScatterCategoryContext, hiddenCategoryIds getrennt von hiddenSeries, Kategorie-Legende (ein Item je Kategorie), Farb-/Sichtbarkeitslogik über dieselbe categoryContext-Quelle in buildScatterSeriesLayout (Static + Motion). Achsen-Domain bleibt stabil; activeIndex wird beim Ausblenden der aktiven Kategorie bereinigt. 12 neue Tests in scatter-category.test.tsx; gesamte Scatter-Suite (48 Tests) plus typecheck/lint/format grün.",
+  "current_status": "ScatterChart unterstützt Serienmodus (unverändert) und Kategoriemodus (Farben, Legende, Toggle, Motion-Exit). Tooltip-Umbau und Docs stehen noch aus."
+}

@@ -1,0 +1,4 @@
+{
+  "summary": "Explored packages/docs for PreactPress conventions: MDX frontmatter + component imports, HeroDemo + ExampleFrame gallery pattern, PropsTable from data/props.ts, PieChart documented across pie.mdx/PieExamples/PieApiNotes with six anchored examples. No docs smoke/screenshot tests exist; CI uses typecheck + docs:build; core pie tests live in packages/core/tests/pie*.test.*. Light/dark via @kamod-ch/themes init script, ThemeToggle, Tailwind dark variant, and CSS chart tokens.",
+  "current_status": "kamod-charts docs package is a PreactPress site with complete PieChart reference docs, live demos (no screenshots), and theme/responsive patterns; validation is build/typecheck/CI rather than dedicated docs screenshot tests."
+}

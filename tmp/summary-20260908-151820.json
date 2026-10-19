@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 4 pie outside labels completed: layoutPieLabels pure helper with leader lines, left/right text anchors, shift/hide/none collision modes, minAngle suppression, gutter reservation for auto outerRadius, and PieLabelLayer for decorative non-focusable SVG. MotionPieSeries filters exit-phase slices from label layout. Fixed pie-label.test.tsx (render import, motion tests). All 79 pie-related tests pass plus typecheck, lint, format:check. No commit.",
+  "current_status": "Prompts 1–4 complete. Pie chart has shared model, tooltip, legend, and collision-aware outside labels with leader lines. New files: pie-label.ts, pie-label-layer.tsx, pie-label.test.tsx (untracked). Ready for review."
+}

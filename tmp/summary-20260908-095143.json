@@ -1,0 +1,4 @@
+{
+  "summary": "Removed 'v0.1 alpha' version badge from docs header by deleting BadgeVersion component and its usage in Layout.tsx.",
+  "current_status": "Docs header cleaned up. Prior fixes (Y-axis labels, AreaIntro, ApiNotes, accessibility spacing) and core changes remain uncommitted."
+}

@@ -9,6 +9,7 @@ import {
 } from "../interaction/hit-testing";
 import type { NumericDomain } from "../scales";
 import { createCartesianScales, getCartesianPoints } from "../series/cartesian";
+import { type CartesianXIndex, findNearestIndexOnXIndex } from "./cartesian-x-index";
 import { getStackedSeriesValueAt } from "../series/stacked-line-points";
 import type { StackSeries } from "../series/stack";
 
@@ -163,23 +164,33 @@ export const findNearestCartesianIndexByX = <TDatum>({
   xScale: xScaleKind,
   plotWidth,
   plotX,
+  xIndex,
+  yDomain = [0, 1],
+  seriesKey = indexAccessor as DataAccessor<TDatum, number | null | undefined>,
 }: {
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
   plotWidth: number;
   plotX: number;
+  xIndex?: CartesianXIndex | null;
+  yDomain?: NumericDomain;
+  seriesKey?: DataAccessor<TDatum, number | null | undefined>;
 }): number | null => {
   if (data.length === 0 || plotWidth <= 0) {
     return null;
   }
 
+  if (xIndex) {
+    return findNearestIndexOnXIndex(xIndex, plotX);
+  }
+
   const { xScale } = createCartesianScales({
     data,
     xKey,
-    yKey: indexAccessor,
+    yKey: seriesKey,
     xScale: xScaleKind,
-    yDomain: [0, 1],
+    yDomain,
     xRange: [0, plotWidth],
     yRange: [1, 0],
   });

@@ -1,0 +1,4 @@
+{
+  "summary": "Investigated user report that area chart x coordinate always shows the same value on docs hero chart (kamod-chart-P0-0). Root cause: pointer hit-testing relied on SVG surface viewBox when events targeted child elements; added plot capture rect and robust surface resolution in getPointerPosition/resolvePointerPlot. Added regression tests for tooltip x label scrubbing across plot positions. All 183 tests pass.",
+  "current_status": "Area chart pointer/tooltip x scrubbing fix applied in chart.tsx, pointer.ts, chart-pointer.ts. Release hardening from Prompt 6 still uncommitted. User should rebuild docs preview to verify hero chart tooltip updates Jan→Jun when scrubbing horizontally."
+}

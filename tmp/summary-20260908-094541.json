@@ -1,0 +1,4 @@
+{
+  "summary": "Completed beautification of the Area Chart 'API notes' section: added reusable ApiNotes card component with header and responsive 2-column grid, AreaApiNotes with 8 structured items (icons, inline code), and wired it into area.mdx. Docs typecheck passes with no linter errors.",
+  "current_status": "Area Chart Phases 1–6 largely complete (184 tests pass). Docs API notes block redesigned. Uncommitted changes across core, tests, docs, CHANGELOG, bundle-size. Awaiting optional browser QA and release commit if user requests."
+}

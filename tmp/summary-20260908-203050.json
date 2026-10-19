@@ -1,0 +1,4 @@
+{
+  "summary": "Completed Prompt 5 (exports, focused subpath, API compatibility): extended scripts/test-package-exports.mjs with DonutChart runtime/type checks on root and /donut, internal hook exclusion, and pie subpath backward-compat guard; added tests/donut-package.test.ts (cartesian entry tree-shake boundary, SSR subpath import, declaration surface) and tests/fixtures/donut-type-consumer.ts (generic DataAccessor type fixture); updated docs/bundle-size.md via pnpm size:report. All gates green: 479 tests, typecheck, oxlint, oxfmt, build, export test.",
+  "current_status": "DonutChart public API and @kamod-ch/charts/donut subpath are complete and gated in CI. Pie API unchanged. Prompt 4 (half-donut product behavior) remains open from prior handoff."
+}

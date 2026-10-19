@@ -1,0 +1,4 @@
+{
+  "summary": "Removed the UIpkge attribution paragraph from packages/docs/charts/area.mdx (\"Example layouts were inspired by the MIT-licensed...\") as requested. API notes with inline UIpkge step-curve references remain unchanged.",
+  "current_status": "Area docs page no longer shows the MIT-licensed gallery attribution block under API notes. Other area chart work (pointer smooth tracking, release hardening) remains uncommitted."
+}

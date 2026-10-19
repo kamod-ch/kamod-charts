@@ -41,8 +41,13 @@ export const stackedLayerToCartesianPoints = <TDatum>(
   });
 };
 
-export const getStackedSeriesValueAt = <TDatum>(
+export const buildStackLayers = <TDatum>(
   data: readonly TDatum[],
+  series: readonly StackSeries<TDatum>[],
+): readonly (readonly StackedValue<TDatum>[])[] => getStackedValues(data, series);
+
+export const getStackedSeriesValueFromLayers = <TDatum>(
+  layers: readonly (readonly StackedValue<TDatum>[])[],
   series: readonly StackSeries<TDatum>[],
   seriesId: string,
   index: number,
@@ -51,7 +56,13 @@ export const getStackedSeriesValueAt = <TDatum>(
   if (seriesIndex < 0) {
     return null;
   }
-
-  const layers = getStackedValues(data, series);
   return layers[seriesIndex]?.[index] ?? null;
 };
+
+export const getStackedSeriesValueAt = <TDatum>(
+  data: readonly TDatum[],
+  series: readonly StackSeries<TDatum>[],
+  seriesId: string,
+  index: number,
+): StackedValue<TDatum> | null =>
+  getStackedSeriesValueFromLayers(buildStackLayers(data, series), series, seriesId, index);

@@ -1,0 +1,4 @@
+{
+  "summary": "Added not-prose mt-6 to AccessibilityNotes section for spacing above the accessibility card on area docs (and consistently on all chart pages using the component).",
+  "current_status": "Area docs UX polish ongoing (API notes card, removed duplicate accessibility h2, spacing fix). Area intro paragraph beautification still pending from prior request."
+}

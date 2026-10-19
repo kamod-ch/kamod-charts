@@ -1,0 +1,4 @@
+{
+  "summary": "Implemented optional Pie legend with stable key-based visibility toggling on Prompt 2 foundation. Added hiddenKeys to normalizePieData/buildPieSlices with recalculated totals/percentages, showLegend/PieLegendOptions API, Legend in Chart overlay, and resolveNextActiveIndexAfterHide for active/tooltip state when hiding slices. Hidden slices excluded from geometry, navigation, and tooltips; colors remain tied to original indices; all-hidden shows emptyContent while legend remains restorable. Added pie-legend.test.tsx with 12 tests. All validation passed: 60 pie/tooltip/legend/motion tests, typecheck, lint, format:check, test:exports. No commit.",
+  "current_status": "Prompts 1–3 complete. Pie chart has shared model, tooltip/live region, and interactive legend. Source + 4 test files changed; dist updated by export test build. Ready for review."
+}

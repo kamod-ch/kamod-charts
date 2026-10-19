@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.55.1
+        version: 1.64.1
       '@types/node':
         specifier: ^25.9.2
         version: 25.9.5
@@ -20,6 +23,38 @@ importers:
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
+
+  packages/browser-fixture:
+    dependencies:
+      '@kamod-ch/charts':
+        specifier: workspace:*
+        version: link:../core
+      preact:
+        specifier: ^10.29.8
+        version: 10.29.8(preact-render-to-string@6.7.0)
+    devDependencies:
+      '@preact/preset-vite':
+        specifier: ^2.10.2
+        version: 2.10.6(@babel/core@7.29.7(supports-color@7.2.0))(preact@10.29.8)(rollup@4.62.4)(supports-color@7.2.0)(vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0))
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
+      vite:
+        specifier: ^7.1.9
+        version: 7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0)
+
+  packages/consumer-fixtures:
+    dependencies:
+      '@kamod-ch/charts':
+        specifier: workspace:*
+        version: link:../core
+      preact:
+        specifier: ^10.29.8
+        version: 10.29.8(preact-render-to-string@6.7.0)
+    devDependencies:
+      vite:
+        specifier: ^7.3.7
+        version: 7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0)
 
   packages/core:
     dependencies:
@@ -792,6 +827,11 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     cpu: [x64]
     os: [win32]
+
+  '@playwright/test@1.64.1':
+    resolution: {integrity: sha512-IaYGml/nSOiZWROfPtuIL7neuu9qDOZ3TNvNljUIrhDMxiGTgPjzj/g9p9RxpS2tSepPDRY+UwAaEeiKtUvIAg==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
@@ -2706,6 +2746,16 @@ packages:
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
 
+  playwright-core@1.64.1:
+    resolution: {integrity: sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.1:
+    resolution: {integrity: sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   points-on-curve@0.2.0:
     resolution: {integrity: sha512-0mYKnYYe9ZcqMCWhUjItv/oHjvgEsfKvnUTg8sAtnHr3GVy7rGkXCb6d5cSyqrWqL4k81b9CPg3urd+T7aop3A==}
 
@@ -3127,6 +3177,46 @@ packages:
     resolution: {integrity: sha512-IKSpYkzDBsKAxa05naRbj7GvNVMSdww/Z/E89oO3xndz+gWnOBOKOAbEXv7qDhktY/j3vHgJmoV1pPzqU2tx9g==}
     peerDependencies:
       vite: 5.x || 6.x || 7.x || 8.x
+
+  vite@7.3.7:
+    resolution: {integrity: sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==}
+    engines: {node: ^20.19.0 || >=22.12.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^20.19.0 || >=22.12.0
+      jiti: '>=1.21.0'
+      less: ^4.0.0
+      lightningcss: ^1.21.0
+      sass: ^1.70.0
+      sass-embedded: ^1.70.0
+      stylus: '>=0.54.8'
+      sugarss: ^5.0.0
+      terser: ^5.16.0
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      jiti:
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
 
   vite@8.2.1:
     resolution: {integrity: sha512-EU/eS7BH3XROHh2YnBefjM6DBKA6ZeMZEYQbj7NLWg5wHYlhB8B/Mayd5XsgWq+NFYccDOTemRpdETWR6Ka/lw==}
@@ -3795,7 +3885,30 @@ snapshots:
   '@oxlint/binding-win32-x64-msvc@1.78.0':
     optional: true
 
+  '@playwright/test@1.64.1':
+    dependencies:
+      playwright: 1.64.1
+
   '@polka/url@1.0.0-next.29': {}
+
+  '@preact/preset-vite@2.10.6(@babel/core@7.29.7(supports-color@7.2.0))(preact@10.29.8)(rollup@4.62.4)(supports-color@7.2.0)(vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0))':
+    dependencies:
+      '@babel/core': 7.29.7(supports-color@7.2.0)
+      '@babel/plugin-transform-react-jsx': 7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0)
+      '@babel/plugin-transform-react-jsx-development': 7.29.7(@babel/core@7.29.7(supports-color@7.2.0))(supports-color@7.2.0)
+      '@prefresh/vite': 2.4.12(preact@10.29.8)(supports-color@7.2.0)(vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0))
+      '@rollup/pluginutils': 5.4.0(rollup@4.62.4)
+      babel-plugin-transform-hook-names: 1.0.2(@babel/core@7.29.7(supports-color@7.2.0))
+      debug: 4.4.3(supports-color@7.2.0)
+      magic-string: 0.30.21
+      picocolors: 1.1.1
+      vite: 7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0)
+      vite-prerender-plugin: 0.5.13(vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0))
+      zimmerframe: 1.1.4
+    transitivePeerDependencies:
+      - preact
+      - rollup
+      - supports-color
 
   '@preact/preset-vite@2.10.6(@babel/core@7.29.7(supports-color@7.2.0))(preact@10.29.8)(rollup@4.62.4)(supports-color@7.2.0)(vite@8.2.1(@types/node@25.9.5)(esbuild@0.27.7)(jiti@2.7.0))':
     dependencies:
@@ -3830,6 +3943,18 @@ snapshots:
       preact: 10.29.8(preact-render-to-string@6.7.0)
 
   '@prefresh/utils@1.2.1': {}
+
+  '@prefresh/vite@2.4.12(preact@10.29.8)(supports-color@7.2.0)(vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0))':
+    dependencies:
+      '@babel/core': 7.29.7(supports-color@7.2.0)
+      '@prefresh/babel-plugin': 0.5.3
+      '@prefresh/core': 1.5.10(preact@10.29.8)
+      '@prefresh/utils': 1.2.1
+      '@rollup/pluginutils': 4.2.1
+      preact: 10.29.8(preact-render-to-string@6.7.0)
+      vite: 7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0)
+    transitivePeerDependencies:
+      - supports-color
 
   '@prefresh/vite@2.4.12(preact@10.29.8)(supports-color@7.2.0)(vite@8.2.1(@types/node@25.9.5)(esbuild@0.27.7)(jiti@2.7.0))':
     dependencies:
@@ -5887,6 +6012,12 @@ snapshots:
       mlly: 1.8.2
       pathe: 2.0.3
 
+  playwright-core@1.64.1: {}
+
+  playwright@1.64.1:
+    dependencies:
+      playwright-core: 1.64.1
+
   points-on-curve@0.2.0: {}
 
   points-on-path@0.2.1:
@@ -6384,6 +6515,16 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
+  vite-prerender-plugin@0.5.13(vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0)):
+    dependencies:
+      kolorist: 1.8.0
+      magic-string: 0.30.21
+      node-html-parser: 6.1.13
+      simple-code-frame: 1.3.0
+      source-map: 0.7.6
+      stack-trace: 1.0.0
+      vite: 7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0)
+
   vite-prerender-plugin@0.5.13(vite@8.2.1(@types/node@25.9.5)(esbuild@0.27.7)(jiti@2.7.0)):
     dependencies:
       kolorist: 1.8.0
@@ -6393,6 +6534,20 @@ snapshots:
       source-map: 0.7.6
       stack-trace: 1.0.0
       vite: 8.2.1(@types/node@25.9.5)(esbuild@0.27.7)(jiti@2.7.0)
+
+  vite@7.3.7(@types/node@25.9.5)(jiti@2.7.0)(lightningcss@1.33.0):
+    dependencies:
+      esbuild: 0.27.7
+      fdir: 6.5.0(picomatch@4.0.5)
+      picomatch: 4.0.5
+      postcss: 8.5.26
+      rollup: 4.62.4
+      tinyglobby: 0.2.17
+    optionalDependencies:
+      '@types/node': 25.9.5
+      fsevents: 2.3.3
+      jiti: 2.7.0
+      lightningcss: 1.33.0
 
   vite@8.2.1(@types/node@25.9.5)(esbuild@0.27.7)(jiti@2.7.0):
     dependencies:

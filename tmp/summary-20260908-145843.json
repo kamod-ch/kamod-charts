@@ -1,0 +1,4 @@
+{
+  "summary": "Implemented centralized pie data model by splitting normalizePieData (pure data preparation with total, percentage, stable keys/colors) from buildPieSlices (d3 geometry). Updated PieSeries, MotionPieSeries, and PieChart to share this logic. PieChart keyboard navigation now operates on visible positive slices in render order; Escape clears active state; Enter/Space only fires for valid slices. Added emptyContent and activeOffset props to high-level API; removed hardcoded German empty text. Extended sort to boolean | comparator on PieChartProps. Added 23 pie tests covering normalization, navigation, empty states, and SSR determinism. All validation passed: typecheck, lint, format:check, pie + motion tests (37 total).",
+  "current_status": "Pie model centralization complete on branch main (HEAD 4db777e). Seven source/test files modified, no commit pushed. Ready for review."
+}

@@ -1,7 +1,8 @@
-import { fireEvent, render } from "./testing-library";
+import { fireEvent, render, waitFor } from "./testing-library";
 import renderToString from "preact-render-to-string";
 import { describe, expect, it, vi } from "vitest";
 import { DonutChart } from "../src";
+import { resolveDonutChartLabels } from "../src/charts/donut-chart";
 import {
   createDonutCenterContext,
   resolveDonutCenterContent,
@@ -19,6 +20,77 @@ const data: Datum[] = [
   { name: "B", value: 20 },
   { name: "C", value: 30 },
 ];
+
+describe("resolveDonutChartLabels", () => {
+  it("defaults to outside labels on full and none on half", () => {
+    expect(resolveDonutChartLabels("full")).toBe("outside");
+    expect(resolveDonutChartLabels("half")).toBe("none");
+    expect(resolveDonutChartLabels("full", "inside")).toBe("inside");
+    expect(resolveDonutChartLabels("half", "outside")).toBe("outside");
+  });
+});
+
+describe("DonutChart half variant", () => {
+  it("omits slice labels by default and marks the semicircle variant in SSR", () => {
+    const markup = renderToString(
+      <DonutChart
+        data={data}
+        valueKey="value"
+        labelKey="name"
+        width={320}
+        height={240}
+        variant="half"
+        showTotal={false}
+      />,
+    );
+
+    expect(markup).toContain('data-kamod-chart-circular-variant="half"');
+    expect(markup).not.toContain(">A</text>");
+    expect(markup).not.toContain(">B</text>");
+    expect(markup).toContain("<path");
+  });
+
+  it("renders showTotal in the reserved half baseline via center offset", () => {
+    const markup = renderToString(
+      <DonutChart
+        data={data}
+        valueKey="value"
+        labelKey="name"
+        width={320}
+        height={240}
+        variant="half"
+        formatTotal={(total) => `Σ ${total}`}
+      />,
+    );
+
+    expect(markup).toContain(">Σ 60</text>");
+    expect(markup).toMatch(/translate\(0 -8\)/);
+  });
+
+  it("supports tooltip and keyboard navigation on half donuts", async () => {
+    const { container } = render(
+      <DonutChart
+        data={data}
+        valueKey="value"
+        labelKey="name"
+        width={320}
+        height={240}
+        variant="half"
+        tooltip
+      />,
+    );
+    const svg = container.querySelector("svg");
+    if (!svg) {
+      throw new Error("expected svg");
+    }
+
+    fireEvent.keyDown(svg, { key: "ArrowRight" });
+    await waitFor(() => {
+      expect(container.querySelector("[data-kamod-chart-tooltip]")).not.toBeNull();
+    });
+    expect(container.querySelector("[data-kamod-chart-tooltip]")?.textContent).toContain("A");
+  });
+});
 
 describe("DonutChart defaults", () => {
   it("renders a full donut ring with outside labels and automatic total", () => {

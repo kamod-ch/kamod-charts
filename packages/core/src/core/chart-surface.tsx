@@ -30,13 +30,13 @@ export const ChartSurface = ({
 }: ChartSurfaceProps) => {
   const titleId = labelledBy ?? (title && id ? `${id}-title` : undefined);
   const descriptionId = describedBy ?? (description && id ? `${id}-description` : undefined);
-  const ariaLabelledBy = [titleId, descriptionId].filter(Boolean).join(" ") || undefined;
 
   return (
     <svg
       id={id}
       role={role}
-      aria-labelledby={ariaLabelledBy}
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
       class={className}
       style={style}
       width={width}

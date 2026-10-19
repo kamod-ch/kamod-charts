@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 1 umgesetzt: Neue Scatter-Typen in types.ts (ScatterSizeScale, ScatterCategoryConfig, ScatterSeriesConfig, ScatterPointContext, erweiterte ScatterChartProps mit sizeKey/categoryKey; pointSize als Legacy-Alias dokumentiert). Pure Utilities in scatter-size.ts (Domain-Inferenz, sqrt/linear-Mapping, Clamping, resolveScatterRadius) und scatter-model.ts (Kategorie-Derivation/Merge, ResolvedScatterPoint-Modell, resolveScatterPoints). 20 fokussierte Tests grün; typecheck und format:check grün. ScatterChart noch nicht verdrahtet.",
+  "current_status": "Bubble-Kernlogik (Größe + Kategorien) ist als reine Utilities mit Tests vorhanden und exportiert über charts/index.ts (Types). Nächster Schritt: Wiring in ScatterChart/ScatterSeries und Docs."
+}

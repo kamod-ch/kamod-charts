@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 7 release prep: audited diff (additive, no new deps), updated CHANGELOG.md and api/index.mdx, bundle report +26 KB explained, all release gates green except pnpm ci final git diff on docs/bundle-size.md (expected until commit). 249 tests pass. No publish/commit.",
+  "current_status": "LineChart extension release-ready on main (uncommitted): changelog, bundle-size.md, docs API note updated; awaiting maintainer commit/tag/publish approval."
+}

@@ -2,6 +2,21 @@
 
 All notable changes to `@kamod-ch/charts` are documented here.
 
+## Unreleased
+
+### Added
+
+- Cartesian charts: optional `yDomain`, `margin`, `class`, `style`, `emptyContent`, and `format` (see RFC 0009).
+- `LineChart` / `AreaChart`: controlled `activeIndex` and `onActiveChange`; `BarChart` controlled selection callbacks.
+- `useSynchronizedCartesianSelection`, `findNearestDatumIndexByX`, and `downsampleMinMax` export from `@kamod-ch/charts/performance`.
+- `ChartFormatProvider` and locale-aware default tooltip formatters.
+- Playwright coverage for sync charts, a11y, and bar clicks; browser benchmark and consumer bundle reporting scripts.
+
+### Fixed
+
+- `ChartSurface` uses `aria-describedby` for descriptions (title remains on `aria-labelledby`).
+- Plot capture layer ordering so bar clicks work with `tooltip={true}`.
+
 ## 0.2.0 — 2026-09-09
 
 ### Added

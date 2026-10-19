@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 7 release readiness: reviewed full diff (no API breaks, no new runtime deps, no React/ECharts, ReferenceArea reused via thin bar-reference-area adapter). Updated CHANGELOG.md with additive BarChart entries and migration note. Ran all release gates green (298 tests). Bundle total +10,473 bytes (+5.2%); bar-chart entry unchanged at 434B. Updated docs/bundle-size.md. No commit/push/publish.",
+  "current_status": "BarChart extension is release-ready pending maintainer approval. Uncommitted changes include core features, docs gallery, QA tests, CHANGELOG, and bundle-size report."
+}

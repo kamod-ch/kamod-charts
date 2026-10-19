@@ -1,0 +1,4 @@
+{
+  "summary": "Implemented Pie tooltip, pointer state, and LiveRegion on Prompt 1 foundation. Added PieSliceContext/PieTooltipOptions types, pieSliceAnchor/pieSliceSurfacePoint geometry helpers, PieActiveOverlay using existing Tooltip primitive and LiveRegion, separate keyboard/pointer state in PieChart, pointer handlers in Static and Motion PieSeries. Default tooltip shows label, value, and percentage; custom render/formatters supported. All validation passed: 48 pie/tooltip/motion tests, typecheck, lint, format:check. No commit.",
+  "current_status": "Prompt 1 + Prompt 2 complete. 9 modified + 3 new files in packages/core (pie-active-layers, pie-tooltip-options, pie-tooltip.test). Ready for review."
+}

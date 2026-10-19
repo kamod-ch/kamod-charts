@@ -1,0 +1,4 @@
+{
+  "summary": "Replaced plain area chart intro paragraph and markdown code fence with AreaIntro component: card layout matching ApiNotes, copyable import line, and two-column static vs motion import callouts. Wired into area.mdx; docs typecheck passes.",
+  "current_status": "Area docs UX polish complete (AreaIntro, AreaApiNotes, accessibility spacing). Core area chart work and release hardening remain uncommitted."
+}

@@ -92,7 +92,6 @@ export const ChartRoot = <TDatum,>({
               onPointerLeave={onPointerLeave}
             >
               <g data-kamod-chart-plot="" transform={`translate(${plotArea.x} ${plotArea.y})`}>
-                {context.isEmpty ? emptyState : children}
                 {!context.isEmpty && onPointerMove ? (
                   <rect
                     data-kamod-chart-plot-capture=""
@@ -112,6 +111,7 @@ export const ChartRoot = <TDatum,>({
                     }
                   />
                 ) : null}
+                {context.isEmpty ? emptyState : children}
               </g>
             </ChartSurface>
             {overlay}

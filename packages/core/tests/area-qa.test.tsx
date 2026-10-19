@@ -524,7 +524,8 @@ describe("Area chart release QA", () => {
         />,
       );
       expect(markup).toContain('role="img"');
-      expect(markup).toContain('aria-labelledby="a11y-area-title a11y-area-description"');
+      expect(markup).toContain('aria-labelledby="a11y-area-title"');
+      expect(markup).toContain('aria-describedby="a11y-area-description"');
       expect(markup).toContain('<title id="a11y-area-title">Revenue trend</title>');
       expect(markup).toContain('<desc id="a11y-area-description">Monthly revenue in EUR</desc>');
     });

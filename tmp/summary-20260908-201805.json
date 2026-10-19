@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 2 abgeschlossen: Pie-Pipeline auf einheitliches ResolvedPieLayout refaktoriert ohne API- oder Full-Pie-Regressions. Neuer interner Helper pie-series-layout.ts (resolvePieSeriesLayout, buildPieSlicesForLayout, Transform-Helpers). PieSeries, MotionPieSeries, PieActiveOverlay nutzen dieselben Layout-Inputs. pieSliceSurfacePoint und layoutPieLabels (Collision-Bounds relativ zu layout.centerY) angepasst. Kein circular-chart-controller (keine echte Wiederverwendung). 96 Pie/Motion-Tests grün, typecheck/lint/format ok.",
+  "current_status": "Full PieChart nutzt durchgängig resolvePieLayout; bereit für Half/DonutChart-Integration in Folge-Prompts."
+}

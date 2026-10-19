@@ -12,9 +12,10 @@ export const downsampleByStride = <TDatum>(
 
   const stride = Math.ceil(data.length / threshold);
   const sampled = data.filter((_datum, index) => index % stride === 0);
-  const last = data[data.length - 1];
+  const lastIndex = data.length - 1;
+  const last = data[lastIndex];
 
-  if (last && sampled[sampled.length - 1] !== last) {
+  if (sampled.length === 0 || sampled[sampled.length - 1] !== last) {
     return [...sampled, last];
   }
 

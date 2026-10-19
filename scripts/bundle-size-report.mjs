@@ -22,7 +22,10 @@ const total = rows.reduce((sum, [, size]) => sum + size, 0);
 const fileWidth = Math.max("File".length, ...rows.map(([file]) => file.length));
 const bytesWidth = Math.max("Bytes".length, ...rows.map(([, size]) => String(size).length));
 const markdown = [
-  "# Bundle size report",
+  "# Bundle size report (dist inventory)",
+  "",
+  "This file lists **published dist file sizes**, not minified consumer application bundles.",
+  "For consumer measurements see `docs/performance/consumer-bundles.md` and `pnpm consumer:report`.",
   "",
   `Generated from current \`packages/core/dist\`. Total JS/CSS bytes: ${total} bytes.`,
   "",

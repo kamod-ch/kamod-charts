@@ -1,7 +1,7 @@
 import * as preact from 'preact';
-import { P as PieChartProps } from '../types-Dqcdlu94.js';
+import { e as PieChartProps } from '../types-D9_pj9ff.js';
 import '../types-vhy5Wa3f.js';
-import '../types-Doyfwbln.js';
+import '../types-B2kenooF.js';
 import '../tooltip-placement-DZrqa8Zt.js';
 import 'd3-shape';
 

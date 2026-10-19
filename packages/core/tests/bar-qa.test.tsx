@@ -139,7 +139,8 @@ describe("Bar chart release QA", () => {
         />,
       );
       expect(markup).toContain('role="img"');
-      expect(markup).toContain('aria-labelledby="a11y-bar-title a11y-bar-description"');
+      expect(markup).toContain('aria-labelledby="a11y-bar-title"');
+      expect(markup).toContain('aria-describedby="a11y-bar-description"');
       expect(markup).toContain('<title id="a11y-bar-title">Revenue by month</title>');
       expect(markup).toContain('<desc id="a11y-bar-description">Grouped deploy counts</desc>');
     });

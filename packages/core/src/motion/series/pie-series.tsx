@@ -120,7 +120,7 @@ const AnimatedPieSeries = <TDatum,>({
       valueKey,
     ],
   );
-  const targetKey = `${plotArea.width}x${plotArea.height}::${slices
+  const targetKey = `${variant}::${plotArea.width}x${plotArea.height}::${slices
     .map(
       (slice) =>
         `${slice.key}:${slice.startAngle}:${slice.endAngle}:${slice.innerRadius}:${slice.outerRadius}`,

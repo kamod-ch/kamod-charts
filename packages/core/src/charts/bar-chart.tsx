@@ -20,6 +20,9 @@ import { resolveBarReferenceAreaProps } from "./bar-reference-area";
 import { resolvePointerPlot } from "./chart-pointer";
 import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled, resolveTooltipOptions } from "./tooltip-options";
+import { useCartesianIntlAxisTicks } from "./cartesian-axis-formatters";
+import { CartesianChartFrame } from "./cartesian-chart-frame";
+import { resolveCartesianEmptyState } from "./cartesian-empty-state";
 import type { BarChartProps } from "./types";
 
 export const BarChart = <TDatum,>({
@@ -48,6 +51,14 @@ export const BarChart = <TDatum,>({
   referenceAreas = [],
   onBarClick,
   animate,
+  yDomain: yDomainProp,
+  margin,
+  class: className,
+  style: styleProp,
+  emptyContent,
+  format,
+  activeIndex: controlledActiveIndex,
+  onActiveChange,
 }: BarChartProps<TDatum>) => {
   const motion = useChartMotionContext();
   const BarMarks = (motion.slots.BarMarks ?? StaticBarMarks) as typeof StaticBarMarks;
@@ -55,16 +66,24 @@ export const BarChart = <TDatum,>({
   const visibleSeries = series.filter(
     (entry, index) => !entry.hidden && !hiddenSeries.includes(getSeriesId(entry, index)),
   );
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(null);
+  const activeIndex =
+    controlledActiveIndex !== undefined ? controlledActiveIndex : internalActiveIndex;
+  const setActiveIndex = (index: number | null) => {
+    if (controlledActiveIndex === undefined) {
+      setInternalActiveIndex(index);
+    }
+  };
   const [activeSeriesIndex, setActiveSeriesIndex] = useState(0);
   const stackSeries = visibleSeries.map((entry, index) => ({
     id: getSeriesId(entry, index),
     value: entry.key,
   }));
-  const yDomain = useMemo(
+  const inferredYDomain = useMemo(
     () => (stacked ? inferStackedDomain(data, stackSeries) : inferGroupedDomain(data, stackSeries)),
     [data, stacked, stackSeries],
   );
+  const yDomain = yDomainProp ?? inferredYDomain;
   const isHorizontal = orientation === "horizontal";
   const resolvedSeriesIndex =
     visibleSeries.length === 0 ? 0 : Math.min(activeSeriesIndex, visibleSeries.length - 1);
@@ -73,243 +92,272 @@ export const BarChart = <TDatum,>({
   const tooltipOptions = resolveTooltipOptions(tooltip, "nearest");
   const fallbackWidth = width ?? initialWidth ?? 640;
 
-  const activateBar = (bar: BarGeometry<TDatum> | null) => {
+  const activateBar = (
+    bar: BarGeometry<TDatum> | null,
+    source: "pointer" | "keyboard" = "pointer",
+  ) => {
     if (!bar) {
       setActiveIndex(null);
+      onActiveChange?.({
+        activeIndex: null,
+        activeSeriesId: null,
+        source,
+      });
       return;
     }
     setActiveIndex(bar.index);
     setActiveSeriesIndex(bar.seriesIndex);
+    const seriesId = getSeriesId(visibleSeries[bar.seriesIndex]!, bar.seriesIndex);
+    onActiveChange?.({
+      activeIndex: bar.index,
+      activeSeriesId: seriesId,
+      source,
+    });
   };
 
+  const chartStyle =
+    typeof styleProp === "string"
+      ? styleProp
+      : { ...styleProp, ...(tooltipEnabled ? { cursor: "crosshair" } : {}) };
+  const { xTickFormatter, yTickFormatter } = useCartesianIntlAxisTicks(format);
+
   return (
-    <Chart
-      data={data}
-      xKey={xKey}
-      xScale={xScale}
-      width={width}
-      height={height}
-      initialWidth={initialWidth}
-      responsive={responsive}
-      title={title}
-      description={description}
-      id={id}
-      tabIndex={0}
-      style={tooltipEnabled ? { cursor: "crosshair" } : undefined}
-      onPointerMove={
-        tooltipEnabled
-          ? (event) => {
-              const { plot, position } = resolvePointerPlot(event, fallbackWidth, height);
-              const bars = resolveBarGeometry({
-                data,
-                series: visibleSeries,
-                xKey,
-                yDomain,
-                stacked,
-                grouped,
-                horizontal: isHorizontal,
-                minBarSize,
-                maxBarSize,
-                plotWidth: plot.width,
-                plotHeight: plot.height,
-              });
-              activateBar(
-                hitTestBars(
-                  bars,
-                  position.plotX,
-                  position.plotY,
-                  tooltipOptions?.mode ?? "nearest",
-                  isHorizontal,
-                ),
-              );
-            }
-          : undefined
-      }
-      onPointerLeave={tooltipEnabled ? () => setActiveIndex(null) : undefined}
-      onKeyDown={createChartKeyboardHandler({
-        pointCount: data.length,
-        seriesCount: Math.max(visibleSeries.length, 1),
-        activeIndex: activeIndex ?? 0,
-        activeSeriesIndex: resolvedSeriesIndex,
-        onChange: (state) => {
-          const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
-          const bars = resolveBarGeometry({
-            data,
-            series: visibleSeries,
-            xKey,
-            yDomain,
-            stacked,
-            grouped,
-            horizontal: isHorizontal,
-            minBarSize,
-            maxBarSize,
-            plotWidth: plot.width,
-            plotHeight: plot.height,
-          });
-          const stepped = stepDefinedBar(
-            bars,
-            state.activeIndex,
-            state.activeSeriesIndex,
-            state.activeIndex - (activeIndex ?? 0),
-            state.activeSeriesIndex - resolvedSeriesIndex,
-            data.length,
-            visibleSeries.length,
-          );
-          if (!stepped) {
-            setActiveIndex(null);
-            return;
-          }
-          setActiveIndex(stepped.index);
-          setActiveSeriesIndex(stepped.seriesIndex);
-        },
-        onSelect: (state) => {
-          if (!onBarClick || !activeSeries) {
-            return;
-          }
-          const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
-          const bars = resolveBarGeometry({
-            data,
-            series: visibleSeries,
-            xKey,
-            yDomain,
-            stacked,
-            grouped,
-            horizontal: isHorizontal,
-            minBarSize,
-            maxBarSize,
-            plotWidth: plot.width,
-            plotHeight: plot.height,
-          });
-          const bar = findDefinedBar(bars, state.activeIndex, state.activeSeriesIndex);
-          if (bar && bar.value != null) {
-            onBarClick(bar.datum, bar.seriesId, bar.index, bar.value);
-          }
-        },
-        onEscape: () => setActiveIndex(null),
-      })}
-      overlay={
-        <>
-          {showLegend ? (
-            <Legend
-              items={series.map((entry, index) => {
-                const seriesId = getSeriesId(entry, index);
-                return {
-                  id: seriesId,
-                  label: entry.label,
-                  color: entry.color ?? `var(--chart-${(index % 4) + 1})`,
-                  hidden: hiddenSeries.includes(seriesId),
-                };
-              })}
-              onToggle={(seriesId) => {
-                const activeId = activeSeries
-                  ? getSeriesId(activeSeries, resolvedSeriesIndex)
-                  : null;
-                setHiddenSeries((current) =>
-                  current.includes(seriesId)
-                    ? current.filter((entry) => entry !== seriesId)
-                    : [...current, seriesId],
+    <CartesianChartFrame format={format}>
+      <Chart
+        data={data}
+        xKey={xKey}
+        xScale={xScale}
+        width={width}
+        height={height}
+        initialWidth={initialWidth}
+        responsive={responsive}
+        margin={margin}
+        class={className}
+        title={title}
+        description={description}
+        id={id}
+        emptyState={resolveCartesianEmptyState(emptyContent)}
+        tabIndex={0}
+        style={chartStyle}
+        onPointerMove={
+          tooltipEnabled
+            ? (event) => {
+                const { plot, position } = resolvePointerPlot(event, fallbackWidth, height);
+                const bars = resolveBarGeometry({
+                  data,
+                  series: visibleSeries,
+                  xKey,
+                  yDomain,
+                  stacked,
+                  grouped,
+                  horizontal: isHorizontal,
+                  minBarSize,
+                  maxBarSize,
+                  plotWidth: plot.width,
+                  plotHeight: plot.height,
+                });
+                activateBar(
+                  hitTestBars(
+                    bars,
+                    position.plotX,
+                    position.plotY,
+                    tooltipOptions?.mode ?? "nearest",
+                    isHorizontal,
+                  ),
                 );
-                if (activeId === seriesId) {
-                  setActiveIndex(null);
-                }
-              }}
+              }
+            : undefined
+        }
+        onPointerLeave={tooltipEnabled ? () => activateBar(null, "pointer") : undefined}
+        onKeyDown={createChartKeyboardHandler({
+          pointCount: data.length,
+          seriesCount: Math.max(visibleSeries.length, 1),
+          activeIndex: activeIndex ?? 0,
+          activeSeriesIndex: resolvedSeriesIndex,
+          onChange: (state) => {
+            const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
+            const bars = resolveBarGeometry({
+              data,
+              series: visibleSeries,
+              xKey,
+              yDomain,
+              stacked,
+              grouped,
+              horizontal: isHorizontal,
+              minBarSize,
+              maxBarSize,
+              plotWidth: plot.width,
+              plotHeight: plot.height,
+            });
+            const stepped = stepDefinedBar(
+              bars,
+              state.activeIndex,
+              state.activeSeriesIndex,
+              state.activeIndex - (activeIndex ?? 0),
+              state.activeSeriesIndex - resolvedSeriesIndex,
+              data.length,
+              visibleSeries.length,
+            );
+            if (!stepped) {
+              activateBar(null, "keyboard");
+              return;
+            }
+            setActiveSeriesIndex(stepped.seriesIndex);
+            activateBar(
+              findDefinedBar(bars, stepped.index, stepped.seriesIndex) ?? null,
+              "keyboard",
+            );
+          },
+          onSelect: (state) => {
+            if (!onBarClick || !activeSeries) {
+              return;
+            }
+            const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
+            const bars = resolveBarGeometry({
+              data,
+              series: visibleSeries,
+              xKey,
+              yDomain,
+              stacked,
+              grouped,
+              horizontal: isHorizontal,
+              minBarSize,
+              maxBarSize,
+              plotWidth: plot.width,
+              plotHeight: plot.height,
+            });
+            const bar = findDefinedBar(bars, state.activeIndex, state.activeSeriesIndex);
+            if (bar && bar.value != null) {
+              onBarClick(bar.datum, bar.seriesId, bar.index, bar.value);
+            }
+          },
+          onEscape: () => activateBar(null, "keyboard"),
+        })}
+        overlay={
+          <>
+            {showLegend ? (
+              <Legend
+                items={series.map((entry, index) => {
+                  const seriesId = getSeriesId(entry, index);
+                  return {
+                    id: seriesId,
+                    label: entry.label,
+                    color: entry.color ?? `var(--chart-${(index % 4) + 1})`,
+                    hidden: hiddenSeries.includes(seriesId),
+                  };
+                })}
+                onToggle={(seriesId) => {
+                  const activeId = activeSeries
+                    ? getSeriesId(activeSeries, resolvedSeriesIndex)
+                    : null;
+                  setHiddenSeries((current) =>
+                    current.includes(seriesId)
+                      ? current.filter((entry) => entry !== seriesId)
+                      : [...current, seriesId],
+                  );
+                  if (activeId === seriesId) {
+                    setActiveIndex(null);
+                  }
+                }}
+              />
+            ) : null}
+            <BarActiveLayers
+              data={data}
+              xKey={xKey}
+              visibleSeries={visibleSeries}
+              yDomain={yDomain}
+              stacked={stacked}
+              grouped={grouped}
+              horizontal={isHorizontal}
+              minBarSize={minBarSize}
+              maxBarSize={maxBarSize}
+              activeIndex={activeIndex}
+              activeSeries={activeSeries}
+              resolvedSeriesIndex={resolvedSeriesIndex}
+              tooltip={tooltip}
+              format={format}
             />
-          ) : null}
-          <BarActiveLayers
-            data={data}
-            xKey={xKey}
-            visibleSeries={visibleSeries}
-            yDomain={yDomain}
-            stacked={stacked}
-            grouped={grouped}
-            horizontal={isHorizontal}
-            minBarSize={minBarSize}
-            maxBarSize={maxBarSize}
-            activeIndex={activeIndex}
-            activeSeries={activeSeries}
-            resolvedSeriesIndex={resolvedSeriesIndex}
-            tooltip={tooltip}
+          </>
+        }
+      >
+        {referenceAreas.map((area, index) => (
+          <ReferenceArea
+            key={area.id ?? `reference-area-${index}`}
+            {...resolveBarReferenceAreaProps(area, {
+              xKey,
+              xScale,
+              yDomain,
+              horizontal: isHorizontal,
+            })}
           />
-        </>
-      }
-    >
-      {referenceAreas.map((area, index) => (
-        <ReferenceArea
-          key={area.id ?? `reference-area-${index}`}
-          {...resolveBarReferenceAreaProps(area, {
-            xKey,
-            xScale,
-            yDomain,
-            horizontal: isHorizontal,
-          })}
-        />
-      ))}
-      {showGrid ? (
-        isHorizontal ? (
-          <Grid xScale="linear" xDomain={yDomain} yKey={xKey} yScale={xScale} />
-        ) : (
-          <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} />
-        )
-      ) : null}
-      <BarActiveCrosshair
-        data={data}
-        xKey={xKey}
-        visibleSeries={visibleSeries}
-        yDomain={yDomain}
-        stacked={stacked}
-        grouped={grouped}
-        horizontal={isHorizontal}
-        minBarSize={minBarSize}
-        maxBarSize={maxBarSize}
-        activeIndex={activeIndex}
-        activeSeries={activeSeries}
-        resolvedSeriesIndex={resolvedSeriesIndex}
-        tooltip={tooltip}
-      />
-      {isHorizontal ? (
-        <>
-          <XAxis scale="linear" domain={yDomain} />
-          <YAxis dataKey={xKey} scale={xScale} />
-        </>
-      ) : (
-        <>
-          <XAxis dataKey={xKey} scale={xScale} />
-          <YAxis domain={yDomain} />
-        </>
-      )}
-      <BarMarks
-        data={data}
-        xKey={xKey}
-        series={visibleSeries}
-        yDomain={yDomain}
-        stacked={stacked}
-        grouped={grouped}
-        horizontal={isHorizontal}
-        radius={radius}
-        minBarSize={minBarSize}
-        maxBarSize={maxBarSize}
-        valueLabels={valueLabels}
-        activeIndex={activeIndex}
-        activeSeriesIndex={resolvedSeriesIndex}
-        onBarClick={onBarClick}
-        {...(animate === undefined ? {} : { animate })}
-      />
-      {referenceLines.map((line, index) => (
-        <ReferenceLine
-          key={index}
-          x={line.x}
-          y={line.y}
-          label={line.label}
-          color={line.color}
-          yKey={line.yKey}
+        ))}
+        {showGrid ? (
+          isHorizontal ? (
+            <Grid xScale="linear" xDomain={yDomain} yKey={xKey} yScale={xScale} />
+          ) : (
+            <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} />
+          )
+        ) : null}
+        <BarActiveCrosshair
+          data={data}
           xKey={xKey}
-          xScale={isHorizontal ? "linear" : xScale}
-          xDomain={isHorizontal ? yDomain : undefined}
-          yScale={isHorizontal ? xScale : "linear"}
-          yDomain={isHorizontal ? undefined : yDomain}
+          visibleSeries={visibleSeries}
+          yDomain={yDomain}
+          stacked={stacked}
+          grouped={grouped}
+          horizontal={isHorizontal}
+          minBarSize={minBarSize}
+          maxBarSize={maxBarSize}
+          activeIndex={activeIndex}
+          activeSeries={activeSeries}
+          resolvedSeriesIndex={resolvedSeriesIndex}
+          tooltip={tooltip}
         />
-      ))}
-    </Chart>
+        {isHorizontal ? (
+          <>
+            <XAxis scale="linear" domain={yDomain} tickFormatter={yTickFormatter} />
+            <YAxis dataKey={xKey} scale={xScale} tickFormatter={xTickFormatter} />
+          </>
+        ) : (
+          <>
+            <XAxis dataKey={xKey} scale={xScale} tickFormatter={xTickFormatter} />
+            <YAxis domain={yDomain} tickFormatter={yTickFormatter} />
+          </>
+        )}
+        <BarMarks
+          data={data}
+          xKey={xKey}
+          series={visibleSeries}
+          yDomain={yDomain}
+          stacked={stacked}
+          grouped={grouped}
+          horizontal={isHorizontal}
+          radius={radius}
+          minBarSize={minBarSize}
+          maxBarSize={maxBarSize}
+          valueLabels={valueLabels}
+          activeIndex={activeIndex}
+          activeSeriesIndex={resolvedSeriesIndex}
+          onBarClick={onBarClick}
+          {...(animate === undefined ? {} : { animate })}
+        />
+        {referenceLines.map((line, index) => (
+          <ReferenceLine
+            key={index}
+            x={line.x}
+            y={line.y}
+            label={line.label}
+            color={line.color}
+            yKey={line.yKey}
+            xKey={xKey}
+            xScale={isHorizontal ? "linear" : xScale}
+            xDomain={isHorizontal ? yDomain : undefined}
+            yScale={isHorizontal ? xScale : "linear"}
+            yDomain={isHorizontal ? undefined : yDomain}
+          />
+        ))}
+      </Chart>
+    </CartesianChartFrame>
   );
 };
 
@@ -327,6 +375,7 @@ type BarActiveProps<TDatum> = {
   activeSeries?: BarChartProps<TDatum>["series"][number];
   resolvedSeriesIndex: number;
   tooltip: BarChartProps<TDatum>["tooltip"];
+  format?: BarChartProps<TDatum>["format"];
 };
 
 const useBarActivePoint = <TDatum,>(props: BarActiveProps<TDatum>): CartesianActivePoint | null => {

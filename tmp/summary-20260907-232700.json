@@ -1,0 +1,4 @@
+{
+  "summary": "Addressed choppy area/line chart hover UX: in axis tooltip mode, crosshair and tooltip anchor now follow pointer plot coordinates smoothly while tooltip content still snaps to the nearest datum. Added useCartesianPointerState hook, pointerPlot wiring in cartesian-active-layers, updated area-chart and line-chart. Keyboard navigation clears pointer tracking so crosshair re-aligns to active points. Added regression test for smooth crosshair x. 184 tests pass.",
+  "current_status": "Area chart pointer interaction improved: smooth crosshair/tooltip tracking with discrete tooltip values in axis mode. Release hardening changes remain uncommitted."
+}

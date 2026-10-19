@@ -1,7 +1,7 @@
 import { useMemo } from "preact/hooks";
 import { pointKey, uniquifyKeys } from "../animation/keys";
 import type { ScatterCategoryContext } from "../charts/scatter-model";
-import type { ScatterSizeScale } from "../charts/scatter-size";
+import type { ScatterSizeScale } from "../charts/types";
 import {
   ACTIVE_SCATTER_STROKE_WIDTH,
   buildScatterSeriesLayout,

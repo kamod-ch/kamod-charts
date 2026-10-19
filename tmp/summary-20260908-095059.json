@@ -1,0 +1,4 @@
+{
+  "summary": "Fixed clipped Y-axis tick labels showing only '000' for large revenue values: YAxis now auto-applies d3 SI format (~s, e.g. 50k) when numeric domain span >= 1000, default left chart margin increased from 40 to 48px, added unit and integration tests. All 187 core tests pass.",
+  "current_status": "Y-axis label clipping bug fixed in core. Area docs UX polish and release hardening changes remain uncommitted pending user request."
+}

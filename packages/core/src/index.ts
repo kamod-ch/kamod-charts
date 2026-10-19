@@ -8,3 +8,4 @@ export * from "./performance";
 export * from "./primitives";
 export * from "./scales";
 export * from "./series";
+export * from "./formatting";

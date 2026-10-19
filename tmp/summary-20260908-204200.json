@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 7 final acceptance: code review of full donut diff (no React/echarts/any in src; shared resolvePieSeriesLayout for paths/labels/tooltip/center; PieChart API preserved via refactor to circular-chart-controller/view). All gates green except pnpm run ci fails only on uncommitted docs/bundle-size.md (+15.6KB total, donut entry 378B). 479 tests pass, exports verified, docs build OK. Documented known gaps: half-donut product polish, motion targetKey without variant, ScatterSizeScale rollup warning pre-existing.",
+  "current_status": "DonutChart feature complete and release-ready pending git commit (src, dist, docs/bundle-size.md). Avoid committing vitest results.json artifact."
+}

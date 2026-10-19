@@ -1,0 +1,4 @@
+{
+  "summary": "Removed docs header search input (desktop and mobile), cleaned up query state/sidebar filtering, unused imports, and search: true from theme config.",
+  "current_status": "Docs header simplified (no version badge, no search). Core and docs UX changes remain uncommitted."
+}

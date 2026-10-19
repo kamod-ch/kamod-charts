@@ -80,9 +80,8 @@ describe("Line chart release QA", () => {
 
       expect(first).toBe(second);
       expect(first).toContain("data-kamod-chart-stacked-line-series");
-      expect(first).toContain(
-        'aria-labelledby="line-stacked-ssr-title line-stacked-ssr-description"',
-      );
+      expect(first).toContain('aria-labelledby="line-stacked-ssr-title"');
+      expect(first).toContain('aria-describedby="line-stacked-ssr-description"');
       expect(first).not.toMatch(/NaN/);
     });
 
@@ -165,7 +164,8 @@ describe("Line chart release QA", () => {
         />,
       );
       expect(markup).toContain('role="img"');
-      expect(markup).toContain('aria-labelledby="a11y-line-title a11y-line-description"');
+      expect(markup).toContain('aria-labelledby="a11y-line-title"');
+      expect(markup).toContain('aria-describedby="a11y-line-description"');
       expect(markup).toContain('<title id="a11y-line-title">Revenue trend</title>');
       expect(markup).toContain('<desc id="a11y-line-description">Monthly revenue in EUR</desc>');
     });

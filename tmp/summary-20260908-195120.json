@@ -1,0 +1,4 @@
+{
+  "summary": "Explored kamod-charts reference primitives (ReferenceLine/Area/Point), cartesian type definitions, geometry helpers, chart layering order across Line/Area/Bar/Scatter, export barrels, existing tests, and plot clipping strategy. ScatterChart currently supports referenceLines only (below scatter series); it lacks referenceAreas/referencePoints props and does not forward strokeWidth/strokeDasharray to ReferenceLine unlike LineChart.",
+  "current_status": "Reference system is mature for LineChart (full trio) and BarChart (lines + areas); AreaChart has lines only; ScatterChart has partial referenceLines support. No SVG clipPath—plot bounds enforced via geometry clamping for areas/points."
+}

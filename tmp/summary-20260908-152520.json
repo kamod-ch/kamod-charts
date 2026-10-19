@@ -1,0 +1,4 @@
+{
+  "summary": "Implemented Rose/Nightingale mode (Prompt 5): PieRoseOptions with sqrt/linear scale and auto minRadius, rose branch in buildPieSlices using equal angles (d3 pie value=1) and value-scaled outer radii, wired through PieChart/PieSeries/MotionPieActiveOverlay. Active offset applied after base radius; normal pie unchanged when rose unset. Motion enter/exit from innerRadius for rose slices. Added pie-rose.ts and pie-rose.test.tsx (16 tests). All 374 core tests pass; typecheck, lint, format:check OK. No commit.",
+  "current_status": "Prompts 1–5 complete. Pie chart supports shared model, tooltip, legend, outside labels, and rose/nightingale geometry. Ready for review."
+}

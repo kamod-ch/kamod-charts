@@ -2,7 +2,14 @@ import { useMemo } from "preact/hooks";
 import { useCircularChartController } from "./circular-chart-controller";
 import { CircularChartView } from "./circular-chart-view";
 import { createDonutCenterContext, resolveDonutCenterContent } from "./donut-center-content";
-import type { DonutChartProps } from "./types";
+import type { DonutChartProps, DonutVariant } from "./types";
+import type { PieLabels } from "../series/pie-label";
+
+/** Default slice labels: outside on full rings, none on half donuts (flat edge). */
+export const resolveDonutChartLabels = <TDatum,>(
+  variant: DonutVariant,
+  labels?: PieLabels<TDatum>,
+): PieLabels<TDatum> => labels ?? (variant === "half" ? "none" : "outside");
 
 export const DonutChart = <TDatum,>({
   data,
@@ -21,7 +28,7 @@ export const DonutChart = <TDatum,>({
   padAngle = Math.PI / 90,
   cornerRadius = 6,
   sort = false,
-  labels = "outside",
+  labels,
   colors,
   showTotal = true,
   formatTotal,
@@ -34,6 +41,7 @@ export const DonutChart = <TDatum,>({
   onSegmentClick,
   animate,
 }: DonutChartProps<TDatum>) => {
+  const resolvedLabels = resolveDonutChartLabels(variant, labels);
   const controller = useCircularChartController({
     data,
     valueKey,
@@ -85,7 +93,7 @@ export const DonutChart = <TDatum,>({
         sort,
         colors,
         activeOffset,
-        labels,
+        labels: resolvedLabels,
       }}
       seriesProps={{
         innerRadiusRatio,
@@ -95,7 +103,7 @@ export const DonutChart = <TDatum,>({
         cornerRadius,
         sort,
         colors,
-        labels,
+        labels: resolvedLabels,
         activeOffset,
       }}
       centerContent={resolvedCenterContent}

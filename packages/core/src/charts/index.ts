@@ -4,6 +4,8 @@ export { LineChart } from "./line-chart";
 export { PieChart } from "./pie-chart";
 export { DonutChart } from "./donut-chart";
 export { ScatterChart } from "./scatter-chart";
+export { findNearestDatumIndexByX } from "./cartesian-sync";
+export { useSynchronizedCartesianSelection } from "./use-synchronized-cartesian-selection";
 export type {
   AreaChartProps,
   BarChartProps,
@@ -17,7 +19,9 @@ export type {
   CartesianReferencePoint,
   CartesianReferenceSegment,
   CartesianReferenceSegmentPoint,
+  CartesianActiveSelection,
   CartesianSeriesConfig,
+  ChartFormatOptions,
   CartesianTooltipContext,
   CartesianTooltipMode,
   CartesianTooltipOptions,

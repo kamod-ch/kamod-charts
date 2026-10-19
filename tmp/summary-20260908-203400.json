@@ -1,0 +1,4 @@
+{
+  "summary": "Implemented Prompt 6 DonutChart documentation in packages/docs: new charts/donut.mdx with full API prose, DonutExamples.tsx (four reference demos: revenue split, filled, half, KPI ring), DonutApiNotes.tsx, donut-datasets.ts, donutSpecificProps in props.ts; wired sidebar, API index, gallery entries, vite alias @kamod-ch/charts/donut, and cross-links from pie/accessibility pages. Docs typecheck, preactpress build/check, and oxfmt all pass.",
+  "current_status": "DonutChart is documented end-to-end with four live demos and package subpath imports. Prompts 0–3 and 5 complete; Prompt 4 (half-donut product polish) still optional; Prompt 6 docs done."
+}

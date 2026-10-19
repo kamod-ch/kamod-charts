@@ -1,0 +1,4 @@
+{
+  "summary": "Phase-0-Baseline für kamod-charts abgeschlossen: Kein AGENTS.md im Repo (Konventionen aus CONTRIBUTING.md und docs/rfc/0001). Git auf main, sauberes Working Tree. Relevante Scatter-/Cartesian-Dateien, Barrel-Exports und Tests inspiziert. Baseline ausgeführt: pnpm typecheck (grün) und scatter-relevante Vitest-Suites (9 Dateien, 76 Tests, grün). Kurzbericht zu pointSize, Hit-Testing, Keyboard, Theme-Farben, Scripts und Test-/Docs-Pfaden erstellt.",
+  "current_status": "kamod-charts main ist baseline-stabil ohne Fehler. ScatterChart existiert mit Static/Motion-Series, nearest-Tooltip, ReferenceLines; referenceAreas/referencePoints sind in Types vorhanden aber noch nicht in ScatterChart verdrahtet. Nächste Phasen können auf dokumentierten Pfaden und Scripts aufbauen."
+}

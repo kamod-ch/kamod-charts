@@ -18,6 +18,26 @@ describe("accessibility helpers", () => {
     { date: new Date("2026-01-02T00:00:00.000Z"), value: null },
   ];
 
+  it("renders invalid dates and null without throwing during SSR", () => {
+    const rows = [
+      { date: new Date("2026-01-01T00:00:00.000Z"), value: 1 },
+      { date: new Date(Number.NaN), value: 2 },
+      { date: null, value: 3 },
+    ];
+    const markup = renderToString(
+      <DataTable
+        data={rows}
+        columns={[
+          { id: "date", header: "Date", accessor: "date" },
+          { id: "value", header: "Value", accessor: "value" },
+        ]}
+      />,
+    );
+
+    expect(markup).toContain("2026-01-01T00:00:00.000Z");
+    expect(markup).not.toContain("Invalid Date");
+  });
+
   it("renders an accessible data table alternative", () => {
     const markup = renderToString(
       <DataTable
@@ -47,6 +67,13 @@ describe("animation and performance helpers", () => {
     expect(prefersReducedMotion()).toBe(false);
     expect(shouldAnimate({ reducedMotion: true })).toBe(false);
     expect(interpolateValue(0, 10, 0.5)).toBe(5);
+  });
+
+  it("preserves the last original index even when the value is falsy", () => {
+    const sampled = downsampleByStride([1, 2, 3, 0], { threshold: 2 });
+    expect(sampled.at(-1)).toBe(0);
+    expect(sampled[0]).toBe(1);
+    expect(downsampleByStride([5, 5, 5], { threshold: 2 })).toEqual([5, 5]);
   });
 
   it("downsamples large arrays and keeps the last datum", () => {

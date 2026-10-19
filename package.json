@@ -18,8 +18,13 @@
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
     "test": "pnpm -r --filter !@kamod-ch/charts-docs test",
+    "test:browser": "playwright test",
+    "test:browser:install": "playwright install chromium",
     "test:exports": "pnpm build && node scripts/test-package-exports.mjs",
     "size:report": "pnpm build && node scripts/bundle-size-report.mjs",
+    "bench:browser": "node scripts/browser-benchmark.mjs",
+    "smoke:consumer": "pnpm --filter @kamod-ch/charts build && node scripts/consumer-smoke.mjs",
+    "consumer:report": "node scripts/consumer-bundle-report.mjs",
     "docs:dev": "pnpm --filter @kamod-ch/charts-docs dev",
     "docs:build": "pnpm --filter @kamod-ch/charts-docs build",
     "build:docs": "pnpm --filter @kamod-ch/charts-docs build",
@@ -31,6 +36,7 @@
     "release:publish": "pnpm --filter @kamod-ch/charts publish --access public --provenance --no-git-checks"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
     "@types/node": "^25.9.2",
     "oxfmt": "^0.54.0",
     "oxlint": "^1.69.0",

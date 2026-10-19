@@ -1,0 +1,4 @@
+{
+  "summary": "Phase 2 implementiert: typisierte AreaFill/Gradient-API, strokeWidth/strokeDasharray, showPoints/pointRadius/activeIndex für AreaSeries und StackedAreaSeries; AreaChart reicht Props durch; SVG linearGradient mit stabilen IDs aus Chart-Root und Series-ID; Helper in area-fill.ts und area-style.tsx; Motion-Parität ergänzt. 13 neue Tests in area-fill-marker.test.tsx, 138 Tests gesamt bestanden, typecheck/lint/format OK.",
+  "current_status": "Phase 1 (Kurven) und Phase 2 (Fill/Stroke/Marker) abgeschlossen. Docs und dist-Build stehen noch aus. Kein Commit."
+}

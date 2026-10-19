@@ -1,0 +1,4 @@
+{
+  "summary": "Removed duplicate '## Accessibility' h2 from area.mdx; AccessibilityNotes component already renders its own h3 heading inside the card.",
+  "current_status": "Area chart docs cleaned up (API notes card + single accessibility heading). Core changes and release hardening remain uncommitted pending user request."
+}

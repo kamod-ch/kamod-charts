@@ -1,0 +1,4 @@
+{
+  "summary": "Prompt 6 completed: PreactPress pie documentation with six gallery scenarios (basic+legend+tooltip, donut, center KPI, rose, outside labels, carrier capacity), PieApiNotes, extended props tables, pie-datasets, gallery updates, and accessibility notes. Browser QA on /charts/pie verified 7 charts, keyboard nav (Arrow/Enter/Escape), legend hide-all empty state, light theme, mobile viewport, live regions, leader lines, no NaN SVG paths, no duplicate IDs. All checks pass: 374 tests, typecheck, lint, format, exports, docs:build. Dev server stopped. No commit.",
+  "current_status": "Pie chart feature (Prompts 1–6) is documentation-complete and validation-green. Docs live at packages/docs/charts/pie.mdx with six demos; core pie APIs (tooltip, legend, labels, rose) are implemented and tested but remain uncommitted on main."
+}

@@ -1,0 +1,4 @@
+{
+  "summary": "Phase 3 abgeschlossen: AreaChart verdrahtet fill/outline/stroke/showPoints/pointRadius/curve/activeIndex stabil über visibleEntries mit Original-Indizes; Legend-Toggle stabilisiert activeSeriesIndex und Gradient-IDs; Motion-Slot-Typen präzisiert; Motion-Area/StackedAreaSeries behalten Styles/Marker bei. 10 neue Tests in area-motion-wiring.test.tsx. 148 Tests, typecheck, lint, format, test:exports OK.",
+  "current_status": "Area-Chart Phasen 1–3 implementiert und validiert. dist/ durch lokalen Build aktualisiert (nicht committed). Docs-Phase steht noch aus."
+}
