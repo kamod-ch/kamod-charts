@@ -4,14 +4,14 @@
 
 ## Aggregate checks (2026-10-18)
 
-| Check | Command | Result |
-| --- | --- | --- |
-| Typecheck, lint, format, test, build, exports | `pnpm check` | **Pass** |
-| Docs site | `pnpm docs:build` | **Pass** (run after recipe changes) |
-| Browser smoke | `pnpm test:browser` | **7** tests (Chromium) |
-| Tarball consumer | `pnpm smoke:consumer` | **Pass** (`--skipLibCheck` isolated install) |
-| Consumer bundles | `KAMOD_CONSUMER_USE_DIST=1 pnpm consumer:report` | **Pass** → `docs/performance/consumer-bundles.md` |
-| Browser benchmarks | `pnpm bench:browser` | Manual (preview on `:4173`) |
+| Check                                         | Command                                          | Result                                            |
+| --------------------------------------------- | ------------------------------------------------ | ------------------------------------------------- |
+| Typecheck, lint, format, test, build, exports | `pnpm check`                                     | **Pass**                                          |
+| Docs site                                     | `pnpm docs:build`                                | **Pass** (run after recipe changes)               |
+| Browser smoke                                 | `pnpm test:browser`                              | **7** tests (Chromium)                            |
+| Tarball consumer                              | `pnpm smoke:consumer`                            | **Pass** (`--skipLibCheck` isolated install)      |
+| Consumer bundles                              | `KAMOD_CONSUMER_USE_DIST=1 pnpm consumer:report` | **Pass** → `docs/performance/consumer-bundles.md` |
+| Browser benchmarks                            | `pnpm bench:browser`                             | Manual (preview on `:4173`)                       |
 
 ## Delivered roadmap scope (prompts 00–14)
 
