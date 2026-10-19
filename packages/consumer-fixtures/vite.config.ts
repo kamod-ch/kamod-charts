@@ -4,13 +4,18 @@ import { defineConfig } from "vite";
 const useDist = process.env.KAMOD_CONSUMER_USE_DIST === "1";
 
 export default defineConfig({
+  esbuild: {
+    jsx: "automatic",
+    jsxImportSource: "preact",
+  },
   resolve: {
     alias: useDist
       ? undefined
       : {
-          "@kamod-ch/charts/bar-chart": resolve(__dirname, "../core/src/charts/bar-chart.tsx"),
-          "@kamod-ch/charts/line-chart": resolve(__dirname, "../core/src/charts/line-chart.tsx"),
-          "@kamod-ch/charts/donut-chart": resolve(__dirname, "../core/src/charts/donut-chart.tsx"),
+          "@kamod-ch/charts/bar": resolve(__dirname, "../core/src/charts/bar-chart.tsx"),
+          "@kamod-ch/charts/donut": resolve(__dirname, "../core/src/charts/donut-chart.tsx"),
+          "@kamod-ch/charts/line": resolve(__dirname, "../core/src/charts/line-chart.tsx"),
+          "@kamod-ch/charts/motion": resolve(__dirname, "../core/src/motion/index.ts"),
           "@kamod-ch/charts": resolve(__dirname, "../core/src/index.ts"),
         },
   },
