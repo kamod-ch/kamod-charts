@@ -11,19 +11,19 @@ Plan: [plans/svg-roadmap-cursor-prompts.md](../../plans/svg-roadmap-cursor-promp
 
 ## Prompt status
 
-| Prompt | Status       | Notes                                                                                                |
-| -----: | ------------ | ---------------------------------------------------------------------------------------------------- |
-|     00 | **erledigt** | Befund + RFC 001 + diese Datei                                                                       |
-|     01 | **erledigt** | `svgProps`, `svgRef`, Handler-Komposition; siehe [svg-surface-api.md](./svg-surface-api.md)          |
-|     02 | **erledigt** | `plotLayers`, root `defs`, opt-in `clipPlotArea`                                                     |
-|     03 | **erledigt** | `@kamod-ch/charts/export`; [svg-export.md](./svg-export.md)                                          |
-|     04 | **erledigt** | `renderPoint`, `renderBar`, `renderLabel`; [svg-surface-api.md](./svg-surface-api.md)                |
-|     05 | **erledigt** | `tickCollision`, truncate/hide/rotate; Tests `tick-collision.test.tsx`                               |
-|     06 | **erledigt** | `aspectRatio` in `resolveChartSize` + kartesische Charts                                             |
-|     07 | **erledigt** | `chart-chrome-props.ts`, Pie/Donut `class`/`style`/`aspectRatio`; Tests `svg-surface-parity.test.ts` |
-|     08 | **optional (offen)** | PNG/Raster — nicht umgesetzt                                                                  |
-|     09 | **optional (offen)** | Zoom/Pan-Spike — nicht umgesetzt                                                                |
-|     10 | **erledigt**         | CHANGELOG Unreleased; Check-Matrix unten                                                        |
+| Prompt | Status               | Notes                                                                                                |
+| -----: | -------------------- | ---------------------------------------------------------------------------------------------------- |
+|     00 | **erledigt**         | Befund + RFC 001 + diese Datei                                                                       |
+|     01 | **erledigt**         | `svgProps`, `svgRef`, Handler-Komposition; siehe [svg-surface-api.md](./svg-surface-api.md)          |
+|     02 | **erledigt**         | `plotLayers`, root `defs`, opt-in `clipPlotArea`                                                     |
+|     03 | **erledigt**         | `@kamod-ch/charts/export`; [svg-export.md](./svg-export.md)                                          |
+|     04 | **erledigt**         | `renderPoint`, `renderBar`, `renderLabel`; [svg-surface-api.md](./svg-surface-api.md)                |
+|     05 | **erledigt**         | `tickCollision`, truncate/hide/rotate; Tests `tick-collision.test.tsx`                               |
+|     06 | **erledigt**         | `aspectRatio` in `resolveChartSize` + kartesische Charts                                             |
+|     07 | **erledigt**         | `chart-chrome-props.ts`, Pie/Donut `class`/`style`/`aspectRatio`; Tests `svg-surface-parity.test.ts` |
+|     08 | **optional (offen)** | PNG/Raster — nicht umgesetzt                                                                         |
+|     09 | **optional (offen)** | Zoom/Pan-Spike — nicht umgesetzt                                                                     |
+|     10 | **erledigt**         | CHANGELOG Unreleased; Check-Matrix unten                                                             |
 
 Abhängigkeiten entsprechen der Plan-Tabelle in `plans/svg-roadmap-cursor-prompts.md`.
 
@@ -42,16 +42,16 @@ Abhängigkeiten entsprechen der Plan-Tabelle in `plans/svg-roadmap-cursor-prompt
 
 ## Checks
 
-| Datum      | Command                     | Ergebnis                                 |
-| ---------- | --------------------------- | ---------------------------------------- |
-| 2026-10-20 | `pnpm typecheck`            | pass (nach 01)                           |
-| 2026-10-20 | `packages/core` `pnpm test` | **524** tests, 56 files — pass (nach 07) |
-| 2026-10-20 | `pnpm test:exports`         | pass                                     |
-| 2026-10-20 | `pnpm check`                | pass                                     |
-| 2026-10-20 | `pnpm smoke:consumer`       | pass                                     |
+| Datum      | Command                     | Ergebnis                                       |
+| ---------- | --------------------------- | ---------------------------------------------- |
+| 2026-10-20 | `pnpm typecheck`            | pass (nach 01)                                 |
+| 2026-10-20 | `packages/core` `pnpm test` | **524** tests, 56 files — pass (nach 07)       |
+| 2026-10-20 | `pnpm test:exports`         | pass                                           |
+| 2026-10-20 | `pnpm check`                | pass                                           |
+| 2026-10-20 | `pnpm smoke:consumer`       | pass                                           |
 | 2026-10-20 | `pnpm test:browser`         | **7** passed (PlotPointerCapture unter Layern) |
-| 2026-10-20 | `pnpm docs:build`           | pass                                     |
-| 2026-10-20 | `pnpm size:report`          | pass                                     |
+| 2026-10-20 | `pnpm docs:build`           | pass                                           |
+| 2026-10-20 | `pnpm size:report`          | pass                                           |
 
 ## Nächster Schritt
 
