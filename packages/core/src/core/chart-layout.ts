@@ -22,22 +22,46 @@ export const clampDimension = (value: number): number => {
   return value;
 };
 
+const resolveHeight = ({
+  width,
+  height,
+  aspectRatio,
+}: {
+  width: number;
+  height?: number;
+  aspectRatio?: number;
+}): number => {
+  if (aspectRatio != null && Number.isFinite(aspectRatio) && aspectRatio > 0 && width > 0) {
+    return clampDimension(width / aspectRatio);
+  }
+  return clampDimension(height ?? 320);
+};
+
 export const resolveChartSize = ({
   width,
   height,
   initialWidth,
   responsive,
+  aspectRatio,
+  measuredWidth,
 }: {
   width?: number;
-  height: number;
+  height?: number;
   initialWidth?: number;
   responsive?: boolean;
-}): ChartSize => ({
-  width: clampDimension(
-    responsive ? (initialWidth ?? width ?? 640) : (width ?? initialWidth ?? 640),
-  ),
-  height: clampDimension(height),
-});
+  aspectRatio?: number;
+  /** Responsive width from `ResizeObserver` (client only, after hydration). */
+  measuredWidth?: number;
+}): ChartSize => {
+  const resolvedWidth = clampDimension(
+    responsive ? (measuredWidth ?? width ?? initialWidth ?? 640) : (width ?? initialWidth ?? 640),
+  );
+
+  return {
+    width: resolvedWidth,
+    height: resolveHeight({ width: resolvedWidth, height, aspectRatio }),
+  };
+};
 
 export const calculatePlotArea = (size: ChartSize, margin: ChartMargin): ChartRect => {
   const width = clampDimension(size.width - margin.left - margin.right);

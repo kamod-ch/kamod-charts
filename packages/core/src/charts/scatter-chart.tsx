@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
 import { XAxis, YAxis } from "../axes";
-import { Chart } from "../core";
+import { Chart, resolveChartSize } from "../core";
 import { getPointerPosition } from "../interaction";
 import {
   Grid,
@@ -26,6 +26,7 @@ import { createScatterKeyboardHandler } from "./scatter-keyboard";
 import { DEFAULT_SCATTER_SIZE_SCALE, inferScatterSizeDomain } from "./scatter-size";
 import { isTooltipEnabled } from "./tooltip-options";
 import { useCartesianIntlAxisTicks } from "./cartesian-axis-formatters";
+import { cartesianAxisCollisionProps } from "./cartesian-axis-props";
 import { CartesianChartFrame } from "./cartesian-chart-frame";
 import { resolveCartesianEmptyState } from "./cartesian-empty-state";
 import type { ScatterChartProps } from "./types";
@@ -39,6 +40,7 @@ export const ScatterChart = <TDatum,>({
   height,
   initialWidth,
   responsive,
+  aspectRatio,
   title,
   description,
   id,
@@ -64,6 +66,14 @@ export const ScatterChart = <TDatum,>({
   style: styleProp,
   emptyContent,
   format,
+  svgRef,
+  svgProps,
+  defs,
+  clipPlotArea,
+  tickCollision,
+  maxTickLabelLength,
+  maxTickLabelWidth,
+  tickRotation,
 }: ScatterChartProps<TDatum>) => {
   const motion = useChartMotionContext();
   const ScatterSeries = (motion.slots.ScatterSeries ??
@@ -106,10 +116,17 @@ export const ScatterChart = <TDatum,>({
   const activeSeries = visibleSeries[resolvedSeriesIndex];
   const tooltipEnabled = isTooltipEnabled(tooltip);
   const fallbackWidth = width ?? initialWidth ?? 640;
+  const chartHeight = resolveChartSize({
+    width,
+    height,
+    initialWidth,
+    responsive,
+    aspectRatio,
+  }).height;
   const sortByRadius = sizeKey != null;
   const fallbackPlotArea = useMemo(
-    () => resolvePlotAreaFromSize(fallbackWidth, height),
-    [fallbackWidth, height],
+    () => resolvePlotAreaFromSize(fallbackWidth, chartHeight),
+    [chartHeight, fallbackWidth],
   );
   const interactionCandidates = useMemo(
     () =>
@@ -219,6 +236,12 @@ export const ScatterChart = <TDatum,>({
       ? styleProp
       : { ...styleProp, ...(tooltipEnabled ? { cursor: "crosshair" } : {}) };
   const { xTickFormatter, yTickFormatter } = useCartesianIntlAxisTicks(format);
+  const axisCollision = cartesianAxisCollisionProps({
+    tickCollision,
+    maxTickLabelLength,
+    maxTickLabelWidth,
+    tickRotation,
+  });
 
   return (
     <CartesianChartFrame format={format}>
@@ -230,6 +253,7 @@ export const ScatterChart = <TDatum,>({
         height={height}
         initialWidth={initialWidth}
         responsive={responsive}
+        aspectRatio={aspectRatio}
         margin={margin}
         class={className}
         title={title}
@@ -238,12 +262,16 @@ export const ScatterChart = <TDatum,>({
         emptyState={resolveCartesianEmptyState(emptyContent)}
         tabIndex={0}
         style={chartStyle}
+        svgRef={svgRef}
+        svgProps={svgProps}
+        defs={defs}
+        clipPlotArea={clipPlotArea}
         onPointerMove={
           tooltipEnabled
             ? (event) => {
                 const size = {
                   width: event.currentTarget.viewBox.baseVal.width || fallbackWidth,
-                  height: event.currentTarget.viewBox.baseVal.height || height,
+                  height: event.currentTarget.viewBox.baseVal.height || chartHeight,
                 };
                 const nextPlot = resolvePlotAreaFromSize(size.width, size.height);
                 const position = getPointerPosition(event, nextPlot);
@@ -339,112 +367,138 @@ export const ScatterChart = <TDatum,>({
             />
           </>
         }
-      >
-        {referenceAreas.map((area, index) => (
-          <ReferenceArea
-            key={area.id ?? `reference-area-${index}`}
-            id={area.id}
-            x1={area.x1}
-            x2={area.x2}
-            y1={area.y1}
-            y2={area.y2}
-            xKey={area.xKey ?? xKey}
-            yKey={area.yKey}
-            xScale={xScale}
-            yDomain={yDomain}
-            label={area.label}
-            fill={area.fill}
-            fillOpacity={area.fillOpacity}
-            class={area.class}
-          />
-        ))}
-        {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
-        <XAxis dataKey={xKey} scale={xScale} tickFormatter={xTickFormatter} />
-        <YAxis domain={yDomain} tickFormatter={yTickFormatter} />
-        {referenceLines.map((line, index) => (
-          <ReferenceLine
-            key={index}
-            x={line.x}
-            y={line.y}
-            yDomain={yDomain}
-            label={line.label}
-            color={line.color}
-            strokeWidth={line.strokeWidth}
-            strokeDasharray={line.strokeDasharray}
-            yKey={line.yKey}
-            xKey={xKey}
-            xScale={xScale}
-          />
-        ))}
-        {referenceSegments.map((segment, index) => (
-          <ReferenceSegment
-            key={segment.id ?? `reference-segment-${index}`}
-            id={segment.id}
-            start={segment.start}
-            end={segment.end}
-            xKey={segment.xKey ?? xKey}
-            yKey={segment.yKey}
-            xScale={xScale}
-            yDomain={yDomain}
-            label={segment.label}
-            labelPosition={segment.labelPosition}
-            color={segment.color}
-            strokeWidth={segment.strokeWidth}
-            strokeDasharray={segment.strokeDasharray}
-            class={segment.class}
-          />
-        ))}
-        {visibleSeries.map((entry, index) => (
-          <ScatterSeries
-            key={entry.id ?? String(entry.key)}
-            id={entry.id ?? String(entry.key)}
-            yKey={entry.key}
-            yDomain={yDomain}
-            color={entry.color ?? `var(--chart-${(index % 4) + 1})`}
-            sizeKey={sizeKey}
-            sizeScale={sizeScale}
-            sizeDomain={resolvedSizeDomain}
-            pointRadiusRange={pointRadiusRange}
-            pointRadius={pointRadius}
-            pointSize={pointSize}
-            seriesPointRadius={entry.pointRadius}
-            pointOpacity={entry.pointOpacity}
-            sortByRadius={sortByRadius}
-            categoryContext={categoryContext}
-            activeIndex={entry === activeSeries ? effectiveActiveIndex : null}
-            {...(animate === undefined ? {} : { animate })}
-          />
-        ))}
-        {referencePoints.map((point, index) => (
-          <ReferencePoint
-            key={point.id ?? `reference-point-${index}`}
-            id={point.id}
-            x={point.x}
-            y={point.y}
-            xKey={point.xKey ?? xKey}
-            yKey={point.yKey}
-            xScale={xScale}
-            yDomain={yDomain}
-            label={point.label}
-            color={point.color}
-            size={point.size}
-            shape={point.shape}
-            labelPosition={point.labelPosition}
-            class={point.class}
-          />
-        ))}
-        <CartesianActiveCrosshair
-          activeIndex={effectiveActiveIndex}
-          activeSeries={activeSeries}
-          visibleSeries={visibleSeries}
-          xKey={xKey}
-          xScale={xScale}
-          yDomain={yDomain}
-          tooltip={tooltip}
-          defaultMode="nearest"
-          scatterPlotPosition={scatterPlotPosition}
-        />
-      </Chart>
+        plotLayers={{
+          clipped: (
+            <>
+              {referenceAreas.map((area, index) => (
+                <ReferenceArea
+                  key={area.id ?? `reference-area-${index}`}
+                  id={area.id}
+                  x1={area.x1}
+                  x2={area.x2}
+                  y1={area.y1}
+                  y2={area.y2}
+                  xKey={area.xKey ?? xKey}
+                  yKey={area.yKey}
+                  xScale={xScale}
+                  yDomain={yDomain}
+                  label={area.label}
+                  fill={area.fill}
+                  fillOpacity={area.fillOpacity}
+                  class={area.class}
+                />
+              ))}
+              {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
+              {referenceSegments.map((segment, index) => (
+                <ReferenceSegment
+                  key={segment.id ?? `reference-segment-${index}`}
+                  id={segment.id}
+                  start={segment.start}
+                  end={segment.end}
+                  xKey={segment.xKey ?? xKey}
+                  yKey={segment.yKey}
+                  xScale={xScale}
+                  yDomain={yDomain}
+                  label={segment.label}
+                  labelPosition={segment.labelPosition}
+                  color={segment.color}
+                  strokeWidth={segment.strokeWidth}
+                  strokeDasharray={segment.strokeDasharray}
+                  class={segment.class}
+                />
+              ))}
+              {visibleSeries.map((entry, index) => (
+                <ScatterSeries
+                  key={entry.id ?? String(entry.key)}
+                  id={entry.id ?? String(entry.key)}
+                  yKey={entry.key}
+                  yDomain={yDomain}
+                  color={entry.color ?? `var(--chart-${(index % 4) + 1})`}
+                  sizeKey={sizeKey}
+                  sizeScale={sizeScale}
+                  sizeDomain={resolvedSizeDomain}
+                  pointRadiusRange={pointRadiusRange}
+                  pointRadius={pointRadius}
+                  pointSize={pointSize}
+                  seriesPointRadius={entry.pointRadius}
+                  pointOpacity={entry.pointOpacity}
+                  sortByRadius={sortByRadius}
+                  categoryContext={categoryContext}
+                  activeIndex={entry === activeSeries ? effectiveActiveIndex : null}
+                  seriesLabel={entry.label}
+                  renderPoint={entry.renderPoint}
+                  {...(animate === undefined ? {} : { animate })}
+                />
+              ))}
+            </>
+          ),
+          foreground: (
+            <>
+              {referencePoints.map((point, index) => (
+                <ReferencePoint
+                  key={point.id ?? `reference-point-${index}`}
+                  id={point.id}
+                  x={point.x}
+                  y={point.y}
+                  xKey={point.xKey ?? xKey}
+                  yKey={point.yKey}
+                  xScale={xScale}
+                  yDomain={yDomain}
+                  label={point.label}
+                  color={point.color}
+                  size={point.size}
+                  shape={point.shape}
+                  labelPosition={point.labelPosition}
+                  class={point.class}
+                />
+              ))}
+              <CartesianActiveCrosshair
+                activeIndex={effectiveActiveIndex}
+                activeSeries={activeSeries}
+                visibleSeries={visibleSeries}
+                xKey={xKey}
+                xScale={xScale}
+                yDomain={yDomain}
+                tooltip={tooltip}
+                defaultMode="nearest"
+                scatterPlotPosition={scatterPlotPosition}
+              />
+            </>
+          ),
+          axes: (
+            <>
+              <XAxis
+                dataKey={xKey}
+                scale={xScale}
+                tickFormatter={xTickFormatter}
+                {...axisCollision}
+              />
+              <YAxis
+                domain={yDomain}
+                tickFormatter={yTickFormatter}
+                tickCollision={tickCollision}
+                maxTickLabelLength={maxTickLabelLength}
+                maxTickLabelWidth={maxTickLabelWidth}
+              />
+              {referenceLines.map((line, index) => (
+                <ReferenceLine
+                  key={index}
+                  x={line.x}
+                  y={line.y}
+                  yDomain={yDomain}
+                  label={line.label}
+                  color={line.color}
+                  strokeWidth={line.strokeWidth}
+                  strokeDasharray={line.strokeDasharray}
+                  yKey={line.yKey}
+                  xKey={xKey}
+                  xScale={xScale}
+                />
+              ))}
+            </>
+          ),
+        }}
+      />
     </CartesianChartFrame>
   );
 };

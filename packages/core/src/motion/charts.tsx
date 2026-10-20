@@ -49,3 +49,12 @@ export const ScatterChart = <TDatum,>(props: ScatterChartProps<TDatum>) => (
     <StaticScatterChart {...props} animate={props.animate ?? true} />
   </MotionConfig>
 );
+
+export type {
+  AreaChartProps,
+  BarChartProps,
+  DonutChartProps,
+  LineChartProps,
+  PieChartProps,
+  ScatterChartProps,
+} from "../charts/types";

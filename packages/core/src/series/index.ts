@@ -7,6 +7,7 @@ export { BarSeries } from "./bar-series";
 export type { BarSeriesProps } from "./bar-series";
 export { LineSeries } from "./line-series";
 export type { LineSeriesProps } from "./line-series";
+export type { BarRenderContext, PointRenderContext, RenderBar, RenderPoint } from "./mark-slots";
 export type { LineCurve } from "./paths";
 export { PieSeries } from "./pie-series";
 export type { PieDatum, PieSeriesProps, PieSortComparator } from "./pie-series";

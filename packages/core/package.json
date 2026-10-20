@@ -58,6 +58,10 @@
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.js"
     },
+    "./export": {
+      "types": "./dist/export/index.d.ts",
+      "import": "./dist/export/index.js"
+    },
     "./interaction": {
       "types": "./dist/interaction/index.d.ts",
       "import": "./dist/interaction/index.js"

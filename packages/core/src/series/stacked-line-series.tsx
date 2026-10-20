@@ -4,6 +4,7 @@ import { normalizeAccessor, useChartContext, type DataAccessor } from "../core";
 import type { ScaleKind } from "../scales";
 import { shouldShowAreaPoints } from "./area-style";
 import { useCartesianScales } from "./cartesian";
+import { type RenderPoint, renderPointSlot } from "./mark-slots";
 import { buildLinePath, type LineCurve } from "./paths";
 import { getStackedValues, type StackSeries } from "./stack";
 import { stackedLayerToCartesianPoints } from "./stacked-line-points";
@@ -14,6 +15,8 @@ export interface StackedLineSeriesEntry<TDatum> extends StackSeries<TDatum> {
   strokeDasharray?: string;
   showPoints?: boolean | "auto";
   pointRadius?: number;
+  label?: string;
+  renderPoint?: RenderPoint<TDatum>;
 }
 
 export interface StackedLineSeriesProps<TDatum> {
@@ -72,7 +75,6 @@ const StackedLineLayer = <TDatum,>({
   const strokeDasharray = entry.strokeDasharray ?? chartStrokeDasharray;
   const showPoints = entry.showPoints ?? chartShowPoints;
   const pointRadius = entry.pointRadius ?? chartPointRadius ?? 2.5;
-  const activePointRadius = pointRadius + 1.5;
   const scales = useCartesianScales({
     xKey: resolvedXKey,
     yKey: entry.value,
@@ -126,18 +128,29 @@ const StackedLineLayer = <TDatum,>({
 
             const isActive = activeSeriesId === seriesId && activeIndex === point.index;
 
+            const key =
+              keys[pointIndex] ?? pointKey(seriesId, readX(point.datum, point.index), point.index);
             return (
-              <circle
-                key={keys[pointIndex]}
-                cx={point.x}
-                cy={point.y}
-                r={isActive ? activePointRadius : pointRadius}
-                fill={color}
-                stroke="var(--chart-tooltip-background)"
-                stroke-width={isActive ? 2 : 1}
-                data-kamod-chart-key={keys[pointIndex]}
-                data-kamod-chart-active={isActive ? "true" : undefined}
-              />
+              <g key={key}>
+                {renderPointSlot(
+                  {
+                    datum: point.datum,
+                    index: point.index,
+                    seriesId,
+                    seriesLabel: entry.label,
+                    value: raw,
+                    x: point.x,
+                    y: point.y,
+                    color,
+                    opacity: 1,
+                    active: isActive,
+                    hidden: false,
+                    key,
+                    pointRadius,
+                  },
+                  entry.renderPoint,
+                )}
+              </g>
             );
           })
         : null}

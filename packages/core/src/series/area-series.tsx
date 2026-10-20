@@ -1,6 +1,6 @@
 import { useMemo } from "preact/hooks";
 import { pointKey, uniquifyKeys } from "../animation/keys";
-import { useChartContext, type DataAccessor } from "../core";
+import { normalizeAccessor, useChartContext, type DataAccessor } from "../core";
 import type { ScaleKind } from "../scales";
 import type { AreaFill } from "./area-fill";
 import { isAreaGradientFill } from "./area-fill";
@@ -13,6 +13,7 @@ import {
   shouldShowAreaPoints,
 } from "./area-style";
 import { getCartesianPoints, useCartesianScales } from "./cartesian";
+import type { RenderPoint } from "./mark-slots";
 import { buildAreaPath, type LineCurve } from "./paths";
 
 export type { AreaFill, AreaGradientDirection, AreaGradientFill } from "./area-fill";
@@ -35,6 +36,8 @@ export interface AreaSeriesProps<TDatum> {
   showPoints?: boolean | "auto";
   pointRadius?: number;
   activeIndex?: number | null;
+  seriesLabel?: string;
+  renderPoint?: RenderPoint<TDatum>;
   class?: string;
 }
 
@@ -56,9 +59,12 @@ export const AreaSeries = <TDatum,>({
   showPoints = false,
   pointRadius = 2.5,
   activeIndex = null,
+  seriesLabel,
+  renderPoint,
   class: className,
 }: AreaSeriesProps<TDatum>) => {
   const { data, xKey: contextXKey, ids } = useChartContext<TDatum>();
+  const readValue = useMemo(() => normalizeAccessor(dataKey), [dataKey]);
   const resolvedXKey = xKey ?? contextXKey;
   const seriesId = id ?? "series";
   const gradientId = createAreaGradientId(ids.root, seriesId);
@@ -114,11 +120,16 @@ export const AreaSeries = <TDatum,>({
         stroke-dasharray={strokeStyle.strokeDasharray}
       />
       {renderPoints ? (
-        <AreaPointMarkers
+        <AreaPointMarkers<TDatum>
           points={markerPoints}
           color={color}
           pointRadius={pointRadius}
           activeIndex={activeIndex}
+          seriesId={seriesId}
+          seriesLabel={seriesLabel}
+          renderPoint={renderPoint}
+          readDatum={(index) => data[index] as TDatum}
+          readValue={(datum, index) => readValue(datum, index) ?? null}
         />
       ) : null}
     </g>

@@ -203,6 +203,10 @@ export const resolveBarValueLabelContent = <TDatum>(
   context: BarValueLabelContext<TDatum>,
   options: BarValueLabelOptions<TDatum>,
 ): ComponentChildren | null => {
+  if (options.renderLabel) {
+    return options.renderLabel(context);
+  }
+
   if (options.format) {
     const formatted = options.format(value, context);
     if (formatted == null) {

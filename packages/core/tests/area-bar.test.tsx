@@ -1165,7 +1165,7 @@ describe("bar value label rendering", () => {
     const bar = container.querySelector(
       `[data-kamod-chart-series-id="${seriesId}"][data-kamod-chart-index="${index}"]`,
     );
-    return bar?.parentElement?.querySelector("[data-kamod-chart-value-label]");
+    return bar?.querySelector("[data-kamod-chart-value-label]");
   };
 
   it("preserves legacy valueLabels=true placement for positive vertical bars", () => {

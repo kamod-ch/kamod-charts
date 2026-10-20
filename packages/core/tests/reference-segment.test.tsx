@@ -227,10 +227,10 @@ describe("ScatterChart reference layering", () => {
     const ordered = [
       "[data-kamod-chart-reference-area]",
       "[data-kamod-chart-grid]",
-      "[data-kamod-chart-reference-line]",
       "[data-kamod-chart-reference-segment]",
       "[data-kamod-chart-scatter-series]",
       "[data-kamod-chart-reference-point]",
+      "[data-kamod-chart-reference-line]",
     ].map((selector) => container.querySelector(selector));
 
     for (let index = 1; index < ordered.length; index += 1) {

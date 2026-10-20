@@ -19,6 +19,9 @@ export const DonutChart = <TDatum,>({
   height,
   initialWidth,
   responsive,
+  aspectRatio,
+  class: className,
+  style,
   title,
   description,
   id,
@@ -40,6 +43,9 @@ export const DonutChart = <TDatum,>({
   legend,
   onSegmentClick,
   animate,
+  svgRef,
+  svgProps,
+  defs,
 }: DonutChartProps<TDatum>) => {
   const resolvedLabels = resolveDonutChartLabels(variant, labels);
   const controller = useCircularChartController({
@@ -74,12 +80,18 @@ export const DonutChart = <TDatum,>({
       height={height}
       initialWidth={initialWidth}
       responsive={responsive}
+      aspectRatio={aspectRatio}
+      class={className}
+      style={style}
       title={title}
       description={description}
       id={id}
       controller={controller}
       onSegmentClick={onSegmentClick}
       animate={animate}
+      svgRef={svgRef}
+      svgProps={svgProps}
+      defs={defs}
       overlay={{
         tooltip,
         showLegend,

@@ -13,6 +13,7 @@ export default defineConfig({
     "charts/donut-chart": "src/charts/donut-chart.tsx",
     "charts/scatter-chart": "src/charts/scatter-chart.tsx",
     "core/index": "src/core/index.ts",
+    "export/index": "src/export/index.ts",
     "interaction/index": "src/interaction/index.ts",
     "performance/index": "src/performance/index.ts",
     "primitives/index": "src/primitives/index.ts",

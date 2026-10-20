@@ -10,6 +10,9 @@ export const PieChart = <TDatum,>({
   height,
   initialWidth,
   responsive,
+  aspectRatio,
+  class: className,
+  style,
   title,
   description,
   id,
@@ -29,6 +32,9 @@ export const PieChart = <TDatum,>({
   legend,
   onSegmentClick,
   animate,
+  svgRef,
+  svgProps,
+  defs,
 }: PieChartProps<TDatum>) => {
   const controller = useCircularChartController({
     data,
@@ -46,12 +52,18 @@ export const PieChart = <TDatum,>({
       height={height}
       initialWidth={initialWidth}
       responsive={responsive}
+      aspectRatio={aspectRatio}
+      class={className}
+      style={style}
       title={title}
       description={description}
       id={id}
       controller={controller}
       onSegmentClick={onSegmentClick}
       animate={animate}
+      svgRef={svgRef}
+      svgProps={svgProps}
+      defs={defs}
       overlay={{
         tooltip,
         showLegend,

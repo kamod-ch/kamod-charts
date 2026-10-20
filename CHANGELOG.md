@@ -6,6 +6,13 @@ All notable changes to `@kamod-ch/charts` are documented here.
 
 ### Added
 
+- SVG surface: `svgRef` and `svgProps` on `Chart` and all high-level charts (composed event handlers; Kamod-controlled attributes protected). See `docs/development/svg-surface-api.md`.
+- Cartesian charts: root `defs` slot, layered plot rendering (`plotLayers`), and opt-in `clipPlotArea`.
+- `@kamod-ch/charts/export`: `serializeChartSvg`, `downloadChartSvg`, and `normalizeChartSvgFilename` (browser-safe download; SSR-safe import).
+- Series mark slots: `renderPoint` on cartesian line/area/scatter configs, `renderBar` / `renderLabel` on bar series and value labels.
+- Axis tick collision strategies: `tickCollision` (`none` | `truncate` | `hide` | `rotate`) with `maxTickLabelLength`, `maxTickLabelWidth`, and `tickRotation`.
+- Responsive `aspectRatio` sizing on cartesian and circular charts (`resolveChartSize`).
+- Shared chart chrome types (`ChartChromeProps`, `CartesianSurfaceChartProps`) for surface API parity across static charts and `@kamod-ch/charts/motion`.
 - Cartesian charts: optional `yDomain`, `margin`, `class`, `style`, `emptyContent`, and `format` (see RFC 0009).
 - `LineChart` / `AreaChart`: controlled `activeIndex` and `onActiveChange`; `BarChart` controlled selection callbacks.
 - `useSynchronizedCartesianSelection`, `findNearestDatumIndexByX`, and `downsampleMinMax` export from `@kamod-ch/charts/performance`.

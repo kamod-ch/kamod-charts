@@ -27,5 +27,13 @@ describe("chart layout", () => {
       width: 720,
       height: 240,
     });
+    expect(
+      resolveChartSize({
+        initialWidth: 400,
+        responsive: true,
+        aspectRatio: 2,
+        measuredWidth: 300,
+      }),
+    ).toEqual({ width: 300, height: 150 });
   });
 });

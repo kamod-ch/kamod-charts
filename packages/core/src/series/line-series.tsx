@@ -3,6 +3,7 @@ import { pointKey, uniquifyKeys } from "../animation/keys";
 import { useChartContext, type DataAccessor } from "../core";
 import type { ScaleKind } from "../scales";
 import { getCartesianPoints, useCartesianScales } from "./cartesian";
+import { type RenderPoint, renderPointSlot } from "./mark-slots";
 import { buildLinePath, type LineCurve } from "./paths";
 
 export type { LineCurve };
@@ -22,6 +23,8 @@ export interface LineSeriesProps<TDatum> {
   showPoints?: boolean | "auto";
   pointRadius?: number;
   activeIndex?: number | null;
+  seriesLabel?: string;
+  renderPoint?: RenderPoint<TDatum>;
   class?: string;
 }
 
@@ -40,6 +43,8 @@ export const LineSeries = <TDatum,>({
   showPoints = "auto",
   pointRadius = 2.5,
   activeIndex = null,
+  seriesLabel,
+  renderPoint,
   class: className,
 }: LineSeriesProps<TDatum>) => {
   const { data, xKey: contextXKey } = useChartContext<TDatum>();
@@ -62,8 +67,6 @@ export const LineSeries = <TDatum,>({
     [connectNulls, curve, points],
   );
   const shouldShowPoints = showPoints === true || (showPoints === "auto" && points.length <= 500);
-  const activePointRadius = pointRadius + 1.5;
-
   return (
     <g class={className} data-kamod-chart-line-series="" data-kamod-chart-series-id={id}>
       <path
@@ -76,21 +79,35 @@ export const LineSeries = <TDatum,>({
         stroke-linejoin="round"
       />
       {shouldShowPoints
-        ? points.map((point, pointIndex) =>
-            point.defined ? (
-              <circle
-                key={keys[pointIndex]}
-                cx={point.x ?? 0}
-                cy={point.y ?? 0}
-                r={activeIndex === point.index ? activePointRadius : pointRadius}
-                fill={color}
-                stroke="var(--chart-tooltip-background)"
-                stroke-width={activeIndex === point.index ? 2 : 1}
-                data-kamod-chart-key={keys[pointIndex]}
-                data-kamod-chart-active={activeIndex === point.index ? "true" : undefined}
-              />
-            ) : null,
-          )
+        ? points.map((point, pointIndex) => {
+            if (!point.defined || point.x == null || point.y == null) {
+              return null;
+            }
+            const key = keys[pointIndex] ?? pointKey(seriesId, point.xValue, point.index);
+            const active = activeIndex === point.index;
+            return (
+              <g key={key}>
+                {renderPointSlot(
+                  {
+                    datum: point.datum,
+                    index: point.index,
+                    seriesId,
+                    seriesLabel,
+                    value: point.yValue ?? null,
+                    x: point.x,
+                    y: point.y,
+                    color,
+                    opacity: 1,
+                    active,
+                    hidden: false,
+                    key,
+                    pointRadius,
+                  },
+                  renderPoint,
+                )}
+              </g>
+            );
+          })
         : null}
     </g>
   );

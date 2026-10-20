@@ -10,6 +10,9 @@ export {
 export { ChartProvider, useChartContext } from "./chart-context";
 export { ChartSurface } from "./chart-surface";
 export type { ChartSurfaceProps } from "./chart-surface";
+export type { ChartSvgProps, ChartSurfaceSvgOptions } from "./chart-svg-props";
+export { createPlotClipPathId } from "./chart-clip";
+export type { ChartClippingOptions, ChartDefsSlotOptions, ChartPlotLayers } from "./chart-layers";
 export { Chart, ChartRoot, defaultEmptyState } from "./chart";
 export { PlotArea } from "./plot-area";
 export type { PlotAreaProps } from "./plot-area";

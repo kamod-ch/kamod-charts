@@ -8,9 +8,12 @@ import {
   type TickFormatter,
   type TickValue,
 } from "./tick-format";
+import type { TickCollisionOptions } from "./tick-collision";
+import { prepareAxisTicks } from "./tick-collision";
+import { AxisTickText } from "./tick-label";
 import { getScalePosition, getTicks } from "./ticks";
 
-export interface YAxisProps<TDatum> {
+export interface YAxisProps<TDatum> extends TickCollisionOptions {
   dataKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   scale?: ScaleKind;
   domain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
@@ -33,6 +36,9 @@ export const YAxis = <TDatum,>({
   tickFormatter,
   formatSpecifier,
   label,
+  tickCollision,
+  maxTickLabelLength,
+  maxTickLabelWidth,
   class: className,
 }: YAxisProps<TDatum>) => {
   const { plotArea } = useChartContext<TDatum>();
@@ -67,26 +73,49 @@ export const YAxis = <TDatum,>({
     return formatSpecifier;
   }, [axisScale, formatSpecifier, scale, tickFormatter]);
 
+  const formattedTicks = ticks.flatMap((tick, index) => {
+    const position = getScalePosition(axisScale, tick);
+    if (position == null) {
+      return [];
+    }
+    const labelText = formatTick(tick as TickValue, index, {
+      formatter: tickFormatter,
+      formatSpecifier: resolvedFormatSpecifier,
+    });
+    return [{ position, labelText, index }];
+  });
+  const prepared = prepareAxisTicks(
+    formattedTicks.map((entry) => ({ position: entry.position, labelText: entry.labelText })),
+    {
+      tickCollision,
+      maxTickLabelLength,
+      maxTickLabelWidth,
+      orientation: "y",
+    },
+  );
+
   return (
     <g class={className} data-kamod-chart-y-axis="">
       <line y1={0} y2={plotArea.height} stroke="var(--chart-axis)" />
-      {ticks.map((tick, index) => {
-        const position = getScalePosition(axisScale, tick);
-        if (position == null) {
+      {prepared.map((entry) => {
+        if (!entry.visible) {
           return null;
         }
 
-        const labelText = formatTick(tick as TickValue, index, {
-          formatter: tickFormatter,
-          formatSpecifier: resolvedFormatSpecifier,
-        });
-
         return (
-          <g key={`${String(tick)}-${index}`} transform={`translate(0 ${position})`}>
+          <g
+            key={`${entry.labelText}-${entry.index}`}
+            transform={`translate(0 ${entry.position})`}
+            data-kamod-chart-tick=""
+          >
             <line x2={-6} stroke="var(--chart-axis)" />
-            <text x={-9} dy="0.32em" text-anchor="end">
-              {labelText}
-            </text>
+            <AxisTickText
+              x={-9}
+              dy="0.32em"
+              text-anchor="end"
+              displayText={entry.displayText}
+              fullText={entry.fullText}
+            />
           </g>
         );
       })}

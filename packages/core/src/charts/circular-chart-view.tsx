@@ -1,6 +1,7 @@
 import type { ComponentChildren } from "preact";
 import { useChartMotionContext } from "../animation/slots";
 import { Chart } from "../core";
+import type { ChartChromeProps } from "./chart-chrome-props";
 import { Legend } from "../primitives";
 import { PieSeries as StaticPieSeries } from "../series";
 import type { PieSeriesProps } from "../series/pie-series";
@@ -28,15 +29,8 @@ export interface CircularChartOverlayProps<TDatum> {
   labels?: PieSeriesProps<TDatum>["labels"];
 }
 
-export interface CircularChartViewProps<TDatum> {
+export interface CircularChartViewProps<TDatum> extends ChartChromeProps {
   data: readonly TDatum[];
-  width?: number;
-  height: number;
-  initialWidth?: number;
-  responsive?: boolean;
-  title?: string;
-  description?: string;
-  id?: string;
   controller: CircularChartController<TDatum>;
   overlay: CircularChartOverlayProps<TDatum>;
   seriesProps: Omit<
@@ -72,10 +66,20 @@ export const CircularChartView = <TDatum,>({
   emptyContent,
   onSegmentClick,
   animate,
+  class: className,
+  style: styleProp,
+  aspectRatio,
+  svgRef,
+  svgProps,
+  defs,
 }: CircularChartViewProps<TDatum>) => {
   const motion = useChartMotionContext();
   const PieSeries = (motion.slots.PieSeries ?? StaticPieSeries) as typeof StaticPieSeries;
   const tooltipEnabled = isPieTooltipEnabled(overlay.tooltip);
+  const chartStyle =
+    typeof styleProp === "string"
+      ? styleProp
+      : { ...styleProp, ...(tooltipEnabled ? { cursor: "default" } : {}) };
   const {
     hiddenKeys,
     activeIndex,
@@ -125,11 +129,16 @@ export const CircularChartView = <TDatum,>({
       height={height}
       initialWidth={initialWidth}
       responsive={responsive}
+      aspectRatio={aspectRatio}
+      class={className}
       title={title}
       description={description}
       id={id}
       tabIndex={0}
-      style={tooltipEnabled ? { cursor: "default" } : undefined}
+      style={chartStyle}
+      svgRef={svgRef}
+      svgProps={svgProps}
+      defs={defs}
       onKeyDown={handleChartKeyDown}
       overlay={overlay.showLegend || tooltipEnabled ? chartOverlay : undefined}
     >

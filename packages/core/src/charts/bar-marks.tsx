@@ -1,5 +1,7 @@
 import { barKey } from "../animation/keys";
 import { useChartContext } from "../core";
+import type { BarRenderContext } from "../series/mark-slots";
+import { renderBarSlot } from "../series/mark-slots";
 import { resolveBarGeometryFill } from "./bar-fill";
 import { resolveBarGeometry } from "./bar-geometry";
 import { roundedRectPath } from "./bar-path";
@@ -75,23 +77,40 @@ export const BarMarks = <TDatum,>({
           stacked,
           active: isActive,
         });
+        const path = roundedRectPath(bar.x, bar.y, bar.width, bar.height, radius);
+        const barContext: BarRenderContext<TDatum> = {
+          datum: bar.datum,
+          index: bar.index,
+          value: bar.value as number,
+          valueStart: bar.valueStart,
+          valueEnd: bar.valueEnd,
+          seriesId: bar.seriesId,
+          seriesIndex: bar.seriesIndex,
+          seriesLabel: bar.series.label,
+          orientation: horizontal ? "horizontal" : "vertical",
+          stacked,
+          active: isActive,
+          x: bar.x,
+          y: bar.y,
+          width: bar.width,
+          height: bar.height,
+          fill,
+          opacity: 1,
+          key,
+        };
+        const handleClick =
+          onBarClick && bar.value != null
+            ? () => onBarClick(bar.datum, bar.seriesId, bar.index, bar.value as number)
+            : undefined;
 
         return (
-          <g key={key} data-kamod-chart-key={key}>
-            <path
-              d={roundedRectPath(bar.x, bar.y, bar.width, bar.height, radius)}
-              fill={fill}
-              data-kamod-chart-bar=""
-              data-kamod-chart-key={key}
-              data-kamod-chart-series-id={bar.seriesId}
-              data-kamod-chart-index={String(bar.index)}
-              data-kamod-chart-active={isActive ? "true" : undefined}
-              onClick={
-                onBarClick && bar.value != null
-                  ? () => onBarClick(bar.datum, bar.seriesId, bar.index, bar.value as number)
-                  : undefined
-              }
-            />
+          <g
+            key={key}
+            data-kamod-chart-key={key}
+            data-kamod-chart-series-id={bar.seriesId}
+            data-kamod-chart-index={String(bar.index)}
+          >
+            {renderBarSlot(barContext, path, bar.series.renderBar, handleClick)}
             {label ? (
               <text
                 x={label.layout.x}

@@ -1,5 +1,5 @@
-export { XAxis, YAxis, formatTick, getScalePosition, getTicks, inferNumericTickFormatSpecifier, useAxisScale } from '../chunk-CVDHIQU7.js';
-import '../chunk-Q6JNEXFB.js';
-import '../chunk-JDH6VYL7.js';
+export { XAxis, YAxis, estimateTickLabelWidth, formatTick, getScalePosition, getTicks, inferNumericTickFormatSpecifier, prepareAxisTicks, truncateTickLabel, useAxisScale } from '../chunk-KIYPFLSG.js';
+import '../chunk-XIXY3OY2.js';
+import '../chunk-PUXYJWCR.js';
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

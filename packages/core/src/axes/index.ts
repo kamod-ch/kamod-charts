@@ -8,3 +8,9 @@ export { XAxis } from "./x-axis";
 export type { XAxisProps } from "./x-axis";
 export { YAxis } from "./y-axis";
 export type { YAxisProps } from "./y-axis";
+export { estimateTickLabelWidth, prepareAxisTicks, truncateTickLabel } from "./tick-collision";
+export type {
+  PreparedAxisTick,
+  TickCollisionOptions,
+  TickCollisionStrategy,
+} from "./tick-collision";

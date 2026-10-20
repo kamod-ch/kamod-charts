@@ -1,5 +1,7 @@
 import type { AreaFill, AreaGradientDirection } from "./area-fill";
 import { isAreaGradientFill } from "./area-fill";
+import type { RenderPoint } from "./mark-slots";
+import { renderPointSlot } from "./mark-slots";
 
 export const normalizeSvgIdPart = (value: string): string => value.replace(/[^a-zA-Z0-9_-]/g, "-");
 
@@ -106,34 +108,73 @@ export interface AreaMarkerPoint {
   y: number;
 }
 
-export interface AreaPointMarkersProps {
+export interface AreaPointMarkersProps<TDatum = unknown> {
   points: readonly AreaMarkerPoint[];
   color: string;
   pointRadius: number;
   activeIndex?: number | null;
+  seriesId?: string;
+  seriesLabel?: string;
+  renderPoint?: RenderPoint<TDatum>;
+  readDatum?: (index: number) => TDatum;
+  readValue?: (datum: TDatum, index: number) => number | null;
 }
 
-export const AreaPointMarkers = ({
+export const AreaPointMarkers = <TDatum,>({
   points,
   color,
   pointRadius,
   activeIndex = null,
-}: AreaPointMarkersProps) => (
+  seriesId = "series",
+  seriesLabel,
+  renderPoint,
+  readDatum,
+  readValue,
+}: AreaPointMarkersProps<TDatum>) => (
   <>
     {points.map((point) => {
       const isActive = activeIndex === point.index;
+      const datum = readDatum?.(point.index);
+      if (!datum) {
+        if (renderPoint) {
+          return null;
+        }
+        return (
+          <circle
+            key={point.key}
+            cx={point.x}
+            cy={point.y}
+            r={isActive ? pointRadius + 1.5 : pointRadius}
+            fill={color}
+            stroke="var(--chart-tooltip-background)"
+            stroke-width={isActive ? 2 : 1}
+            data-kamod-chart-key={point.key}
+            data-kamod-chart-active={isActive ? "true" : undefined}
+          />
+        );
+      }
+      const value = readValue?.(datum, point.index) ?? null;
       return (
-        <circle
-          key={point.key}
-          cx={point.x}
-          cy={point.y}
-          r={isActive ? pointRadius + 1.5 : pointRadius}
-          fill={color}
-          stroke="var(--chart-tooltip-background)"
-          stroke-width={isActive ? 2 : 1}
-          data-kamod-chart-key={point.key}
-          data-kamod-chart-active={isActive ? "true" : undefined}
-        />
+        <g key={point.key}>
+          {renderPointSlot(
+            {
+              datum,
+              index: point.index,
+              seriesId,
+              seriesLabel,
+              value,
+              x: point.x,
+              y: point.y,
+              color,
+              opacity: 1,
+              active: isActive,
+              hidden: false,
+              key: point.key,
+              pointRadius,
+            },
+            renderPoint,
+          )}
+        </g>
       );
     })}
   </>

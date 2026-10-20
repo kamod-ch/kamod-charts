@@ -1,7 +1,7 @@
 import { useMemo, useState } from "preact/hooks";
 import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
-import { Chart, useChartContext } from "../core";
+import { Chart, resolveChartSize, useChartContext } from "../core";
 import { createChartKeyboardHandler } from "../interaction";
 import { Grid, Legend, ReferenceArea, ReferenceLine } from "../primitives";
 import { inferGroupedDomain, inferStackedDomain } from "../series";
@@ -21,6 +21,7 @@ import { resolvePointerPlot } from "./chart-pointer";
 import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled, resolveTooltipOptions } from "./tooltip-options";
 import { useCartesianIntlAxisTicks } from "./cartesian-axis-formatters";
+import { cartesianAxisCollisionProps } from "./cartesian-axis-props";
 import { CartesianChartFrame } from "./cartesian-chart-frame";
 import { resolveCartesianEmptyState } from "./cartesian-empty-state";
 import type { BarChartProps } from "./types";
@@ -34,6 +35,7 @@ export const BarChart = <TDatum,>({
   height,
   initialWidth,
   responsive,
+  aspectRatio,
   title,
   description,
   id,
@@ -59,6 +61,14 @@ export const BarChart = <TDatum,>({
   format,
   activeIndex: controlledActiveIndex,
   onActiveChange,
+  svgRef,
+  svgProps,
+  defs,
+  clipPlotArea,
+  tickCollision,
+  maxTickLabelLength,
+  maxTickLabelWidth,
+  tickRotation,
 }: BarChartProps<TDatum>) => {
   const motion = useChartMotionContext();
   const BarMarks = (motion.slots.BarMarks ?? StaticBarMarks) as typeof StaticBarMarks;
@@ -91,6 +101,13 @@ export const BarChart = <TDatum,>({
   const tooltipEnabled = isTooltipEnabled(tooltip);
   const tooltipOptions = resolveTooltipOptions(tooltip, "nearest");
   const fallbackWidth = width ?? initialWidth ?? 640;
+  const chartHeight = resolveChartSize({
+    width,
+    height,
+    initialWidth,
+    responsive,
+    aspectRatio,
+  }).height;
 
   const activateBar = (
     bar: BarGeometry<TDatum> | null,
@@ -120,6 +137,17 @@ export const BarChart = <TDatum,>({
       ? styleProp
       : { ...styleProp, ...(tooltipEnabled ? { cursor: "crosshair" } : {}) };
   const { xTickFormatter, yTickFormatter } = useCartesianIntlAxisTicks(format);
+  const axisCollision = cartesianAxisCollisionProps({
+    tickCollision,
+    maxTickLabelLength,
+    maxTickLabelWidth,
+    tickRotation,
+  });
+  const axisCollisionY = {
+    tickCollision,
+    maxTickLabelLength,
+    maxTickLabelWidth,
+  };
 
   return (
     <CartesianChartFrame format={format}>
@@ -131,6 +159,7 @@ export const BarChart = <TDatum,>({
         height={height}
         initialWidth={initialWidth}
         responsive={responsive}
+        aspectRatio={aspectRatio}
         margin={margin}
         class={className}
         title={title}
@@ -139,10 +168,14 @@ export const BarChart = <TDatum,>({
         emptyState={resolveCartesianEmptyState(emptyContent)}
         tabIndex={0}
         style={chartStyle}
+        svgRef={svgRef}
+        svgProps={svgProps}
+        defs={defs}
+        clipPlotArea={clipPlotArea}
         onPointerMove={
           tooltipEnabled
             ? (event) => {
-                const { plot, position } = resolvePointerPlot(event, fallbackWidth, height);
+                const { plot, position } = resolvePointerPlot(event, fallbackWidth, chartHeight);
                 const bars = resolveBarGeometry({
                   data,
                   series: visibleSeries,
@@ -175,7 +208,7 @@ export const BarChart = <TDatum,>({
           activeIndex: activeIndex ?? 0,
           activeSeriesIndex: resolvedSeriesIndex,
           onChange: (state) => {
-            const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
+            const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, chartHeight);
             const bars = resolveBarGeometry({
               data,
               series: visibleSeries,
@@ -212,7 +245,7 @@ export const BarChart = <TDatum,>({
             if (!onBarClick || !activeSeries) {
               return;
             }
-            const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, height);
+            const plot = resolvePlotAreaFromSize(width ?? fallbackWidth, chartHeight);
             const bars = resolveBarGeometry({
               data,
               series: visibleSeries,
@@ -279,84 +312,110 @@ export const BarChart = <TDatum,>({
             />
           </>
         }
-      >
-        {referenceAreas.map((area, index) => (
-          <ReferenceArea
-            key={area.id ?? `reference-area-${index}`}
-            {...resolveBarReferenceAreaProps(area, {
-              xKey,
-              xScale,
-              yDomain,
-              horizontal: isHorizontal,
-            })}
-          />
-        ))}
-        {showGrid ? (
-          isHorizontal ? (
-            <Grid xScale="linear" xDomain={yDomain} yKey={xKey} yScale={xScale} />
-          ) : (
-            <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} />
-          )
-        ) : null}
-        <BarActiveCrosshair
-          data={data}
-          xKey={xKey}
-          visibleSeries={visibleSeries}
-          yDomain={yDomain}
-          stacked={stacked}
-          grouped={grouped}
-          horizontal={isHorizontal}
-          minBarSize={minBarSize}
-          maxBarSize={maxBarSize}
-          activeIndex={activeIndex}
-          activeSeries={activeSeries}
-          resolvedSeriesIndex={resolvedSeriesIndex}
-          tooltip={tooltip}
-        />
-        {isHorizontal ? (
-          <>
-            <XAxis scale="linear" domain={yDomain} tickFormatter={yTickFormatter} />
-            <YAxis dataKey={xKey} scale={xScale} tickFormatter={xTickFormatter} />
-          </>
-        ) : (
-          <>
-            <XAxis dataKey={xKey} scale={xScale} tickFormatter={xTickFormatter} />
-            <YAxis domain={yDomain} tickFormatter={yTickFormatter} />
-          </>
-        )}
-        <BarMarks
-          data={data}
-          xKey={xKey}
-          series={visibleSeries}
-          yDomain={yDomain}
-          stacked={stacked}
-          grouped={grouped}
-          horizontal={isHorizontal}
-          radius={radius}
-          minBarSize={minBarSize}
-          maxBarSize={maxBarSize}
-          valueLabels={valueLabels}
-          activeIndex={activeIndex}
-          activeSeriesIndex={resolvedSeriesIndex}
-          onBarClick={onBarClick}
-          {...(animate === undefined ? {} : { animate })}
-        />
-        {referenceLines.map((line, index) => (
-          <ReferenceLine
-            key={index}
-            x={line.x}
-            y={line.y}
-            label={line.label}
-            color={line.color}
-            yKey={line.yKey}
-            xKey={xKey}
-            xScale={isHorizontal ? "linear" : xScale}
-            xDomain={isHorizontal ? yDomain : undefined}
-            yScale={isHorizontal ? xScale : "linear"}
-            yDomain={isHorizontal ? undefined : yDomain}
-          />
-        ))}
-      </Chart>
+        plotLayers={{
+          clipped: (
+            <>
+              {referenceAreas.map((area, index) => (
+                <ReferenceArea
+                  key={area.id ?? `reference-area-${index}`}
+                  {...resolveBarReferenceAreaProps(area, {
+                    xKey,
+                    xScale,
+                    yDomain,
+                    horizontal: isHorizontal,
+                  })}
+                />
+              ))}
+              {showGrid ? (
+                isHorizontal ? (
+                  <Grid xScale="linear" xDomain={yDomain} yKey={xKey} yScale={xScale} />
+                ) : (
+                  <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} />
+                )
+              ) : null}
+              <BarMarks
+                data={data}
+                xKey={xKey}
+                series={visibleSeries}
+                yDomain={yDomain}
+                stacked={stacked}
+                grouped={grouped}
+                horizontal={isHorizontal}
+                radius={radius}
+                minBarSize={minBarSize}
+                maxBarSize={maxBarSize}
+                valueLabels={valueLabels}
+                activeIndex={activeIndex}
+                activeSeriesIndex={resolvedSeriesIndex}
+                onBarClick={onBarClick}
+                {...(animate === undefined ? {} : { animate })}
+              />
+            </>
+          ),
+          foreground: (
+            <BarActiveCrosshair
+              data={data}
+              xKey={xKey}
+              visibleSeries={visibleSeries}
+              yDomain={yDomain}
+              stacked={stacked}
+              grouped={grouped}
+              horizontal={isHorizontal}
+              minBarSize={minBarSize}
+              maxBarSize={maxBarSize}
+              activeIndex={activeIndex}
+              activeSeries={activeSeries}
+              resolvedSeriesIndex={resolvedSeriesIndex}
+              tooltip={tooltip}
+            />
+          ),
+          axes: (
+            <>
+              {isHorizontal ? (
+                <>
+                  <XAxis
+                    scale="linear"
+                    domain={yDomain}
+                    tickFormatter={yTickFormatter}
+                    {...axisCollisionY}
+                  />
+                  <YAxis
+                    dataKey={xKey}
+                    scale={xScale}
+                    tickFormatter={xTickFormatter}
+                    {...axisCollision}
+                  />
+                </>
+              ) : (
+                <>
+                  <XAxis
+                    dataKey={xKey}
+                    scale={xScale}
+                    tickFormatter={xTickFormatter}
+                    {...axisCollision}
+                  />
+                  <YAxis domain={yDomain} tickFormatter={yTickFormatter} {...axisCollisionY} />
+                </>
+              )}
+              {referenceLines.map((line, index) => (
+                <ReferenceLine
+                  key={index}
+                  x={line.x}
+                  y={line.y}
+                  label={line.label}
+                  color={line.color}
+                  yKey={line.yKey}
+                  xKey={xKey}
+                  xScale={isHorizontal ? "linear" : xScale}
+                  xDomain={isHorizontal ? yDomain : undefined}
+                  yScale={isHorizontal ? xScale : "linear"}
+                  yDomain={isHorizontal ? undefined : yDomain}
+                />
+              ))}
+            </>
+          ),
+        }}
+      />
     </CartesianChartFrame>
   );
 };

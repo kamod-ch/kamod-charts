@@ -1,4 +1,6 @@
 import type { ComponentChildren, JSX } from "preact";
+import type { ChartClippingOptions, ChartDefsSlotOptions, ChartPlotLayers } from "./chart-layers";
+import type { ChartSurfaceSvgOptions } from "./chart-svg-props";
 
 export type ChartPrimitiveValue = string | number | Date;
 export type ChartNullableValue<TValue extends ChartPrimitiveValue = ChartPrimitiveValue> =
@@ -64,17 +66,31 @@ export interface ChartAccessibilityOptions {
 
 export interface ChartDimensionsInput {
   width?: number;
-  height: number;
+  /** Ignored when `aspectRatio` is set on a responsive chart. */
+  height?: number;
   initialWidth?: number;
   responsive?: boolean;
+  /** width / height; derives height from measured width when `responsive` is true. */
+  aspectRatio?: number;
 }
 
-export interface ChartRootProps<TDatum> extends ChartDimensionsInput, ChartAccessibilityOptions {
+export interface ChartRootProps<TDatum>
+  extends
+    ChartDimensionsInput,
+    ChartAccessibilityOptions,
+    ChartSurfaceSvgOptions,
+    ChartDefsSlotOptions,
+    ChartClippingOptions {
   data: readonly TDatum[];
   margin?: Partial<ChartMargin>;
   xKey?: DomainDataAccessor<TDatum>;
   xScale?: ChartCartesianScaleKind;
   children?: ComponentChildren;
+  /**
+   * Explicit cartesian layer content. When set, `children` are not rendered in the plot
+   * (use `children` only for unstructured low-level charts).
+   */
+  plotLayers?: ChartPlotLayers;
   class?: string;
   style?: JSX.CSSProperties | string;
   tabIndex?: number;
@@ -91,6 +107,7 @@ export interface ChartContextValue<TDatum> {
     root: string;
     title: string;
     description: string;
+    plotClipPath?: string;
   };
   margin: ChartMargin;
   size: ChartSize;

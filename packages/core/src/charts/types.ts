@@ -1,14 +1,17 @@
 import type { ComponentChildren } from "preact";
 import type { ChartAnimate } from "../animation";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
+import type { ChartChromeProps, CartesianSurfaceChartProps } from "./chart-chrome-props";
 import type { TooltipPlacement } from "../primitives/tooltip-placement";
 import type {
-  LineCurve,
   AreaFill,
+  LineCurve,
   PieLabels,
   PieRose,
   PieSliceContext,
   PieSortComparator,
+  RenderBar,
+  RenderPoint,
 } from "../series";
 
 export interface CartesianSeriesConfig<TDatum> {
@@ -17,6 +20,7 @@ export interface CartesianSeriesConfig<TDatum> {
   label?: string;
   color?: string;
   hidden?: boolean;
+  renderPoint?: RenderPoint<TDatum>;
 }
 
 export interface BarDatumContext<TDatum> {
@@ -36,6 +40,7 @@ export type BarFill<TDatum> = string | ((context: BarDatumContext<TDatum>) => st
 
 export interface BarSeriesConfig<TDatum> extends CartesianSeriesConfig<TDatum> {
   fill?: BarFill<TDatum>;
+  renderBar?: RenderBar<TDatum>;
   valueLabels?: boolean | BarValueLabelOptions<TDatum>;
 }
 
@@ -46,6 +51,7 @@ export interface BarValueLabelContext<TDatum> extends BarDatumContext<TDatum> {
 export interface BarValueLabelOptions<TDatum> {
   position?: "auto" | "inside" | "outside" | "center";
   format?: (value: number, context: BarValueLabelContext<TDatum>) => ComponentChildren;
+  renderLabel?: (context: BarValueLabelContext<TDatum>) => ComponentChildren;
   color?: string;
   class?: string;
   offset?: number;
@@ -175,25 +181,16 @@ export interface CartesianActiveSelection {
   source?: "pointer" | "keyboard" | "external";
 }
 
-export interface CommonCartesianChartProps<TDatum> {
+export interface CommonCartesianChartProps<TDatum> extends CartesianSurfaceChartProps {
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
   /** Fixed numeric Y domain; overrides inference when set. */
   yDomain?: readonly [number, number];
   margin?: ChartMargin;
-  class?: string;
-  style?: string | Record<string, string | number>;
   /** Shown when `data` is empty (chart-level empty state). */
   emptyContent?: ComponentChildren;
   format?: ChartFormatOptions;
-  width?: number;
-  height: number;
-  initialWidth?: number;
-  responsive?: boolean;
-  title?: string;
-  description?: string;
-  id?: string;
   showGrid?: boolean;
   showLegend?: boolean;
   tooltip?: boolean | CartesianTooltipOptions<TDatum>;
@@ -250,17 +247,10 @@ export interface BarChartProps<TDatum> extends CommonCartesianChartProps<TDatum>
   onBarClick?: (datum: TDatum, seriesId: string, index: number, value: number) => void;
 }
 
-export interface PieChartProps<TDatum> {
+export interface PieChartProps<TDatum> extends ChartChromeProps {
   data: readonly TDatum[];
   valueKey: DataAccessor<TDatum, number | null | undefined>;
   labelKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
-  width?: number;
-  height: number;
-  initialWidth?: number;
-  responsive?: boolean;
-  title?: string;
-  description?: string;
-  id?: string;
   innerRadius?: number;
   outerRadius?: number;
   padAngle?: number;
@@ -300,17 +290,10 @@ export type DonutFormatTotal<TDatum> = (
   context: DonutCenterContext<TDatum>,
 ) => ComponentChildren;
 
-export interface DonutChartProps<TDatum> {
+export interface DonutChartProps<TDatum> extends ChartChromeProps {
   data: readonly TDatum[];
   valueKey: DataAccessor<TDatum, number | null | undefined>;
   labelKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
-  width?: number;
-  height: number;
-  initialWidth?: number;
-  responsive?: boolean;
-  title?: string;
-  description?: string;
-  id?: string;
   variant?: DonutVariant;
   innerRadiusRatio?: number;
   outerRadius?: number;

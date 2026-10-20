@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { D as DataAccessor } from '../types-B2kenooF.js';
+import { D as DataAccessor } from '../types-DSaae0gq.js';
 
 interface ChartDescriptionInput {
     title?: string;

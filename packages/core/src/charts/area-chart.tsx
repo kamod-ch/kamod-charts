@@ -12,6 +12,7 @@ import {
 } from "../series";
 import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
 import { useCartesianIntlAxisTicks } from "./cartesian-axis-formatters";
+import { cartesianAxisCollisionProps } from "./cartesian-axis-props";
 import { CartesianChartFrame } from "./cartesian-chart-frame";
 import { resolveCartesianEmptyState } from "./cartesian-empty-state";
 import { buildCartesianLayoutModel } from "./cartesian-layout-model";
@@ -34,6 +35,7 @@ export const AreaChart = <TDatum,>({
   height,
   initialWidth,
   responsive,
+  aspectRatio,
   title,
   description,
   id,
@@ -60,6 +62,14 @@ export const AreaChart = <TDatum,>({
   format,
   activeIndex: controlledActiveIndex,
   onActiveChange,
+  svgRef,
+  svgProps,
+  defs,
+  clipPlotArea,
+  tickCollision,
+  maxTickLabelLength,
+  maxTickLabelWidth,
+  tickRotation,
 }: AreaChartProps<TDatum>) => {
   const motion = useChartMotionContext();
   const AreaSeries = (motion.slots.AreaSeries ?? StaticAreaSeries) as typeof StaticAreaSeries;
@@ -147,6 +157,12 @@ export const AreaChart = <TDatum,>({
       ? styleProp
       : { ...styleProp, ...(tooltipEnabled ? { cursor: "crosshair" } : {}) };
   const { xTickFormatter, yTickFormatter } = useCartesianIntlAxisTicks(format);
+  const axisCollision = cartesianAxisCollisionProps({
+    tickCollision,
+    maxTickLabelLength,
+    maxTickLabelWidth,
+    tickRotation,
+  });
 
   return (
     <CartesianChartFrame format={format}>
@@ -158,6 +174,7 @@ export const AreaChart = <TDatum,>({
         height={height}
         initialWidth={initialWidth}
         responsive={responsive}
+        aspectRatio={aspectRatio}
         margin={margin}
         class={className}
         title={title}
@@ -166,6 +183,10 @@ export const AreaChart = <TDatum,>({
         emptyState={resolveCartesianEmptyState(emptyContent)}
         tabIndex={0}
         style={chartStyle}
+        svgRef={svgRef}
+        svgProps={svgProps}
+        defs={defs}
+        clipPlotArea={clipPlotArea}
         onPointerMove={tooltipEnabled ? onPointerMove : undefined}
         onPointerLeave={tooltipEnabled ? onPointerLeave : undefined}
         onKeyDown={createChartKeyboardHandler({
@@ -250,77 +271,101 @@ export const AreaChart = <TDatum,>({
             />
           </>
         }
-      >
-        {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
-        <CartesianActiveCrosshair
-          activeIndex={activeIndex}
-          activeSeries={activeSeries}
-          visibleSeries={visibleSeries}
-          xKey={xKey}
-          xScale={xScale}
-          yDomain={yDomain}
-          tooltip={tooltip}
-          defaultMode="axis"
-          pointerPlot={pointerPlot}
-        />
-        <XAxis dataKey={xKey} scale={xScale} tickFormatter={xTickFormatter} />
-        <YAxis domain={yDomain} tickFormatter={yTickFormatter} />
-        {referenceLines.map((line, index) => (
-          <ReferenceLine
-            key={index}
-            x={line.x}
-            y={line.y}
-            yDomain={yDomain}
-            label={line.label}
-            color={line.color}
-            yKey={line.yKey}
-            xKey={xKey}
-            xScale={xScale}
-          />
-        ))}
-        {stacked ? (
-          <StackedAreaSeries
-            series={stackSeries}
-            xKey={xKey}
-            xScale={xScale}
-            yDomain={yDomain}
-            opacity={opacity}
-            fill={fill}
-            curve={curve}
-            outline={outline}
-            strokeWidth={strokeWidth}
-            strokeDasharray={strokeDasharray}
-            showPoints={showPoints}
-            pointRadius={pointRadius}
-            activeIndex={activeIndex}
-            activeSeriesId={activeSeriesId}
-            {...(animate === undefined ? {} : { animate })}
-          />
-        ) : (
-          visibleEntries.map(({ entry, originalIndex }) => (
-            <AreaSeries
-              key={getSeriesId(entry, originalIndex)}
-              id={getSeriesId(entry, originalIndex)}
-              dataKey={entry.key}
+        plotLayers={{
+          clipped: (
+            <>
+              {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
+              {stacked ? (
+                <StackedAreaSeries
+                  series={stackSeries}
+                  xKey={xKey}
+                  xScale={xScale}
+                  yDomain={yDomain}
+                  opacity={opacity}
+                  fill={fill}
+                  curve={curve}
+                  outline={outline}
+                  strokeWidth={strokeWidth}
+                  strokeDasharray={strokeDasharray}
+                  showPoints={showPoints}
+                  pointRadius={pointRadius}
+                  activeIndex={activeIndex}
+                  activeSeriesId={activeSeriesId}
+                  {...(animate === undefined ? {} : { animate })}
+                />
+              ) : (
+                visibleEntries.map(({ entry, originalIndex }) => (
+                  <AreaSeries
+                    key={getSeriesId(entry, originalIndex)}
+                    id={getSeriesId(entry, originalIndex)}
+                    dataKey={entry.key}
+                    yDomain={yDomain}
+                    color={entry.color ?? `var(--chart-${(originalIndex % 4) + 1})`}
+                    baseline={baseline}
+                    opacity={opacity}
+                    fill={fill}
+                    outline={outline}
+                    strokeWidth={strokeWidth}
+                    strokeDasharray={strokeDasharray}
+                    showPoints={showPoints}
+                    pointRadius={pointRadius}
+                    curve={curve}
+                    activeIndex={
+                      activeSeriesId === getSeriesId(entry, originalIndex) ? activeIndex : null
+                    }
+                    seriesLabel={entry.label}
+                    renderPoint={entry.renderPoint}
+                    {...(animate === undefined ? {} : { animate })}
+                  />
+                ))
+              )}
+            </>
+          ),
+          foreground: (
+            <CartesianActiveCrosshair
+              activeIndex={activeIndex}
+              activeSeries={activeSeries}
+              visibleSeries={visibleSeries}
+              xKey={xKey}
+              xScale={xScale}
               yDomain={yDomain}
-              color={entry.color ?? `var(--chart-${(originalIndex % 4) + 1})`}
-              baseline={baseline}
-              opacity={opacity}
-              fill={fill}
-              outline={outline}
-              strokeWidth={strokeWidth}
-              strokeDasharray={strokeDasharray}
-              showPoints={showPoints}
-              pointRadius={pointRadius}
-              curve={curve}
-              activeIndex={
-                activeSeriesId === getSeriesId(entry, originalIndex) ? activeIndex : null
-              }
-              {...(animate === undefined ? {} : { animate })}
+              tooltip={tooltip}
+              defaultMode="axis"
+              pointerPlot={pointerPlot}
             />
-          ))
-        )}
-      </Chart>
+          ),
+          axes: (
+            <>
+              <XAxis
+                dataKey={xKey}
+                scale={xScale}
+                tickFormatter={xTickFormatter}
+                {...axisCollision}
+              />
+              <YAxis
+                domain={yDomain}
+                tickFormatter={yTickFormatter}
+                tickCollision={tickCollision}
+                maxTickLabelLength={maxTickLabelLength}
+                maxTickLabelWidth={maxTickLabelWidth}
+              />
+              {referenceLines.map((line, index) => (
+                <ReferenceLine
+                  key={index}
+                  x={line.x}
+                  y={line.y}
+                  yDomain={yDomain}
+                  label={line.label}
+                  color={line.color}
+                  yKey={line.yKey}
+                  xKey={xKey}
+                  xScale={xScale}
+                />
+              ))}
+            </>
+          ),
+        }}
+      />
     </CartesianChartFrame>
   );
 };
