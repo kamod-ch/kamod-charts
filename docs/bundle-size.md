@@ -3,7 +3,7 @@
 This file lists **published dist file sizes**, not minified consumer application bundles.
 For consumer measurements see `docs/performance/consumer-bundles.md` and `pnpm consumer:report`.
 
-Generated from current `packages/core/dist`. Total JS/CSS bytes: 406578 bytes.
+Generated from current `packages/core/dist`. Total JS/CSS bytes: 406651 bytes.
 
 | File                    | Bytes |
 | ----------------------- | ----: |
@@ -22,15 +22,15 @@ Generated from current `packages/core/dist`. Total JS/CSS bytes: 406578 bytes.
 | chunk-5B3P6SG7.js       |  1686 |
 | chunk-ACJDGSTJ.js       | 49782 |
 | chunk-D72UBQ3Y.js       |  9657 |
-| chunk-F4CKKYFJ.js       | 15516 |
 | chunk-FKM2GUSV.js       |  6807 |
-| chunk-GJE4T5PS.js       | 13621 |
 | chunk-GXLSXGCG.js       | 70486 |
+| chunk-H225TNI6.js       | 13631 |
 | chunk-H63KBFOG.js       | 29279 |
+| chunk-HV3RMBE3.js       | 15569 |
 | chunk-K6DL4MTH.js       |  5200 |
 | chunk-R654GXB2.js       |  4137 |
 | chunk-R6OLQ7JF.js       |  4789 |
-| chunk-RKIKTSNQ.js       | 14420 |
+| chunk-SZLRB54A.js       | 14430 |
 | chunk-TRV7RS5D.js       | 13829 |
 | chunk-TWTY7ZW5.js       |  2556 |
 | chunk-W3MGV2AP.js       |  3768 |
