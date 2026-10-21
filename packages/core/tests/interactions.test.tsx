@@ -1,6 +1,6 @@
-import { fireEvent, render } from "./testing-library";
+import { act, fireEvent, render } from "./testing-library";
 import renderToString from "preact-render-to-string";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { getScalePosition } from "../src/axes";
 import { resolvePlotAreaFromSize } from "../src/charts/cartesian-interaction";
 import { Legend, LineChart, ScatterChart, Tooltip, AreaChart, BarChart } from "../src";
@@ -104,6 +104,43 @@ describe("phase 6 interactions", () => {
     expect(container.querySelector("[data-kamod-chart-tooltip]")).not.toBeNull();
     expect(container.querySelector("[data-kamod-chart-crosshair]")).not.toBeNull();
     expect(container.querySelector("[data-kamod-chart-tooltip]")?.textContent).toContain("Revenue");
+  });
+
+  it("retains pointer coordinates until the animation-frame update", () => {
+    let frame: FrameRequestCallback | undefined;
+    vi.stubEnv("VITEST", "");
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+      frame = callback;
+      return 1;
+    });
+
+    try {
+      const { container } = render(
+        <LineChart
+          data={data}
+          xKey="date"
+          xScale="time"
+          series={[{ key: "revenue", id: "revenue", label: "Revenue" }]}
+          width={CHART_WIDTH}
+          height={CHART_HEIGHT}
+          tooltip
+        />,
+      );
+      const surface = requireSurface(container);
+      mockSurfaceRect(surface);
+
+      fireEvent.pointerMove(surface, { clientX: CHART_WIDTH - 50, clientY: 100 });
+      expect(container.querySelector("[data-kamod-chart-tooltip]")).toBeNull();
+
+      act(() => frame?.(0));
+
+      expect(container.querySelector("[data-kamod-chart-tooltip]")?.textContent).toContain(
+        "Revenue: 20",
+      );
+    } finally {
+      vi.unstubAllEnvs();
+      vi.unstubAllGlobals();
+    }
   });
 
   it("clears tooltip on pointer leave", () => {

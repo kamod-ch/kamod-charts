@@ -26,7 +26,6 @@ import { resolveCartesianViewport } from "./resolve-cartesian-viewport";
 import { isContinuousCartesianXScale } from "./x-viewport";
 import { useCartesianXViewportGestures } from "./use-cartesian-x-viewport-gestures";
 import type { ChartSvgProps } from "../core/chart-svg-props";
-import { useCartesianPointerFrame } from "./use-cartesian-pointer-frame";
 import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled } from "./tooltip-options";
 import type { AreaChartProps, CartesianSeriesConfig } from "./types";
@@ -219,12 +218,13 @@ export const AreaChart = <TDatum,>({
     controlledActiveIndex,
     onActiveIndexChange: (index) => notifyActiveChange(index, "pointer"),
   });
-  const tooltipPointerMove = useCartesianPointerFrame(
+  const tooltipPointerMove = useCallback(
     (event: Parameters<typeof onPointerMove>[0]) => {
       if (!viewportGestures.isPanning) {
         onPointerMove(event);
       }
     },
+    [onPointerMove, viewportGestures.isPanning],
   );
   const mergedSvgProps: ChartSvgProps = {
     ...(typeof svgProps === "object" && svgProps ? svgProps : {}),

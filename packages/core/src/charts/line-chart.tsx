@@ -30,7 +30,6 @@ import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled } from "./tooltip-options";
 import type { LineChartProps, LineSeriesConfig } from "./types";
 import { useCartesianPointerState } from "./use-cartesian-pointer-state";
-import { useCartesianPointerFrame } from "./use-cartesian-pointer-frame";
 
 const findSeriesOriginalIndex = <TDatum,>(
   series: readonly LineSeriesConfig<TDatum>[],
@@ -238,12 +237,13 @@ export const LineChart = <TDatum,>({
     controlledActiveIndex,
     onActiveIndexChange: (index) => notifyActiveChange(index, "pointer"),
   });
-  const tooltipPointerMove = useCartesianPointerFrame(
+  const tooltipPointerMove = useCallback(
     (event: Parameters<typeof onPointerMove>[0]) => {
       if (!viewportGestures.isPanning) {
         onPointerMove(event);
       }
     },
+    [onPointerMove, viewportGestures.isPanning],
   );
   const mergedSvgProps: ChartSvgProps = {
     ...(typeof svgProps === "object" && svgProps ? svgProps : {}),

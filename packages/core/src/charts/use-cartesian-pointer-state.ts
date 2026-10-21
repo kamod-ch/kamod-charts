@@ -52,8 +52,7 @@ export const useCartesianPointerState = <TDatum>({
   const [pointerPlot, setPointerPlot] = useState<CartesianPointerPlot | null>(null);
 
   const applyPointer = useCallback(
-    (event: JSX.TargetedPointerEvent<Element>) => {
-      const { plot, position } = resolvePointerPlot(event, fallbackWidth, height);
+    ({ plot, position }: ReturnType<typeof resolvePointerPlot>) => {
       setPointerPlot({ plotX: position.plotX, plotY: position.plotY });
       const nextIndex = findNearestCartesianIndexByX({
         data,
@@ -69,22 +68,18 @@ export const useCartesianPointerState = <TDatum>({
       setActiveIndex(nextIndex);
       onActiveIndexChange?.(nextIndex);
     },
-    [
-      data,
-      fallbackWidth,
-      height,
-      onActiveIndexChange,
-      seriesKey,
-      setActiveIndex,
-      xIndex,
-      xDomain,
-      xKey,
-      xScale,
-      yDomain,
-    ],
+    [data, onActiveIndexChange, seriesKey, setActiveIndex, xIndex, xDomain, xKey, xScale, yDomain],
   );
 
-  const onPointerMove = useCartesianPointerFrame(applyPointer);
+  const schedulePointerMove = useCartesianPointerFrame(applyPointer);
+  const onPointerMove = useCallback(
+    (event: JSX.TargetedPointerEvent<Element>) => {
+      // Preact clears currentTarget after dispatch. Resolve all event- and DOM-dependent
+      // geometry synchronously before handing the latest sample to requestAnimationFrame.
+      schedulePointerMove(resolvePointerPlot(event, fallbackWidth, height));
+    },
+    [fallbackWidth, height, schedulePointerMove],
+  );
 
   const onPointerLeave = useCallback(() => {
     setPointerPlot(null);
