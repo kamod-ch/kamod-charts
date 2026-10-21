@@ -9,22 +9,22 @@ Plan: [kamod-charts-svg-analyse-cursor-prompts.md](./kamod-charts-svg-analyse-cu
 
 ## Prompt status
 
-| Prompt | Status   | Notes                                                      |
-| -----: | -------- | ---------------------------------------------------------- |
-|     00 | **done** | Baseline + `pnpm check` pass (2026-10-20)                  |
-|     01 | **done** | Protokoll, Regressionstest, echte Bench-Messung            |
-|     02 | **done** | `downsampleMinMaxSegmented` + Tests/Docs                   |
-|     03 | **done** | Export nearest-wins + all-computed per element             |
-|     04 | **done** | Tick hide: Y extent, descending, edge overlap              |
-|     05 | **done** | `xDomain`, helpers, line/area wiring, docs demo            |
-|     06 | **done** | X pan/zoom hook, line/area, fixture, e2e, docs             |
-|     07 | **done** | Brush, `LineChartWithXBrush`, synced xDomain hook          |
-|     08 | **done** | Shared reference layers; Area parity; docs/tests           |
-|     09 | **done** | TimeSeriesBuffer, useTimeSeriesBuffer, fixture/docs        |
-|     10 | **done** | Sparkline preset, monitoring demo, fixture, e2e, gallery   |
-|     11 | **done** | Gates + [canvas-decision.md](./canvas-decision.md) (DEFER) |
+| Prompt | Status   | Notes                                                                            |
+| -----: | -------- | -------------------------------------------------------------------------------- |
+|     00 | **done** | Baseline + `pnpm check` pass (2026-10-20)                                        |
+|     01 | **done** | Protokoll, Regressionstest, echte Bench-Messung                                  |
+|     02 | **done** | `downsampleMinMaxSegmented` + Tests/Docs                                         |
+|     03 | **done** | Export nearest-wins + all-computed per element                                   |
+|     04 | **done** | Tick hide: Y extent, descending, edge overlap                                    |
+|     05 | **done** | `xDomain`, helpers, line/area wiring, docs demo                                  |
+|     06 | **done** | X pan/zoom hook, line/area, fixture, e2e, docs                                   |
+|     07 | **done** | Brush, `LineChartWithXBrush`, synced xDomain hook                                |
+|     08 | **done** | Shared reference layers; Area parity; docs/tests                                 |
+|     09 | **done** | TimeSeriesBuffer, useTimeSeriesBuffer, fixture/docs                              |
+|     10 | **done** | Sparkline preset, monitoring demo, fixture, e2e, gallery                         |
+|     11 | **done** | Gates + [canvas-decision.md](./canvas-decision.md) (DEFER)                       |
 |     12 | **done** | PNG (`@kamod-ch/charts/export/png`), CSV helper, docs, monitoring export buttons |
-|     13 | **done** | `computeHistogramBins`, BarChart recipe `/recipes/histogram` |
+|     13 | **done** | `computeHistogramBins`, BarChart recipe `/recipes/histogram`                     |
 
 ## Prompt 10 deliverables
 
@@ -39,26 +39,26 @@ Plan: [kamod-charts-svg-analyse-cursor-prompts.md](./kamod-charts-svg-analyse-cu
 
 ## Checks
 
-| Date       | Command                              | Result                                          |
-| ---------- | ------------------------------------ | ----------------------------------------------- |
-| 2026-10-20 | `pnpm check`                         | pass (566 unit tests + bench measurement tests) |
-| 2026-10-20 | `pnpm test:browser`                  | pass (13 Playwright tests)                      |
-| 2026-10-20 | `pnpm smoke:consumer`                | pass                                            |
-| 2026-10-20 | `pnpm docs:build`                    | pass                                            |
-| 2026-10-20 | `node scripts/browser-benchmark.mjs` | pass (Chromium, preview :4173)                  |
+| Date       | Command                              | Result                                            |
+| ---------- | ------------------------------------ | ------------------------------------------------- |
+| 2026-10-20 | `pnpm check`                         | pass (566 unit tests + bench measurement tests)   |
+| 2026-10-20 | `pnpm test:browser`                  | pass (13 Playwright tests)                        |
+| 2026-10-20 | `pnpm smoke:consumer`                | pass                                              |
+| 2026-10-20 | `pnpm docs:build`                    | pass                                              |
+| 2026-10-20 | `node scripts/browser-benchmark.mjs` | pass (Chromium, preview :4173)                    |
 | 2026-10-21 | `pnpm check`                         | pass (579 unit tests)                             |
 | 2026-10-21 | `pnpm test:browser`                  | pass (13 Playwright tests; fresh fixture preview) |
 | 2026-10-21 | `pnpm docs:build`                    | pass                                              |
 
 ## Prompt 12–13 deliverables
 
-| Artifact | Path |
-| --- | --- |
-| PNG raster export | `@kamod-ch/charts/export/png` — `renderChartToPngBlob`, `downloadChartPng` |
-| CSV data export | `@kamod-ch/charts/export` — `serializeChartDataCsv`, `downloadChartDataCsv` |
-| Docs | [chart-data-csv.md](./chart-data-csv.md), [svg-export.md](./svg-export.md) (PNG section) |
-| Histogram helper | `packages/core/src/data/histogram-bins.ts` |
-| Recipe | `packages/docs/recipes/histogram.mdx`, `HistogramLatencyExample.tsx` |
+| Artifact          | Path                                                                                     |
+| ----------------- | ---------------------------------------------------------------------------------------- |
+| PNG raster export | `@kamod-ch/charts/export/png` — `renderChartToPngBlob`, `downloadChartPng`               |
+| CSV data export   | `@kamod-ch/charts/export` — `serializeChartDataCsv`, `downloadChartDataCsv`              |
+| Docs              | [chart-data-csv.md](./chart-data-csv.md), [svg-export.md](./svg-export.md) (PNG section) |
+| Histogram helper  | `packages/core/src/data/histogram-bins.ts`                                               |
+| Recipe            | `packages/docs/recipes/histogram.mdx`, `HistogramLatencyExample.tsx`                     |
 
 ## Decisions
 
