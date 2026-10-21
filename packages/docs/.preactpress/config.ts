@@ -8,7 +8,9 @@ import tailwindcss from "@tailwindcss/vite";
 const configDir = dirname(fileURLToPath(import.meta.url));
 const chartsSrc = resolve(configDir, "../../core/src");
 const chartsRoot = resolve(configDir, "../../core");
-const base = "/kamod-charts/";
+const isGithubPages =
+  process.env.GITHUB_ACTIONS === "true" || process.env.KAMOD_DOCS_BASE === "github-pages";
+const base = process.env.VITE_BASE_PATH ?? (isGithubPages ? "/kamod-charts/" : "/");
 
 export default defineConfig({
   theme: "./theme/Layout.tsx",

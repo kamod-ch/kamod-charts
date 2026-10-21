@@ -30,7 +30,7 @@
     "preact": "^10.29.8"
   },
   "devDependencies": {
-    "@kamod-ch/preactpress": "^2.2.1",
+    "@kamod-ch/preactpress": "file:../../../preactpress",
     "@tailwindcss/vite": "^4.3.3",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
