@@ -43,14 +43,28 @@ export function DownloadableChart() {
 
 ### Options
 
-| Option            | Default        | Description                                                                                                          |
-| ----------------- | -------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `embedStyles`     | `kamod-tokens` | Inline `--kamod-*` and `--chart-*` custom properties from computed styles. Use `all-computed` or `none` when needed. |
-| `backgroundColor` | transparent    | Inserts a full-size background `<rect>` on the clone only.                                                           |
-| `inlineStyle`     | —              | Extra inline declarations on the cloned root `<svg>`.                                                                |
-| `revokeDelayMs`   | `60000`        | Download-only: delay before `URL.revokeObjectURL`.                                                                   |
+| Option            | Default        | Description                                                                                                                                                                                                                   |
+| ----------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `embedStyles`     | `kamod-tokens` | Inline `--kamod-*` and `--chart-*` from computed styles (nearest element wins over ancestors). `all-computed` also inlines a bounded set of SVG/text properties per element plus `--*` tokens. `none` skips token collection. |
+| `backgroundColor` | transparent    | Inserts a full-size background `<rect>` on the clone only.                                                                                                                                                                    |
+| `inlineStyle`     | —              | Extra inline declarations on the cloned root `<svg>`.                                                                                                                                                                         |
+| `revokeDelayMs`   | `60000`        | Download-only: delay before `URL.revokeObjectURL`.                                                                                                                                                                            |
+
+## PNG raster export
+
+Raster export is a **separate subpath** so normal chart bundles do not pull canvas rasterization code:
+
+```ts
+import { downloadChartPng, renderChartToPngBlob } from "@kamod-ch/charts/export/png";
+```
+
+`renderChartToPngBlob` calls `serializeChartSvg` internally, then draws the SVG to an off-screen canvas. Options include `scale`, `devicePixelRatio`, `maxDimension` (default 8192), and `backgroundColor`. Empty or zero-sized SVG dimensions throw explicit errors; cross-origin assets may produce a tainted-canvas error.
+
+## Chart data CSV
+
+See [chart-data-csv.md](./chart-data-csv.md) for `serializeChartDataCsv` / `downloadChartDataCsv` on original chart rows.
 
 ## Limits
 
 - External web fonts, linked stylesheets, and cross-origin images are not inlined. Exports may look incomplete under strict CSP or without embedded fonts.
-- Raster/PNG export is not part of this entry (optional roadmap prompt 08).
+- PNG export inherits the same external asset limits; rasterization can fail when the SVG references blocked cross-origin images.

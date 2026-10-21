@@ -9,8 +9,10 @@ describe("export entry isolation", () => {
     const index = await readFile(resolve(exportRoot, "index.ts"), "utf8");
     const serialize = await readFile(resolve(exportRoot, "serialize.ts"), "utf8");
     const download = await readFile(resolve(exportRoot, "download.ts"), "utf8");
-    const combined = `${index}\n${serialize}\n${download}`;
+    const csv = await readFile(resolve(exportRoot, "csv.ts"), "utf8");
+    const combined = `${index}\n${serialize}\n${download}\n${csv}`;
     expect(combined).not.toMatch(/@kamod-ch\/motion/);
     expect(combined).not.toMatch(/from ["']motion/);
+    expect(index).not.toMatch(/from ["']\.\/png/);
   });
 });

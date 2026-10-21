@@ -1,0 +1,18 @@
+---
+title: Monitoring demo
+description: Simulated Syncding-style dashboard with live streaming, sync, and sparklines.
+---
+
+import { SyncdingMonitoringDemo } from "../components/examples/SyncdingMonitoringDemo";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Examples / Monitoring</p>
+
+## Simulated host dashboard
+
+All metrics below are **generated for documentation** (seed `42`). They do not represent real Syncding production data.
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <SyncdingMonitoringDemo />
+</div>
+
+Features shown: live/pause ingest, 5/15 minute windows, modifier-wheel zoom, synchronized crosshair, deployment marker, connection gap (null values), sparkline KPIs, optional performance stats, and SVG export on the CPU chart.

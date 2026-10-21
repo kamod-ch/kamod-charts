@@ -125,6 +125,14 @@ export default defineConfig({
           replacement: resolve(chartsSrc, "core/index.ts"),
         },
         {
+          find: "@kamod-ch/charts/export/png",
+          replacement: resolve(chartsSrc, "export/png-entry.ts"),
+        },
+        {
+          find: "@kamod-ch/charts/export",
+          replacement: resolve(chartsSrc, "export/index.ts"),
+        },
+        {
           find: "@kamod-ch/charts",
           replacement: resolve(chartsSrc, "index.ts"),
         },
@@ -207,6 +215,8 @@ export default defineConfig({
         text: "Reference",
         items: [
           { text: "Examples", link: "/examples/" },
+          { text: "Monitoring demo", link: "/examples/monitoring" },
+          { text: "Histogram recipe", link: "/recipes/histogram" },
           { text: "API", link: "/api/" },
           { text: "Playground", link: "/playground/" },
         ],

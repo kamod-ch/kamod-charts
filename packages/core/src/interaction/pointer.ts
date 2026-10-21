@@ -1,4 +1,3 @@
-import type { JSX } from "preact";
 import type { ChartRect } from "../core";
 
 export interface ChartPointerPosition {
@@ -7,6 +6,13 @@ export interface ChartPointerPosition {
   plotX: number;
   plotY: number;
 }
+
+/** Pointer or wheel events with client coordinates relative to the chart surface. */
+export type ChartPointerClientEvent = {
+  clientX: number;
+  clientY: number;
+  currentTarget: EventTarget | null;
+};
 
 const resolveChartSurface = (node: EventTarget | null): SVGSVGElement | null => {
   if (node instanceof SVGSVGElement && node.hasAttribute("data-kamod-chart-surface")) {
@@ -22,11 +28,14 @@ const resolveChartSurface = (node: EventTarget | null): SVGSVGElement | null => 
 };
 
 export const getPointerPosition = (
-  event: JSX.TargetedPointerEvent<Element>,
+  event: ChartPointerClientEvent,
   plotArea: ChartRect,
 ): ChartPointerPosition => {
   const surface = resolveChartSurface(event.currentTarget);
-  const rectHost = surface ?? event.currentTarget;
+  const rectHost = surface ?? (event.currentTarget instanceof Element ? event.currentTarget : null);
+  if (!rectHost) {
+    return { x: 0, y: 0, plotX: 0, plotY: 0 };
+  }
   const rect = rectHost.getBoundingClientRect();
   const viewBoxWidth =
     surface?.viewBox.baseVal.width ??

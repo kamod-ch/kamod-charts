@@ -5,15 +5,16 @@ description: Public entry points for high-level charts and primitives.
 
 ## High-level charts
 
-| Chart   | Import                                                                       |
-| ------- | ---------------------------------------------------------------------------- |
-| Line    | `@kamod-ch/charts/line` → `LineChart`                                        |
-| Area    | `@kamod-ch/charts/area` → `AreaChart`                                        |
-| Bar     | `@kamod-ch/charts/bar` → `BarChart`                                          |
-| Pie     | `@kamod-ch/charts/pie` → `PieChart`                                          |
-| Donut   | `@kamod-ch/charts/donut` → `DonutChart`                                      |
-| Scatter | `@kamod-ch/charts/scatter` → `ScatterChart`                                  |
-| Motion  | `@kamod-ch/charts/motion` → animated charts, `MotionConfig`, `AnimatedValue` |
+| Chart     | Import                                                                       |
+| --------- | ---------------------------------------------------------------------------- |
+| Line      | `@kamod-ch/charts/line` → `LineChart`                                        |
+| Area      | `@kamod-ch/charts/area` → `AreaChart`                                        |
+| Bar       | `@kamod-ch/charts/bar` → `BarChart`                                          |
+| Pie       | `@kamod-ch/charts/pie` → `PieChart`                                          |
+| Donut     | `@kamod-ch/charts/donut` → `DonutChart`                                      |
+| Scatter   | `@kamod-ch/charts/scatter` → `ScatterChart`                                  |
+| Motion    | `@kamod-ch/charts/motion` → animated charts, `MotionConfig`, `AnimatedValue` |
+| Sparkline | `@kamod-ch/charts` → `Sparkline` (compact `LineChart` preset)                |
 
 Root import `@kamod-ch/charts` re-exports the same high-level charts plus primitives. It does not load `@kamod-ch/motion`.
 
@@ -36,5 +37,8 @@ Useful public modules when composing custom charts:
 - `@kamod-ch/charts/axes` — `XAxis`, `YAxis`
 - `@kamod-ch/charts/accessibility` — `DataTable`, `buildChartDescription`
 - `@kamod-ch/charts/theme.css` — semantic chart tokens
+- `@kamod-ch/charts/export` — `serializeChartSvg`, `downloadChartSvg`, `serializeChartDataCsv`, `downloadChartDataCsv`
+- `@kamod-ch/charts/export/png` — `renderChartToPngBlob`, `downloadChartPng` (browser rasterization)
+- `@kamod-ch/charts` — `computeHistogramBins`, `histogramBinsToBarData` (count-based binning helper)
 
 Prop tables on chart pages list the most important fields. For completeness, rely on the TypeScript definitions shipped with the package.

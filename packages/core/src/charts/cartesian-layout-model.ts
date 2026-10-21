@@ -2,6 +2,7 @@ import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import type { NumericDomain } from "../scales";
 import { buildCartesianXIndex, type CartesianXIndex } from "./cartesian-x-index";
 import { resolvePlotAreaFromSize } from "./cartesian-interaction";
+import type { ChartXViewportDomain } from "./x-viewport";
 
 export type CartesianLayoutModel = {
   plotWidth: number;
@@ -14,6 +15,7 @@ export const buildCartesianLayoutModel = <TDatum>({
   data,
   xKey,
   xScale,
+  xDomain,
   yDomain,
   width,
   height,
@@ -22,6 +24,7 @@ export const buildCartesianLayoutModel = <TDatum>({
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  xDomain?: ChartXViewportDomain;
   yDomain: NumericDomain;
   width: number;
   height: number;
@@ -34,6 +37,7 @@ export const buildCartesianLayoutModel = <TDatum>({
           data,
           xKey,
           xScale,
+          xDomain,
           yDomain,
           plotWidth: plot.width,
           seriesKey: primarySeriesKey,

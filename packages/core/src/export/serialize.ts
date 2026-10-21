@@ -3,6 +3,22 @@ import type { SerializeChartSvgOptions } from "./types";
 
 const CHART_TOKEN_PREFIXES = ["--kamod-", "--chart-"];
 
+const ALL_COMPUTED_SVG_STYLE_PROPERTIES = [
+  "fill",
+  "stroke",
+  "stroke-width",
+  "stroke-opacity",
+  "fill-opacity",
+  "opacity",
+  "color",
+  "font-family",
+  "font-size",
+  "font-weight",
+  "font-style",
+  "text-anchor",
+  "dominant-baseline",
+] as const;
+
 const isStyleTokenName = (name: string, mode: SerializeChartSvgOptions["embedStyles"]): boolean => {
   if (mode === "all-computed") {
     return name.startsWith("--");
@@ -29,7 +45,7 @@ const collectCustomProperties = (
         continue;
       }
       const value = computed.getPropertyValue(name).trim();
-      if (value) {
+      if (value && collected[name] === undefined) {
         collected[name] = value;
       }
     }
@@ -37,6 +53,62 @@ const collectCustomProperties = (
   }
 
   return collected;
+};
+
+const isMeaningfulComputedValue = (property: string, value: string): boolean => {
+  if (!value) {
+    return false;
+  }
+  if (property === "fill" || property === "stroke") {
+    return value !== "none";
+  }
+  if (property.startsWith("font-") && value === "normal") {
+    return false;
+  }
+  return true;
+};
+
+const inlineComputedStylesOnClone = (source: Element, clone: Element, view: Window): void => {
+  if (source instanceof Element && clone instanceof Element) {
+    const computed = view.getComputedStyle(source);
+    const declarations: string[] = [];
+
+    for (const property of ALL_COMPUTED_SVG_STYLE_PROPERTIES) {
+      const value = computed.getPropertyValue(property).trim();
+      if (isMeaningfulComputedValue(property, value)) {
+        declarations.push(`${property}:${value}`);
+      }
+    }
+
+    for (let index = 0; index < computed.length; index += 1) {
+      const name = computed.item(index);
+      if (!name?.startsWith("--")) {
+        continue;
+      }
+      const value = computed.getPropertyValue(name).trim();
+      if (value) {
+        declarations.push(`${name}:${value}`);
+      }
+    }
+
+    if (declarations.length > 0) {
+      const existing = clone.getAttribute("style");
+      clone.setAttribute(
+        "style",
+        existing ? `${existing};${declarations.join(";")}` : declarations.join(";"),
+      );
+    }
+  }
+
+  const sourceChildren = [...source.children];
+  const cloneChildren = [...clone.children];
+  for (let index = 0; index < sourceChildren.length; index += 1) {
+    const sourceChild = sourceChildren[index];
+    const cloneChild = cloneChildren[index];
+    if (sourceChild && cloneChild) {
+      inlineComputedStylesOnClone(sourceChild, cloneChild, view);
+    }
+  }
 };
 
 const inlineCustomProperties = (
@@ -79,7 +151,15 @@ export const serializeChartSvg = (
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   }
 
-  if (embedStyles !== "none") {
+  const view = svgElement.ownerDocument?.defaultView;
+  if (embedStyles === "all-computed" && view) {
+    inlineComputedStylesOnClone(svgElement, clone, view);
+    inlineCustomProperties(
+      clone,
+      collectCustomProperties(svgElement, embedStyles),
+      options.inlineStyle,
+    );
+  } else if (embedStyles !== "none") {
     inlineCustomProperties(
       clone,
       collectCustomProperties(svgElement, embedStyles),

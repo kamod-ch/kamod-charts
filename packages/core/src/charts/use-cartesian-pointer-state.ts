@@ -4,6 +4,7 @@ import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import type { NumericDomain } from "../scales";
 import { findNearestCartesianIndexByX } from "./cartesian-interaction";
 import type { CartesianXIndex } from "./cartesian-x-index";
+import type { ChartXViewportDomain } from "./x-viewport";
 import { resolvePointerPlot } from "./chart-pointer";
 import { useCartesianPointerFrame } from "./use-cartesian-pointer-frame";
 
@@ -19,6 +20,7 @@ export const useCartesianPointerState = <TDatum>({
   fallbackWidth,
   height,
   xIndex,
+  xDomain,
   yDomain,
   seriesKey,
   controlledActiveIndex,
@@ -30,6 +32,7 @@ export const useCartesianPointerState = <TDatum>({
   fallbackWidth: number;
   height: number;
   xIndex?: CartesianXIndex | null;
+  xDomain?: ChartXViewportDomain;
   yDomain?: NumericDomain;
   seriesKey?: DataAccessor<TDatum, number | null | undefined>;
   controlledActiveIndex?: number | null;
@@ -59,6 +62,7 @@ export const useCartesianPointerState = <TDatum>({
         plotWidth: plot.width,
         plotX: position.plotX,
         xIndex,
+        xDomain,
         yDomain,
         seriesKey,
       });
@@ -73,6 +77,7 @@ export const useCartesianPointerState = <TDatum>({
       seriesKey,
       setActiveIndex,
       xIndex,
+      xDomain,
       xKey,
       xScale,
       yDomain,

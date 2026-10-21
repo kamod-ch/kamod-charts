@@ -20,6 +20,7 @@ export interface StackedAreaSeriesProps<TDatum> {
   series: readonly (StackSeries<TDatum> & { color?: string })[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ScaleKind;
+  xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
   yDomain: readonly [number, number];
   opacity?: number;
   fill?: AreaFill;
@@ -37,6 +38,7 @@ export const StackedAreaSeries = <TDatum,>({
   series,
   xKey,
   xScale,
+  xDomain,
   yDomain,
   opacity = 0.2,
   fill = "solid",
@@ -55,6 +57,7 @@ export const StackedAreaSeries = <TDatum,>({
     xKey: resolvedXKey,
     yKey: series[0]?.value ?? (() => 0),
     xScale,
+    xDomain,
     yDomain,
   });
   const readX = normalizeAccessor(resolvedXKey ?? ((_datum: TDatum, index: number) => index));

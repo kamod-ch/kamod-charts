@@ -23,6 +23,7 @@ export interface StackedLineSeriesProps<TDatum> {
   series: readonly StackedLineSeriesEntry<TDatum>[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ScaleKind;
+  xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
   yDomain: readonly [number, number];
   curve?: LineCurve;
   connectNulls?: boolean;
@@ -40,6 +41,7 @@ interface StackedLineLayerProps<TDatum> {
   layer: ReturnType<typeof getStackedValues<TDatum>>[number];
   resolvedXKey: DataAccessor<TDatum, string | number | Date | null | undefined> | undefined;
   xScale?: ScaleKind;
+  xDomain?: readonly [number, number] | readonly [Date, Date] | readonly string[];
   yDomain: readonly [number, number];
   curve: LineCurve;
   connectNulls: boolean;
@@ -58,6 +60,7 @@ const StackedLineLayer = <TDatum,>({
   layer,
   resolvedXKey,
   xScale,
+  xDomain,
   yDomain,
   curve,
   connectNulls,
@@ -79,6 +82,7 @@ const StackedLineLayer = <TDatum,>({
     xKey: resolvedXKey,
     yKey: entry.value,
     xScale,
+    xDomain,
     yDomain,
   });
   const readX = normalizeAccessor(resolvedXKey ?? ((_datum: TDatum, index: number) => index));
@@ -162,6 +166,7 @@ export const StackedLineSeries = <TDatum,>({
   series,
   xKey,
   xScale,
+  xDomain,
   yDomain,
   curve = "linear",
   connectNulls = false,
@@ -192,6 +197,7 @@ export const StackedLineSeries = <TDatum,>({
             layer={layer}
             resolvedXKey={resolvedXKey}
             xScale={xScale}
+            xDomain={xDomain}
             yDomain={yDomain}
             curve={curve}
             connectNulls={connectNulls}

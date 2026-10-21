@@ -1,17 +1,19 @@
-import type { JSX } from "preact";
+import type { ChartPointerClientEvent } from "../interaction";
 import { getPointerPosition } from "../interaction";
 import { resolvePlotAreaFromSize } from "./cartesian-interaction";
 
 export const resolvePointerPlot = (
-  event: JSX.TargetedPointerEvent<Element>,
+  event: ChartPointerClientEvent,
   fallbackWidth: number,
   height: number,
 ) => {
+  const target = event.currentTarget;
   const surface =
-    event.currentTarget instanceof SVGSVGElement &&
-    event.currentTarget.hasAttribute("data-kamod-chart-surface")
-      ? event.currentTarget
-      : event.currentTarget.closest("[data-kamod-chart-surface]");
+    target instanceof SVGSVGElement && target.hasAttribute("data-kamod-chart-surface")
+      ? target
+      : target instanceof Element
+        ? target.closest("[data-kamod-chart-surface]")
+        : null;
   const svg = surface instanceof SVGSVGElement ? surface : null;
   const size = {
     width: svg?.viewBox.baseVal.width || fallbackWidth,

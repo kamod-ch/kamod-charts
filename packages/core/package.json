@@ -62,6 +62,10 @@
       "types": "./dist/export/index.d.ts",
       "import": "./dist/export/index.js"
     },
+    "./export/png": {
+      "types": "./dist/export/png.d.ts",
+      "import": "./dist/export/png.js"
+    },
     "./interaction": {
       "types": "./dist/interaction/index.d.ts",
       "import": "./dist/interaction/index.js"

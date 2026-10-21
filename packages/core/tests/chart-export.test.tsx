@@ -37,6 +37,41 @@ describe("chart SVG export", () => {
     expect(svg.querySelector("defs")?.innerHTML).toBeTruthy();
   });
 
+  it("prefers local chart token overrides over ancestor values", () => {
+    const { container } = render(
+      <div style={{ "--chart-1": "blue" } as Record<string, string>}>
+        <LineChart
+          data={[{ x: 1, y: 2 }]}
+          xKey="x"
+          series={[{ key: "y", id: "s1", color: "var(--chart-1)" }]}
+          height={200}
+          style={{ "--chart-1": "red" } as Record<string, string>}
+        />
+      </div>,
+    );
+    const svg = container.querySelector("svg") as SVGSVGElement;
+    const markup = serializeChartSvg(svg, { embedStyles: "kamod-tokens" });
+    expect(markup).toContain("--chart-1:red");
+    expect(markup).not.toContain("--chart-1:blue");
+  });
+
+  it("inlines a bounded set of computed svg styles in all-computed mode", () => {
+    const { container } = render(
+      <LineChart
+        data={[{ x: 1, y: 2 }]}
+        xKey="x"
+        series={[{ key: "y", id: "s1", color: "rgb(12, 34, 56)" }]}
+        height={200}
+      />,
+    );
+    const svg = container.querySelector("svg") as SVGSVGElement;
+    const path = svg.querySelector("path");
+    expect(path).toBeTruthy();
+    const markup = serializeChartSvg(svg, { embedStyles: "all-computed" });
+    expect(markup).toContain('stroke="rgb(12, 34, 56)"');
+    expect(markup).toMatch(/<path[^>]+style="[^"]*stroke-width:/);
+  });
+
   it("does not mutate the live svg dom", () => {
     const { container } = render(
       <LineChart data={[{ x: 1, y: 2 }]} xKey="x" series={[{ key: "y", id: "s1" }]} height={200} />,

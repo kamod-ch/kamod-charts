@@ -13,6 +13,8 @@
       "@kamod-ch/charts/motion": ["../core/src/motion/index.ts"],
       "@kamod-ch/charts/pie": ["../core/src/charts/pie-chart.tsx"],
       "@kamod-ch/charts/scatter": ["../core/src/charts/scatter-chart.tsx"],
+      "@kamod-ch/charts/export": ["../core/src/export/index.ts"],
+      "@kamod-ch/charts/export/png": ["../core/src/export/png-entry.ts"],
       "@kamod-ch/preactpress/client": ["./types/preactpress-client.d.ts"],
       "@kamod-ch/preactpress/config": ["./types/preactpress-config.ts"]
     }

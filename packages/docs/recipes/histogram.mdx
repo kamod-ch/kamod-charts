@@ -1,0 +1,36 @@
+---
+title: Histogram recipe
+description: Bin numeric samples with computeHistogramBins and render counts with BarChart.
+---
+
+import { HistogramLatencyExample } from "../components/examples/HistogramLatencyExample";
+
+<p class="not-prose mb-4 text-sm text-muted-foreground">Recipes / Histogram</p>
+
+## Response time distribution
+
+Bins use **left-closed, right-open** intervals, except the last bin which includes its right edge. The helper is count-based only (not density).
+
+<div class="not-prose my-6 overflow-visible rounded-xl border border-border bg-card p-4">
+  <HistogramLatencyExample />
+</div>
+
+```tsx
+import { BarChart, computeHistogramBins, histogramBinsToBarData } from "@kamod-ch/charts";
+
+const histogram = computeHistogramBins(latencyMs, { binCount: 8 });
+const data = histogramBinsToBarData(histogram);
+
+<BarChart
+  data={data}
+  xKey="bin"
+  series={[{ key: "count", id: "count", label: "Requests" }]}
+  tooltip
+/>;
+```
+
+Custom bin edges:
+
+```ts
+computeHistogramBins(values, { edges: [0, 50, 100, 250, 500] });
+```

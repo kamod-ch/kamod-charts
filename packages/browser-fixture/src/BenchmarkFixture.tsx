@@ -1,15 +1,21 @@
-import { useEffect, useMemo, useState } from "preact/hooks";
+import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { BarChart } from "@kamod-ch/charts/bar-chart";
 import { LineChart } from "@kamod-ch/charts/line-chart";
 import { ScatterChart } from "@kamod-ch/charts/scatter-chart";
 import { buildBenchSeries, type BenchKind } from "./bench-data";
+import {
+  BENCH_PROTOCOL_VERSION,
+  createEmptySnapshot,
+  nextRunId,
+  type BenchSnapshot,
+} from "./bench-protocol";
 
 declare global {
   interface Window {
     __KAMOD_BENCH__?: {
-      markReady: () => void;
-      markUpdated: () => void;
-      getMarks: () => { ready: number[]; updated: number[] };
+      protocolVersion: number;
+      getSnapshot: () => BenchSnapshot;
+      triggerUpdate: (seed: number) => string;
     };
   }
 }
@@ -21,44 +27,105 @@ const parseKind = (value: string | null): BenchKind => {
   return "line";
 };
 
+const observeFrameBoundary = (callback: () => void) => {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(callback);
+  });
+};
+
 export const BenchmarkFixture = ({ kind, pointCount }: { kind: BenchKind; pointCount: number }) => {
   const [data, setData] = useState(() => buildBenchSeries(pointCount));
-  const rows = useMemo(() => data, [data]);
+  const runCounter = useRef(0);
+  const snapshotRef = useRef<BenchSnapshot | null>(null);
+
+  const barStride = Math.max(1, Math.floor(pointCount / 24));
+  const barData = useMemo(
+    () => data.filter((_, index) => index % barStride === 0),
+    [data, barStride],
+  );
+
+  const seriesCount = kind === "scatter" || kind === "stacked-line" ? 2 : 1;
+  const visiblePoints = kind === "bar" ? barData.length : data.length;
+
+  const meta = useMemo(
+    () => ({
+      kind,
+      rawPoints: pointCount,
+      visiblePoints,
+      seriesCount,
+      downsampling: "none" as const,
+      animation: "default" as const,
+    }),
+    [kind, pointCount, visiblePoints, seriesCount],
+  );
 
   useEffect(() => {
-    const ready: number[] = [];
-    const updated: number[] = [];
+    const snapshot = createEmptySnapshot(meta);
+    snapshot.navigationStart =
+      performance.getEntriesByType("navigation")[0]?.fetchStart ?? performance.now();
+    snapshotRef.current = snapshot;
+
     window.__KAMOD_BENCH__ = {
-      markReady: () => ready.push(performance.now()),
-      markUpdated: () => updated.push(performance.now()),
-      getMarks: () => ({ ready, updated }),
-    };
-    requestAnimationFrame(() => window.__KAMOD_BENCH__?.markReady());
-  }, [kind, pointCount]);
+      protocolVersion: BENCH_PROTOCOL_VERSION,
+      getSnapshot: () => snapshotRef.current ?? snapshot,
+      triggerUpdate: (seed: number) => {
+        const current = snapshotRef.current ?? snapshot;
+        if (current.pendingRunId) {
+          throw new Error(`benchmark update already pending (${current.pendingRunId})`);
+        }
+        if (current.initialReadyAt == null) {
+          throw new Error("benchmark initial-ready not recorded yet");
+        }
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setData(buildBenchSeries(pointCount, 99));
-      window.__KAMOD_BENCH__?.markUpdated();
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, [pointCount]);
+        runCounter.current += 1;
+        const runId = nextRunId(runCounter.current);
+        current.pendingRunId = runId;
+        current.runs[runId] = {
+          runId,
+          updateStartAt: null,
+          updateCompleteAt: null,
+        };
+
+        const updateStartAt = performance.now();
+        current.runs[runId]!.updateStartAt = updateStartAt;
+        setData(buildBenchSeries(pointCount, seed));
+
+        observeFrameBoundary(() => {
+          const run = current.runs[runId];
+          if (run) {
+            run.updateCompleteAt = performance.now();
+          }
+          current.pendingRunId = null;
+        });
+
+        return runId;
+      },
+    };
+
+    observeFrameBoundary(() => {
+      const current = snapshotRef.current ?? snapshot;
+      current.initialReadyAt = performance.now();
+    });
+
+    return () => {
+      delete window.__KAMOD_BENCH__;
+      snapshotRef.current = null;
+    };
+  }, [kind, pointCount, meta]);
 
   const common = {
-    data: rows,
+    data: kind === "bar" ? barData : data,
     xKey: "t" as const,
     xScale: "time" as const,
     height: 320,
     width: 960,
     tooltip: true,
+    animate: false,
     title: `Benchmark ${kind}`,
-    description: `${pointCount} points (synthetic)`,
+    description: `${pointCount} raw points (${visiblePoints} drawn for bar)`,
   };
 
   if (kind === "bar") {
-    const barData = rows.filter(
-      (_, index) => index % Math.max(1, Math.floor(rows.length / 24)) === 0,
-    );
     return (
       <BarChart
         {...common}

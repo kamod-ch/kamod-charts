@@ -23,7 +23,10 @@ export type ChartSvgProps = ChartSvgIgnoredProps & {
   onBlur?: JSX.FocusEventHandler<SVGSVGElement>;
   onKeyDown?: JSX.KeyboardEventHandler<SVGSVGElement>;
   onPointerMove?: JSX.PointerEventHandler<SVGSVGElement>;
+  onPointerUp?: JSX.PointerEventHandler<SVGSVGElement>;
+  onPointerCancel?: JSX.PointerEventHandler<SVGSVGElement>;
   onPointerLeave?: JSX.PointerEventHandler<SVGSVGElement>;
+  onWheel?: JSX.WheelEventHandler<SVGSVGElement>;
   [key: `data-${string}`]: string | number | boolean | undefined;
 };
 
@@ -59,7 +62,10 @@ export const splitChartSvgProps = (
     | "onBlur"
     | "onKeyDown"
     | "onPointerMove"
+    | "onPointerUp"
+    | "onPointerCancel"
     | "onPointerLeave"
+    | "onWheel"
   >;
 } => {
   const dataAttributes: Record<string, string | number | boolean | undefined> = {};
@@ -72,7 +78,10 @@ export const splitChartSvgProps = (
     | "onBlur"
     | "onKeyDown"
     | "onPointerMove"
+    | "onPointerUp"
+    | "onPointerCancel"
     | "onPointerLeave"
+    | "onWheel"
   > = {};
 
   if (!svgProps) {
@@ -121,6 +130,15 @@ export const splitChartSvgProps = (
         break;
       case "onPointerLeave":
         events.onPointerLeave = value as ChartSvgProps["onPointerLeave"];
+        break;
+      case "onPointerUp":
+        events.onPointerUp = value as ChartSvgProps["onPointerUp"];
+        break;
+      case "onPointerCancel":
+        events.onPointerCancel = value as ChartSvgProps["onPointerCancel"];
+        break;
+      case "onWheel":
+        events.onWheel = value as ChartSvgProps["onWheel"];
         break;
       default:
         break;

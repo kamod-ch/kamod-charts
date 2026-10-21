@@ -10,6 +10,7 @@ import {
 import type { NumericDomain } from "../scales";
 import { createCartesianScales, getCartesianPoints } from "../series/cartesian";
 import { type CartesianXIndex, findNearestIndexOnXIndex } from "./cartesian-x-index";
+import type { ChartXViewportDomain } from "./x-viewport";
 import { getStackedSeriesValueAt } from "../series/stacked-line-points";
 import type { StackSeries } from "../series/stack";
 
@@ -37,6 +38,7 @@ export const resolveCartesianActivePoint = <TDatum>({
   seriesKey,
   xKey,
   xScale: xScaleKind,
+  xDomain,
   yDomain,
   plotWidth,
   plotHeight,
@@ -48,6 +50,7 @@ export const resolveCartesianActivePoint = <TDatum>({
   seriesKey: DataAccessor<TDatum, number | null | undefined>;
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  xDomain?: ChartXViewportDomain;
   yDomain: NumericDomain;
   plotWidth: number;
   plotHeight: number;
@@ -64,6 +67,7 @@ export const resolveCartesianActivePoint = <TDatum>({
     xKey,
     yKey: seriesKey,
     xScale: xScaleKind,
+    xDomain,
     yDomain,
     xRange: [0, plotWidth],
     yRange: [plotHeight, 0],
@@ -99,6 +103,7 @@ export const resolveStackedCartesianActivePoint = <TDatum>({
   activeSeriesId,
   xKey,
   xScale: xScaleKind,
+  xDomain,
   yDomain,
   plotWidth,
   plotHeight,
@@ -111,6 +116,7 @@ export const resolveStackedCartesianActivePoint = <TDatum>({
   activeSeriesId: string;
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  xDomain?: ChartXViewportDomain;
   yDomain: NumericDomain;
   plotWidth: number;
   plotHeight: number;
@@ -132,6 +138,7 @@ export const resolveStackedCartesianActivePoint = <TDatum>({
     xKey,
     yKey: stackSeries[0]?.value ?? indexAccessor,
     xScale: xScaleKind,
+    xDomain,
     yDomain,
     xRange: [0, plotWidth],
     yRange: [plotHeight, 0],
@@ -165,6 +172,7 @@ export const findNearestCartesianIndexByX = <TDatum>({
   plotWidth,
   plotX,
   xIndex,
+  xDomain,
   yDomain = [0, 1],
   seriesKey = indexAccessor as DataAccessor<TDatum, number | null | undefined>,
 }: {
@@ -174,6 +182,7 @@ export const findNearestCartesianIndexByX = <TDatum>({
   plotWidth: number;
   plotX: number;
   xIndex?: CartesianXIndex | null;
+  xDomain?: ChartXViewportDomain;
   yDomain?: NumericDomain;
   seriesKey?: DataAccessor<TDatum, number | null | undefined>;
 }): number | null => {
@@ -190,6 +199,7 @@ export const findNearestCartesianIndexByX = <TDatum>({
     xKey,
     yKey: seriesKey,
     xScale: xScaleKind,
+    xDomain,
     yDomain,
     xRange: [0, plotWidth],
     yRange: [1, 0],

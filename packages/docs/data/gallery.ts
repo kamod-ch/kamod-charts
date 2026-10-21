@@ -237,4 +237,20 @@ export const galleryExamples: GalleryExample[] = [
     href: "/foundations/colors-and-themes",
     tags: ["colors"],
   },
+  {
+    id: "histogram-latency",
+    title: "Latency histogram",
+    description: "Bin synthetic API response times with BarChart.",
+    kind: "bar",
+    href: "/recipes/histogram",
+    tags: ["basic"],
+  },
+  {
+    id: "monitoring-demo",
+    title: "Monitoring dashboard",
+    description: "Simulated live CPU, RAM, and network charts with sparkline KPIs.",
+    kind: "line",
+    href: "/examples/monitoring",
+    tags: ["responsive", "series"],
+  },
 ];

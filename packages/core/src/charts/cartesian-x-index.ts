@@ -3,6 +3,7 @@ import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import { normalizeAccessor } from "../core";
 import { createCartesianScales } from "../series/cartesian";
 import type { NumericDomain } from "../scales";
+import type { ChartXViewportDomain } from "./x-viewport";
 
 const indexAccessor = <TDatum>(_datum: TDatum, index: number): number => index;
 
@@ -17,6 +18,7 @@ export const buildCartesianXIndex = <TDatum>({
   data,
   xKey,
   xScale: xScaleKind,
+  xDomain,
   yDomain,
   plotWidth,
   seriesKey,
@@ -24,6 +26,7 @@ export const buildCartesianXIndex = <TDatum>({
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  xDomain?: ChartXViewportDomain;
   yDomain: NumericDomain;
   plotWidth: number;
   seriesKey: DataAccessor<TDatum, number | null | undefined>;
@@ -37,6 +40,7 @@ export const buildCartesianXIndex = <TDatum>({
     xKey,
     yKey: seriesKey,
     xScale: xScaleKind,
+    xDomain,
     yDomain,
     xRange: [0, plotWidth],
     yRange: [1, 0],

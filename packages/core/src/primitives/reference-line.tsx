@@ -56,7 +56,7 @@ export const ReferenceLine = <TDatum,>({
   const isVertical = x != null;
 
   return (
-    <g class={className} data-kamod-chart-reference-line="" aria-hidden="true">
+    <g class={className} data-kamod-chart-reference-line="" aria-hidden="true" pointerEvents="none">
       <line
         x1={isVertical ? position : 0}
         x2={isVertical ? position : plotArea.width}

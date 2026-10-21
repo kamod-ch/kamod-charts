@@ -13,6 +13,11 @@ import type {
   RenderBar,
   RenderPoint,
 } from "../series";
+import type { CartesianYAutoscale, ChartXViewportDomain } from "./x-viewport";
+import type {
+  XViewportChangeReason,
+  XViewportInteractionOptions,
+} from "./use-cartesian-x-viewport-gestures";
 
 export interface CartesianSeriesConfig<TDatum> {
   key: DataAccessor<TDatum, number | null | undefined>;
@@ -181,10 +186,34 @@ export interface CartesianActiveSelection {
   source?: "pointer" | "keyboard" | "external";
 }
 
+export type { CartesianYAutoscale, ChartXViewportDomain };
+export type {
+  XViewportChangeReason,
+  XViewportInteractionOptions,
+} from "./use-cartesian-x-viewport-gestures";
+
+export interface CartesianXBrushOptions {
+  /** Height of the overview strip (default 72). */
+  overviewHeight?: number;
+  minSpan?: number;
+  /** Min-max downsample budget for overview series (default 320). */
+  overviewPointBudget?: number;
+}
+
 export interface CommonCartesianChartProps<TDatum> extends CartesianSurfaceChartProps {
   data: readonly TDatum[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  /**
+   * Controlled X viewport for `linear` / `time` scales. Ignored for categorical (`point` / `band`) charts.
+   */
+  xDomain?: ChartXViewportDomain;
+  /** When `xDomain` is set, choose whether Y inference uses all rows or only rows inside the window. Default `data`. */
+  yAutoscale?: CartesianYAutoscale;
+  /** Opt-in drag pan / wheel zoom on linear or time X axes. */
+  xViewportInteraction?: boolean | XViewportInteractionOptions;
+  /** User-driven viewport updates (not fired when `xDomain` changes from props). */
+  onXViewportChange?: (domain: ChartXViewportDomain, reason: XViewportChangeReason) => void;
   /** Fixed numeric Y domain; overrides inference when set. */
   yDomain?: readonly [number, number];
   margin?: ChartMargin;
@@ -202,6 +231,8 @@ export interface CommonCartesianChartProps<TDatum> extends CartesianSurfaceChart
   /** Controlled hidden series ids (legend toggles). */
   hiddenSeriesIds?: readonly string[];
   onHiddenSeriesChange?: (hiddenIds: readonly string[]) => void;
+  /** Extra SVG content in the foreground plot layer (inside clip when enabled). */
+  plotForeground?: ComponentChildren;
 }
 
 export interface LineChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {
@@ -216,6 +247,7 @@ export interface LineChartProps<TDatum> extends CommonCartesianChartProps<TDatum
   referenceLines?: readonly CartesianReferenceLine<TDatum>[];
   referenceAreas?: readonly CartesianReferenceArea<TDatum>[];
   referencePoints?: readonly CartesianReferencePoint<TDatum>[];
+  referenceSegments?: readonly CartesianReferenceSegment<TDatum>[];
 }
 
 export interface AreaChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {
@@ -231,6 +263,9 @@ export interface AreaChartProps<TDatum> extends CommonCartesianChartProps<TDatum
   pointRadius?: number;
   curve?: LineCurve;
   referenceLines?: readonly CartesianReferenceLine<TDatum>[];
+  referenceAreas?: readonly CartesianReferenceArea<TDatum>[];
+  referencePoints?: readonly CartesianReferencePoint<TDatum>[];
+  referenceSegments?: readonly CartesianReferenceSegment<TDatum>[];
 }
 
 export interface BarChartProps<TDatum> extends CommonCartesianChartProps<TDatum> {

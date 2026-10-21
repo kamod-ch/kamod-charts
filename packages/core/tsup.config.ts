@@ -14,6 +14,7 @@ export default defineConfig({
     "charts/scatter-chart": "src/charts/scatter-chart.tsx",
     "core/index": "src/core/index.ts",
     "export/index": "src/export/index.ts",
+    "export/png": "src/export/png-entry.ts",
     "interaction/index": "src/interaction/index.ts",
     "performance/index": "src/performance/index.ts",
     "primitives/index": "src/primitives/index.ts",

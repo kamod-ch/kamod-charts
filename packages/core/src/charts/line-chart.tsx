@@ -3,7 +3,12 @@ import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
 import { Chart } from "../core";
 import { createChartKeyboardHandler } from "../interaction";
-import { Grid, Legend, ReferenceArea, ReferenceLine, ReferencePoint } from "../primitives";
+import { Grid, Legend } from "../primitives";
+import {
+  CartesianReferenceClippedLayers,
+  CartesianReferenceLineLayers,
+  CartesianReferencePointLayers,
+} from "./cartesian-reference-layers";
 import {
   inferCombinedNumericDomain,
   inferStackedDomain,
@@ -14,12 +19,18 @@ import { useCartesianIntlAxisTicks } from "./cartesian-axis-formatters";
 import { cartesianAxisCollisionProps } from "./cartesian-axis-props";
 import { CartesianChartFrame } from "./cartesian-chart-frame";
 import { resolveCartesianEmptyState } from "./cartesian-empty-state";
+import { resolvePlotAreaFromSize } from "./cartesian-interaction";
 import { buildCartesianLayoutModel } from "./cartesian-layout-model";
+import { resolveCartesianViewport } from "./resolve-cartesian-viewport";
+import { isContinuousCartesianXScale } from "./x-viewport";
+import { useCartesianXViewportGestures } from "./use-cartesian-x-viewport-gestures";
+import type { ChartSvgProps } from "../core/chart-svg-props";
 import { CartesianActiveCrosshair, CartesianActiveOverlay } from "./cartesian-active-layers";
 import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled } from "./tooltip-options";
 import type { LineChartProps, LineSeriesConfig } from "./types";
 import { useCartesianPointerState } from "./use-cartesian-pointer-state";
+import { useCartesianPointerFrame } from "./use-cartesian-pointer-frame";
 
 const findSeriesOriginalIndex = <TDatum,>(
   series: readonly LineSeriesConfig<TDatum>[],
@@ -52,7 +63,12 @@ export const LineChart = <TDatum,>({
   referenceLines = [],
   referenceAreas = [],
   referencePoints = [],
+  referenceSegments = [],
   animate,
+  xDomain: xDomainProp,
+  yAutoscale = "data",
+  xViewportInteraction,
+  onXViewportChange,
   yDomain: yDomainProp,
   margin,
   class: className,
@@ -67,6 +83,7 @@ export const LineChart = <TDatum,>({
   svgProps,
   defs,
   clipPlotArea,
+  plotForeground,
   tickCollision,
   maxTickLabelLength,
   maxTickLabelWidth,
@@ -110,15 +127,62 @@ export const LineChart = <TDatum,>({
     label: entry.label,
     renderPoint: entry.renderPoint,
   }));
+  const tooltipEnabled = isTooltipEnabled(tooltip);
+  const fallbackWidth = width ?? initialWidth ?? 640;
+  const chartHeight = height ?? 320;
+  const plotWidth = useMemo(
+    () => resolvePlotAreaFromSize(fallbackWidth, chartHeight).width,
+    [chartHeight, fallbackWidth],
+  );
+  const viewportInteractionEnabled =
+    Boolean(xViewportInteraction) && isContinuousCartesianXScale(xScale);
+  const viewportGestures = useCartesianXViewportGestures({
+    enabled: viewportInteractionEnabled,
+    data,
+    xKey,
+    xScale,
+    xDomain: xDomainProp,
+    onXViewportChange,
+    interaction: typeof xViewportInteraction === "object" ? xViewportInteraction : {},
+    plotWidth,
+    fallbackWidth,
+    chartHeight,
+  });
+  const { resolvedXDomain, dataForYDomain } = useMemo(() => {
+    if (viewportInteractionEnabled) {
+      return resolveCartesianViewport({
+        data,
+        xKey,
+        xScale,
+        xDomain: viewportGestures.effectiveXDomain,
+        yAutoscale,
+      });
+    }
+    return resolveCartesianViewport({
+      data,
+      xKey,
+      xScale,
+      xDomain: xDomainProp,
+      yAutoscale,
+    });
+  }, [
+    data,
+    viewportGestures.effectiveXDomain,
+    viewportInteractionEnabled,
+    xDomainProp,
+    xKey,
+    xScale,
+    yAutoscale,
+  ]);
   const inferredYDomain = useMemo(
     () =>
       stacked
-        ? inferStackedDomain(data, stackSeries)
+        ? inferStackedDomain(dataForYDomain, stackSeries)
         : inferCombinedNumericDomain(
-            data,
+            dataForYDomain,
             visibleSeries.map((entry) => entry.key),
           ),
-    [data, stacked, stackSeries, visibleSeries],
+    [dataForYDomain, stacked, stackSeries, visibleSeries],
   );
   const yDomain = yDomainProp ?? inferredYDomain;
   const resolvedSeriesIndex =
@@ -128,9 +192,6 @@ export const LineChart = <TDatum,>({
   const activeSeriesId = activeSeriesEntry
     ? getSeriesId(activeSeriesEntry.entry, activeSeriesEntry.originalIndex)
     : null;
-  const tooltipEnabled = isTooltipEnabled(tooltip);
-  const fallbackWidth = width ?? initialWidth ?? 640;
-  const chartHeight = height ?? 320;
   const primarySeriesKey = visibleSeries[0]?.key;
   const layout = useMemo(
     () =>
@@ -138,12 +199,13 @@ export const LineChart = <TDatum,>({
         data,
         xKey,
         xScale,
+        xDomain: resolvedXDomain,
         yDomain,
         width: fallbackWidth,
         height: chartHeight,
         primarySeriesKey,
       }),
-    [chartHeight, data, fallbackWidth, primarySeriesKey, xKey, xScale, yDomain],
+    [chartHeight, data, fallbackWidth, primarySeriesKey, resolvedXDomain, xKey, xScale, yDomain],
   );
   const { xIndex } = layout;
   const notifyActiveChange = useCallback(
@@ -170,11 +232,45 @@ export const LineChart = <TDatum,>({
     fallbackWidth,
     height: chartHeight,
     xIndex,
+    xDomain: resolvedXDomain,
     yDomain,
     seriesKey: primarySeriesKey,
     controlledActiveIndex,
     onActiveIndexChange: (index) => notifyActiveChange(index, "pointer"),
   });
+  const tooltipPointerMove = useCartesianPointerFrame(
+    (event: Parameters<typeof onPointerMove>[0]) => {
+      if (!viewportGestures.isPanning) {
+        onPointerMove(event);
+      }
+    },
+  );
+  const mergedSvgProps: ChartSvgProps = {
+    ...(typeof svgProps === "object" && svgProps ? svgProps : {}),
+    ...(viewportGestures.svgProps as ChartSvgProps),
+    onKeyDown: (event) => {
+      if (viewportGestures.handleViewportKeyboard(event)) {
+        return;
+      }
+      createChartKeyboardHandler({
+        pointCount: data.length,
+        seriesCount: Math.max(visibleSeries.length, 1),
+        activeIndex: activeIndex ?? 0,
+        activeSeriesIndex: resolvedSeriesIndex,
+        onChange: (state) => {
+          resetPointerPlot();
+          setActiveIndex(state.activeIndex);
+          notifyActiveChange(state.activeIndex, "keyboard");
+          setActiveSeriesIndex(state.activeSeriesIndex);
+        },
+        onEscape: () => {
+          resetPointerPlot();
+          setActiveIndex(null);
+          notifyActiveChange(null, "keyboard");
+        },
+      })(event);
+    },
+  };
 
   const chartStyle =
     typeof styleProp === "string"
@@ -208,28 +304,11 @@ export const LineChart = <TDatum,>({
         tabIndex={0}
         style={chartStyle}
         svgRef={svgRef}
-        svgProps={svgProps}
+        svgProps={mergedSvgProps}
         defs={defs}
         clipPlotArea={clipPlotArea}
-        onPointerMove={tooltipEnabled ? onPointerMove : undefined}
+        onPointerMove={tooltipEnabled ? tooltipPointerMove : undefined}
         onPointerLeave={tooltipEnabled ? onPointerLeave : undefined}
-        onKeyDown={createChartKeyboardHandler({
-          pointCount: data.length,
-          seriesCount: Math.max(visibleSeries.length, 1),
-          activeIndex: activeIndex ?? 0,
-          activeSeriesIndex: resolvedSeriesIndex,
-          onChange: (state) => {
-            resetPointerPlot();
-            setActiveIndex(state.activeIndex);
-            notifyActiveChange(state.activeIndex, "keyboard");
-            setActiveSeriesIndex(state.activeSeriesIndex);
-          },
-          onEscape: () => {
-            resetPointerPlot();
-            setActiveIndex(null);
-            notifyActiveChange(null, "keyboard");
-          },
-        })}
         overlay={
           <>
             {showLegend ? (
@@ -285,6 +364,7 @@ export const LineChart = <TDatum,>({
               visibleSeries={visibleSeries}
               xKey={xKey}
               xScale={xScale}
+              xDomain={resolvedXDomain}
               yDomain={yDomain}
               tooltip={tooltip}
               defaultMode="axis"
@@ -298,30 +378,23 @@ export const LineChart = <TDatum,>({
         plotLayers={{
           clipped: (
             <>
-              {referenceAreas.map((area, index) => (
-                <ReferenceArea
-                  key={area.id ?? `reference-area-${index}`}
-                  id={area.id}
-                  x1={area.x1}
-                  x2={area.x2}
-                  y1={area.y1}
-                  y2={area.y2}
-                  xKey={area.xKey ?? xKey}
-                  yKey={area.yKey}
-                  xScale={xScale}
-                  yDomain={yDomain}
-                  label={area.label}
-                  fill={area.fill}
-                  fillOpacity={area.fillOpacity}
-                  class={area.class}
-                />
-              ))}
-              {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
+              <CartesianReferenceClippedLayers
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                referenceAreas={referenceAreas}
+                referenceSegments={referenceSegments}
+              />
+              {showGrid ? (
+                <Grid xKey={xKey} xScale={xScale} xDomain={resolvedXDomain} yDomain={yDomain} />
+              ) : null}
               {stacked ? (
                 <StackedLineSeries
                   series={stackSeries}
                   xKey={xKey}
                   xScale={xScale}
+                  xDomain={resolvedXDomain}
                   yDomain={yDomain}
                   curve={curve}
                   connectNulls={connectNulls}
@@ -339,6 +412,7 @@ export const LineChart = <TDatum,>({
                     key={getSeriesId(entry, originalIndex)}
                     id={getSeriesId(entry, originalIndex)}
                     dataKey={entry.key}
+                    xDomain={resolvedXDomain}
                     yDomain={yDomain}
                     color={entry.color ?? `var(--chart-${(originalIndex % 4) + 1})`}
                     curve={curve}
@@ -366,6 +440,7 @@ export const LineChart = <TDatum,>({
                 visibleSeries={visibleSeries}
                 xKey={xKey}
                 xScale={xScale}
+                xDomain={resolvedXDomain}
                 yDomain={yDomain}
                 tooltip={tooltip}
                 defaultMode="axis"
@@ -373,24 +448,14 @@ export const LineChart = <TDatum,>({
                 stacked={stacked}
                 stackSeries={stacked ? stackSeries : undefined}
               />
-              {referencePoints.map((point, index) => (
-                <ReferencePoint
-                  key={point.id ?? `reference-point-${index}`}
-                  id={point.id}
-                  x={point.x}
-                  y={point.y}
-                  xKey={point.xKey ?? xKey}
-                  yKey={point.yKey}
-                  xScale={xScale}
-                  yDomain={yDomain}
-                  label={point.label}
-                  color={point.color}
-                  size={point.size}
-                  shape={point.shape}
-                  labelPosition={point.labelPosition}
-                  class={point.class}
-                />
-              ))}
+              <CartesianReferencePointLayers
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                referencePoints={referencePoints}
+              />
+              {plotForeground}
             </>
           ),
           axes: (
@@ -398,6 +463,7 @@ export const LineChart = <TDatum,>({
               <XAxis
                 dataKey={xKey}
                 scale={xScale}
+                domain={resolvedXDomain}
                 tickFormatter={xTickFormatter}
                 {...axisCollision}
               />
@@ -408,21 +474,13 @@ export const LineChart = <TDatum,>({
                 maxTickLabelLength={maxTickLabelLength}
                 maxTickLabelWidth={maxTickLabelWidth}
               />
-              {referenceLines.map((line, index) => (
-                <ReferenceLine
-                  key={index}
-                  x={line.x}
-                  y={line.y}
-                  yDomain={yDomain}
-                  label={line.label}
-                  color={line.color}
-                  strokeWidth={line.strokeWidth}
-                  strokeDasharray={line.strokeDasharray}
-                  yKey={line.yKey}
-                  xKey={xKey}
-                  xScale={xScale}
-                />
-              ))}
+              <CartesianReferenceLineLayers
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                referenceLines={referenceLines}
+              />
             </>
           ),
         }}

@@ -1,5 +1,5 @@
-import { D as DataAccessor } from '../types-DSaae0gq.js';
-import { S as ScaleKind, D as DomainPadding } from '../domain-DBVhrZ1K.js';
+import { D as DataAccessor } from '../types-rFU8suko.js';
+import { S as ScaleKind, D as DomainPadding } from '../domain-C6g4S_9B.js';
 import { A as AxisScale } from '../ticks-CmQrA2Ry.js';
 export { a as AxisTick, b as AxisTickValue, g as getScalePosition, c as getTicks } from '../ticks-CmQrA2Ry.js';
 import * as preact from 'preact';

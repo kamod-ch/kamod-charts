@@ -17,7 +17,7 @@
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "test": "pnpm -r --filter !@kamod-ch/charts-docs test",
+    "test": "pnpm -r --filter !@kamod-ch/charts-docs test && node --test scripts/bench-measurement.test.mjs",
     "test:browser": "playwright test",
     "test:browser:install": "playwright install chromium",
     "test:exports": "pnpm build && node scripts/test-package-exports.mjs",

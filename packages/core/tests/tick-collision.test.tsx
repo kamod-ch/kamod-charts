@@ -1,13 +1,26 @@
 import renderToString from "preact-render-to-string";
 import { describe, expect, it } from "vitest";
 import { LineChart } from "../src/charts/line-chart";
-import { prepareAxisTicks, truncateTickLabel } from "../src/axes/tick-collision";
+import {
+  estimateTickCollisionWidth,
+  prepareAxisTicks,
+  truncateTickLabel,
+} from "../src/axes/tick-collision";
 
 describe("tick collision utilities", () => {
   it("truncates labels deterministically", () => {
     const result = truncateTickLabel("January revenue report", 8);
     expect(result.display).toBe("January…");
     expect(result.full).toBe("January revenue report");
+  });
+
+  it("does not cap collision width below uncropped label width", () => {
+    const full = "0123456789";
+    expect(estimateTickCollisionWidth(full, full, 20)).toBe(full.length * 6.5);
+    const truncated = truncateTickLabel(full, 2).display;
+    expect(estimateTickCollisionWidth(truncated, full, 40)).toBeGreaterThanOrEqual(
+      truncated.length * 6.5,
+    );
   });
 
   it("hides middle ticks but keeps first and last", () => {
@@ -32,6 +45,36 @@ describe("tick collision utilities", () => {
       orientation: "x",
     });
     expect(prepared[0]?.rotation).toBe(-45);
+  });
+
+  it("uses vertical extent for y-axis hide collisions", () => {
+    const prepared = prepareAxisTicks(
+      [
+        { position: 0, labelText: "0" },
+        { position: 10, labelText: "1" },
+        { position: 20, labelText: "2" },
+        { position: 30, labelText: "3" },
+      ],
+      { tickCollision: "hide", orientation: "y", maxTickLabelWidth: 80 },
+    );
+    expect(prepared.filter((entry) => entry.visible).length).toBeLessThan(prepared.length);
+  });
+
+  it("handles descending pixel positions on the x axis", () => {
+    const prepared = prepareAxisTicks(
+      [
+        { position: 96, labelText: "A" },
+        { position: 72, labelText: "B" },
+        { position: 48, labelText: "C" },
+        { position: 24, labelText: "D" },
+        { position: 0, labelText: "E" },
+      ],
+      { tickCollision: "hide", orientation: "x", maxTickLabelWidth: 30 },
+    );
+    const minPosition = Math.min(...prepared.filter((t) => t.visible).map((t) => t.position));
+    const maxPosition = Math.max(...prepared.filter((t) => t.visible).map((t) => t.position));
+    expect(minPosition).toBe(0);
+    expect(maxPosition).toBe(96);
   });
 
   it("prefers explicit tickRotation over auto rotate", () => {

@@ -9,6 +9,7 @@ export interface TickCollisionOptions {
 }
 
 const ESTIMATED_CHAR_WIDTH = 6.5;
+const ESTIMATED_LINE_HEIGHT = 12;
 const DEFAULT_MAX_TICK_LABEL_LENGTH = 12;
 const TICK_GAP = 4;
 const AUTO_X_ROTATION = -45;
@@ -19,6 +20,50 @@ export const estimateTickLabelWidth = (text: string, maxTickLabelWidth?: number)
     return estimated;
   }
   return Math.min(estimated, maxTickLabelWidth);
+};
+
+/** Width used for collision checks; never below the rendered label width. */
+export const estimateTickCollisionWidth = (
+  displayText: string,
+  fullText: string,
+  maxTickLabelWidth?: number,
+): number => {
+  const rendered = estimateTickLabelWidth(displayText);
+  if (displayText === fullText || maxTickLabelWidth == null) {
+    return rendered;
+  }
+  return Math.max(rendered, Math.min(estimateTickLabelWidth(fullText), maxTickLabelWidth));
+};
+
+const estimateRotatedExtent = (width: number, height: number, rotationDegrees: number): number => {
+  if (rotationDegrees === 0) {
+    return height;
+  }
+  const radians = (rotationDegrees * Math.PI) / 180;
+  return Math.abs(width * Math.sin(radians)) + Math.abs(height * Math.cos(radians));
+};
+
+export const estimateTickLabelExtent = (
+  displayText: string,
+  fullText: string,
+  options: {
+    orientation: "x" | "y";
+    rotation?: number;
+    maxTickLabelWidth?: number;
+  },
+): number => {
+  const width = estimateTickCollisionWidth(displayText, fullText, options.maxTickLabelWidth);
+  const rotation = options.rotation ?? 0;
+  if (options.orientation === "x") {
+    if (rotation === 0) {
+      return width;
+    }
+    return estimateRotatedExtent(width, ESTIMATED_LINE_HEIGHT, rotation);
+  }
+  if (rotation === 0) {
+    return ESTIMATED_LINE_HEIGHT;
+  }
+  return estimateRotatedExtent(width, ESTIMATED_LINE_HEIGHT, rotation);
 };
 
 export const truncateTickLabel = (
@@ -48,6 +93,61 @@ export interface PreparedAxisTick {
   visible: boolean;
   rotation: number;
 }
+
+const applyHideStrategy = (
+  base: PreparedAxisTick[],
+  options: TickCollisionOptions & { orientation: "x" | "y"; tickRotation?: number },
+): PreparedAxisTick[] => {
+  if (base.length <= 1) {
+    return base;
+  }
+
+  const order = [...base.keys()].sort(
+    (left, right) => base[left]!.position - base[right]!.position,
+  );
+  const firstIndex = order[0]!;
+  const lastIndex = order[order.length - 1]!;
+  const visible = base.map(() => false);
+
+  const extentAt = (index: number) =>
+    estimateTickLabelExtent(base[index]!.displayText, base[index]!.fullText, {
+      orientation: options.orientation,
+      rotation: base[index]!.rotation,
+      maxTickLabelWidth: options.maxTickLabelWidth,
+    });
+
+  visible[firstIndex] = true;
+  let cursor = base[firstIndex]!.position + extentAt(firstIndex) / 2 + TICK_GAP;
+
+  for (let orderIndex = 1; orderIndex < order.length - 1; orderIndex += 1) {
+    const index = order[orderIndex]!;
+    const half = extentAt(index) / 2;
+    const center = base[index]!.position;
+    if (center - half >= cursor) {
+      visible[index] = true;
+      cursor = center + half + TICK_GAP;
+    }
+  }
+
+  const lastHalf = extentAt(lastIndex) / 2;
+  const lastCenter = base[lastIndex]!.position;
+  const lastFits = lastCenter - lastHalf >= cursor;
+  if (lastFits) {
+    visible[lastIndex] = true;
+  } else if (visible[firstIndex] && order.length > 2) {
+    const firstHalf = extentAt(firstIndex) / 2;
+    const firstCenter = base[firstIndex]!.position;
+    const firstOverlapsLast = Math.abs(lastCenter - firstCenter) < lastHalf + firstHalf + TICK_GAP;
+    if (firstOverlapsLast) {
+      visible[firstIndex] = false;
+      visible[lastIndex] = true;
+    }
+  } else {
+    visible[lastIndex] = lastFits;
+  }
+
+  return base.map((entry, index) => ({ ...entry, visible: visible[index]! }));
+};
 
 export const prepareAxisTicks = (
   ticks: readonly { position: number; labelText: string }[],
@@ -95,29 +195,7 @@ export const prepareAxisTicks = (
   }
 
   if (strategy === "hide") {
-    if (base.length <= 2) {
-      return base;
-    }
-
-    const widths = base.map((entry) =>
-      estimateTickLabelWidth(entry.displayText, options.maxTickLabelWidth),
-    );
-    const lastIndex = base.length - 1;
-    const visible = base.map(() => false);
-    visible[0] = true;
-    visible[lastIndex] = true;
-
-    let cursor = base[0]!.position + widths[0]! / 2 + TICK_GAP;
-    for (let index = 1; index < lastIndex; index += 1) {
-      const half = widths[index]! / 2;
-      const center = base[index]!.position;
-      if (center - half >= cursor) {
-        visible[index] = true;
-        cursor = center + half + TICK_GAP;
-      }
-    }
-
-    return base.map((entry, index) => ({ ...entry, visible: visible[index]! }));
+    return applyHideStrategy(base, options);
   }
 
   return base;

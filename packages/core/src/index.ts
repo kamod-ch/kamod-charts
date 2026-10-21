@@ -8,4 +8,15 @@ export * from "./performance";
 export * from "./primitives";
 export * from "./scales";
 export * from "./series";
+export * from "./streaming";
 export * from "./formatting";
+export {
+  computeHistogramBins,
+  formatHistogramBinInterval,
+  histogramBinsToBarData,
+} from "./data/histogram-bins";
+export type {
+  ComputeHistogramBinsOptions,
+  HistogramBin,
+  HistogramBinsResult,
+} from "./data/histogram-bins";

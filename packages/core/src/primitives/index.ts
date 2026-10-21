@@ -1,3 +1,5 @@
+export { CartesianXBrush } from "./cartesian-x-brush";
+export type { CartesianXBrushChangeReason, CartesianXBrushProps } from "./cartesian-x-brush";
 export { Crosshair } from "./crosshair";
 export type { CrosshairProps } from "./crosshair";
 export { Grid } from "./grid";

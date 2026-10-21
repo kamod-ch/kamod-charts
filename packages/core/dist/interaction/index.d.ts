@@ -1,7 +1,7 @@
-import { C as CartesianPoint } from '../cartesian-Ct2oQUzO.js';
+import { C as CartesianPoint } from '../cartesian-CGKNouK7.js';
 import { JSX } from 'preact';
-import { l as ChartRect } from '../types-DSaae0gq.js';
-import '../domain-DBVhrZ1K.js';
+import { l as ChartRect } from '../types-rFU8suko.js';
+import '../domain-C6g4S_9B.js';
 
 type CartesianHitResult = {
     index: number;
@@ -46,7 +46,13 @@ interface ChartPointerPosition {
     plotX: number;
     plotY: number;
 }
-declare const getPointerPosition: (event: JSX.TargetedPointerEvent<Element>, plotArea: ChartRect) => ChartPointerPosition;
+/** Pointer or wheel events with client coordinates relative to the chart surface. */
+type ChartPointerClientEvent = {
+    clientX: number;
+    clientY: number;
+    currentTarget: EventTarget | null;
+};
+declare const getPointerPosition: (event: ChartPointerClientEvent, plotArea: ChartRect) => ChartPointerPosition;
 /**
  * Maps plot X to a datum index assuming equal spacing across the plot width.
  * Intended only for explicitly index-spaced domains. Continuous numeric/time
@@ -54,4 +60,4 @@ declare const getPointerPosition: (event: JSX.TargetedPointerEvent<Element>, plo
  */
 declare const getNearestIndexByX: (plotX: number, plotWidth: number, pointCount: number) => number;
 
-export { type CartesianHitResult, type ChartPointerPosition, type KeyboardNavigationOptions, type KeyboardNavigationState, createChartKeyboardHandler, findNearestPoint, findNearestProjectedPoint, findNearestProjectedX, getNearestIndexByX, getPointerPosition };
+export { type CartesianHitResult, type ChartPointerClientEvent, type ChartPointerPosition, type KeyboardNavigationOptions, type KeyboardNavigationState, createChartKeyboardHandler, findNearestPoint, findNearestProjectedPoint, findNearestProjectedX, getNearestIndexByX, getPointerPosition };

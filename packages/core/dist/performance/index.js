@@ -1,3 +1,3 @@
-export { bisectDate, downsampleByStride, downsampleMinMax, getLargeDatasetWarning, shouldReduceMarkers } from '../chunk-ORCD56E4.js';
+export { bisectDate, downsampleByStride, downsampleMinMax, downsampleMinMaxSegmented, getLargeDatasetWarning, shouldReduceMarkers } from '../chunk-D72UBQ3Y.js';
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

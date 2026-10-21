@@ -8,6 +8,7 @@ import {
   throughputMetrics,
 } from "../../data/line-datasets";
 import { ExampleFrame } from "../shared/ExampleFrame";
+import { LineViewportDemo } from "./LineViewportDemo";
 import type { JSX } from "preact";
 
 const sharedFrame = {
@@ -601,6 +602,28 @@ export function LineExamples(): JSX.Element {
   tooltip
   title="Throughput vs capacity steps"
   description="Diamond markers annotate discrete capacity increases."
+/>`}
+      />
+
+      <ExampleFrame
+        id="time-viewport"
+        title="Controlled time window"
+        description="Use xDomain on linear/time line charts to show a trailing monitoring window. Y autoscale can follow only visible rows."
+        badges={["xDomain", "time"]}
+        preview={<LineViewportDemo />}
+        code={`import { LineChart, createTrailingTimeWindowDomain } from "@kamod-ch/charts";
+
+const xDomain = createTrailingTimeWindowDomain(latest, 15 * 60_000, fullExtents);
+
+<LineChart
+  data={points}
+  xKey="t"
+  xScale="time"
+  xDomain={xDomain}
+  yAutoscale="visible"
+  series={[{ key: "cpu", id: "cpu" }]}
+  showGrid
+  tooltip
 />`}
       />
     </div>

@@ -28,6 +28,7 @@ import type {
   ScatterPointContext,
 } from "./types";
 import type { StackSeries } from "../series/stack";
+import type { ChartXViewportDomain } from "./x-viewport";
 import { buildStackLayers, getStackedSeriesValueFromLayers } from "../series/stacked-line-points";
 
 type ActiveLayersProps<TDatum> = {
@@ -36,6 +37,7 @@ type ActiveLayersProps<TDatum> = {
   visibleSeries: readonly CartesianSeriesConfig<TDatum>[];
   xKey?: DataAccessor<TDatum, string | number | Date | null | undefined>;
   xScale?: ChartCartesianScaleKind;
+  xDomain?: ChartXViewportDomain;
   yDomain: NumericDomain;
   tooltip?: boolean | CartesianTooltipOptions<TDatum>;
   defaultMode: CartesianTooltipMode;
@@ -111,6 +113,7 @@ const useActiveInteraction = <TDatum,>({
   visibleSeries,
   xKey,
   xScale,
+  xDomain,
   yDomain,
   activePoint: activePointOverride,
   pointerPlot,
@@ -170,6 +173,7 @@ const useActiveInteraction = <TDatum,>({
                 ),
                 xKey,
                 xScale,
+                xDomain,
                 yDomain,
                 plotWidth: plotArea.width,
                 plotHeight: plotArea.height,
@@ -182,6 +186,7 @@ const useActiveInteraction = <TDatum,>({
                 seriesKey: activeSeries.key,
                 xKey,
                 xScale,
+                xDomain,
                 yDomain,
                 plotWidth: plotArea.width,
                 plotHeight: plotArea.height,

@@ -3,7 +3,12 @@ import { useChartMotionContext } from "../animation/slots";
 import { XAxis, YAxis } from "../axes";
 import { Chart } from "../core";
 import { createChartKeyboardHandler } from "../interaction";
-import { Grid, Legend, ReferenceLine } from "../primitives";
+import { Grid, Legend } from "../primitives";
+import {
+  CartesianReferenceClippedLayers,
+  CartesianReferenceLineLayers,
+  CartesianReferencePointLayers,
+} from "./cartesian-reference-layers";
 import {
   AreaSeries as StaticAreaSeries,
   inferGroupedDomain,
@@ -15,7 +20,13 @@ import { useCartesianIntlAxisTicks } from "./cartesian-axis-formatters";
 import { cartesianAxisCollisionProps } from "./cartesian-axis-props";
 import { CartesianChartFrame } from "./cartesian-chart-frame";
 import { resolveCartesianEmptyState } from "./cartesian-empty-state";
+import { resolvePlotAreaFromSize } from "./cartesian-interaction";
 import { buildCartesianLayoutModel } from "./cartesian-layout-model";
+import { resolveCartesianViewport } from "./resolve-cartesian-viewport";
+import { isContinuousCartesianXScale } from "./x-viewport";
+import { useCartesianXViewportGestures } from "./use-cartesian-x-viewport-gestures";
+import type { ChartSvgProps } from "../core/chart-svg-props";
+import { useCartesianPointerFrame } from "./use-cartesian-pointer-frame";
 import { getSeriesId } from "./series-identity";
 import { isTooltipEnabled } from "./tooltip-options";
 import type { AreaChartProps, CartesianSeriesConfig } from "./types";
@@ -53,7 +64,14 @@ export const AreaChart = <TDatum,>({
   pointRadius,
   curve = "linear",
   referenceLines = [],
+  referenceAreas = [],
+  referencePoints = [],
+  referenceSegments = [],
   animate,
+  xDomain: xDomainProp,
+  yAutoscale = "data",
+  xViewportInteraction,
+  onXViewportChange,
   yDomain: yDomainProp,
   margin,
   class: className,
@@ -66,6 +84,7 @@ export const AreaChart = <TDatum,>({
   svgProps,
   defs,
   clipPlotArea,
+  plotForeground,
   tickCollision,
   maxTickLabelLength,
   maxTickLabelWidth,
@@ -93,9 +112,59 @@ export const AreaChart = <TDatum,>({
     value: entry.key,
     color: entry.color,
   }));
+  const tooltipEnabled = isTooltipEnabled(tooltip);
+  const fallbackWidth = width ?? initialWidth ?? 640;
+  const chartHeight = height ?? 320;
+  const plotWidth = useMemo(
+    () => resolvePlotAreaFromSize(fallbackWidth, chartHeight).width,
+    [chartHeight, fallbackWidth],
+  );
+  const viewportInteractionEnabled =
+    Boolean(xViewportInteraction) && isContinuousCartesianXScale(xScale);
+  const viewportGestures = useCartesianXViewportGestures({
+    enabled: viewportInteractionEnabled,
+    data,
+    xKey,
+    xScale,
+    xDomain: xDomainProp,
+    onXViewportChange,
+    interaction: typeof xViewportInteraction === "object" ? xViewportInteraction : {},
+    plotWidth,
+    fallbackWidth,
+    chartHeight,
+  });
+  const { resolvedXDomain, dataForYDomain } = useMemo(() => {
+    if (viewportInteractionEnabled) {
+      return resolveCartesianViewport({
+        data,
+        xKey,
+        xScale,
+        xDomain: viewportGestures.effectiveXDomain,
+        yAutoscale,
+      });
+    }
+    return resolveCartesianViewport({
+      data,
+      xKey,
+      xScale,
+      xDomain: xDomainProp,
+      yAutoscale,
+    });
+  }, [
+    data,
+    viewportGestures.effectiveXDomain,
+    viewportInteractionEnabled,
+    xDomainProp,
+    xKey,
+    xScale,
+    yAutoscale,
+  ]);
   const inferredYDomain = useMemo(
-    () => (stacked ? inferStackedDomain(data, stackSeries) : inferGroupedDomain(data, stackSeries)),
-    [data, stacked, stackSeries],
+    () =>
+      stacked
+        ? inferStackedDomain(dataForYDomain, stackSeries)
+        : inferGroupedDomain(dataForYDomain, stackSeries),
+    [dataForYDomain, stacked, stackSeries],
   );
   const yDomain = yDomainProp ?? inferredYDomain;
   const resolvedSeriesIndex =
@@ -105,9 +174,6 @@ export const AreaChart = <TDatum,>({
   const activeSeriesId = activeSeriesEntry
     ? getSeriesId(activeSeriesEntry.entry, activeSeriesEntry.originalIndex)
     : null;
-  const tooltipEnabled = isTooltipEnabled(tooltip);
-  const fallbackWidth = width ?? initialWidth ?? 640;
-  const chartHeight = height ?? 320;
   const primarySeriesKey = visibleSeries[0]?.key;
   const layout = useMemo(
     () =>
@@ -115,12 +181,13 @@ export const AreaChart = <TDatum,>({
         data,
         xKey,
         xScale,
+        xDomain: resolvedXDomain,
         yDomain,
         width: fallbackWidth,
         height: chartHeight,
         primarySeriesKey,
       }),
-    [chartHeight, data, fallbackWidth, primarySeriesKey, xKey, xScale, yDomain],
+    [chartHeight, data, fallbackWidth, primarySeriesKey, resolvedXDomain, xKey, xScale, yDomain],
   );
   const notifyActiveChange = useCallback(
     (index: number | null, source: "pointer" | "keyboard") => {
@@ -146,11 +213,45 @@ export const AreaChart = <TDatum,>({
     fallbackWidth,
     height: chartHeight,
     xIndex: layout.xIndex,
+    xDomain: resolvedXDomain,
     yDomain,
     seriesKey: primarySeriesKey,
     controlledActiveIndex,
     onActiveIndexChange: (index) => notifyActiveChange(index, "pointer"),
   });
+  const tooltipPointerMove = useCartesianPointerFrame(
+    (event: Parameters<typeof onPointerMove>[0]) => {
+      if (!viewportGestures.isPanning) {
+        onPointerMove(event);
+      }
+    },
+  );
+  const mergedSvgProps: ChartSvgProps = {
+    ...(typeof svgProps === "object" && svgProps ? svgProps : {}),
+    ...(viewportGestures.svgProps as ChartSvgProps),
+    onKeyDown: (event) => {
+      if (viewportGestures.handleViewportKeyboard(event)) {
+        return;
+      }
+      createChartKeyboardHandler({
+        pointCount: data.length,
+        seriesCount: Math.max(visibleSeries.length, 1),
+        activeIndex: activeIndex ?? 0,
+        activeSeriesIndex: resolvedSeriesIndex,
+        onChange: (state) => {
+          resetPointerPlot();
+          setActiveIndex(state.activeIndex);
+          notifyActiveChange(state.activeIndex, "keyboard");
+          setActiveSeriesIndex(state.activeSeriesIndex);
+        },
+        onEscape: () => {
+          resetPointerPlot();
+          setActiveIndex(null);
+          notifyActiveChange(null, "keyboard");
+        },
+      })(event);
+    },
+  };
 
   const chartStyle =
     typeof styleProp === "string"
@@ -184,28 +285,11 @@ export const AreaChart = <TDatum,>({
         tabIndex={0}
         style={chartStyle}
         svgRef={svgRef}
-        svgProps={svgProps}
+        svgProps={mergedSvgProps}
         defs={defs}
         clipPlotArea={clipPlotArea}
-        onPointerMove={tooltipEnabled ? onPointerMove : undefined}
+        onPointerMove={tooltipEnabled ? tooltipPointerMove : undefined}
         onPointerLeave={tooltipEnabled ? onPointerLeave : undefined}
-        onKeyDown={createChartKeyboardHandler({
-          pointCount: data.length,
-          seriesCount: Math.max(visibleSeries.length, 1),
-          activeIndex: activeIndex ?? 0,
-          activeSeriesIndex: resolvedSeriesIndex,
-          onChange: (state) => {
-            resetPointerPlot();
-            setActiveIndex(state.activeIndex);
-            notifyActiveChange(state.activeIndex, "keyboard");
-            setActiveSeriesIndex(state.activeSeriesIndex);
-          },
-          onEscape: () => {
-            resetPointerPlot();
-            setActiveIndex(null);
-            notifyActiveChange(null, "keyboard");
-          },
-        })}
         overlay={
           <>
             {showLegend ? (
@@ -261,6 +345,7 @@ export const AreaChart = <TDatum,>({
               visibleSeries={visibleSeries}
               xKey={xKey}
               xScale={xScale}
+              xDomain={resolvedXDomain}
               yDomain={yDomain}
               tooltip={tooltip}
               defaultMode="axis"
@@ -274,12 +359,23 @@ export const AreaChart = <TDatum,>({
         plotLayers={{
           clipped: (
             <>
-              {showGrid ? <Grid xKey={xKey} xScale={xScale} yDomain={yDomain} /> : null}
+              <CartesianReferenceClippedLayers
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                referenceAreas={referenceAreas}
+                referenceSegments={referenceSegments}
+              />
+              {showGrid ? (
+                <Grid xKey={xKey} xScale={xScale} xDomain={resolvedXDomain} yDomain={yDomain} />
+              ) : null}
               {stacked ? (
                 <StackedAreaSeries
                   series={stackSeries}
                   xKey={xKey}
                   xScale={xScale}
+                  xDomain={resolvedXDomain}
                   yDomain={yDomain}
                   opacity={opacity}
                   fill={fill}
@@ -299,6 +395,7 @@ export const AreaChart = <TDatum,>({
                     key={getSeriesId(entry, originalIndex)}
                     id={getSeriesId(entry, originalIndex)}
                     dataKey={entry.key}
+                    xDomain={resolvedXDomain}
                     yDomain={yDomain}
                     color={entry.color ?? `var(--chart-${(originalIndex % 4) + 1})`}
                     baseline={baseline}
@@ -322,23 +419,35 @@ export const AreaChart = <TDatum,>({
             </>
           ),
           foreground: (
-            <CartesianActiveCrosshair
-              activeIndex={activeIndex}
-              activeSeries={activeSeries}
-              visibleSeries={visibleSeries}
-              xKey={xKey}
-              xScale={xScale}
-              yDomain={yDomain}
-              tooltip={tooltip}
-              defaultMode="axis"
-              pointerPlot={pointerPlot}
-            />
+            <>
+              <CartesianActiveCrosshair
+                activeIndex={activeIndex}
+                activeSeries={activeSeries}
+                visibleSeries={visibleSeries}
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                tooltip={tooltip}
+                defaultMode="axis"
+                pointerPlot={pointerPlot}
+              />
+              <CartesianReferencePointLayers
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                referencePoints={referencePoints}
+              />
+              {plotForeground}
+            </>
           ),
           axes: (
             <>
               <XAxis
                 dataKey={xKey}
                 scale={xScale}
+                domain={resolvedXDomain}
                 tickFormatter={xTickFormatter}
                 {...axisCollision}
               />
@@ -349,19 +458,13 @@ export const AreaChart = <TDatum,>({
                 maxTickLabelLength={maxTickLabelLength}
                 maxTickLabelWidth={maxTickLabelWidth}
               />
-              {referenceLines.map((line, index) => (
-                <ReferenceLine
-                  key={index}
-                  x={line.x}
-                  y={line.y}
-                  yDomain={yDomain}
-                  label={line.label}
-                  color={line.color}
-                  yKey={line.yKey}
-                  xKey={xKey}
-                  xScale={xScale}
-                />
-              ))}
+              <CartesianReferenceLineLayers
+                xKey={xKey}
+                xScale={xScale}
+                xDomain={resolvedXDomain}
+                yDomain={yDomain}
+                referenceLines={referenceLines}
+              />
             </>
           ),
         }}
