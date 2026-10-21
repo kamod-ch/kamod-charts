@@ -126,8 +126,8 @@ importers:
   packages/docs:
     dependencies:
       '@kamod-ch/brand':
-        specifier: ^0.1.12
-        version: 0.1.12(preact@10.29.8)
+        specifier: ^0.2.0
+        version: 0.2.0(preact@10.29.8)
       '@kamod-ch/charts':
         specifier: workspace:*
         version: link:../core
@@ -525,8 +525,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kamod-ch/brand@0.1.12':
-    resolution: {integrity: sha512-ubS0lKHkqSdefC3Nid9H8KQT62jITocsuef/qkDrOYvisEN+R4nQ9KW3w7dQrTkWa8zVmxOMslDNtPtUPpRThA==}
+  '@kamod-ch/brand@0.2.0':
+    resolution: {integrity: sha512-c69R05YctBEBJpY+XDum+1Garffp1LLdQJnr0Q4HZ8yQPtRFI1mCNXiXUsO6fNmqH5nRy1drPMdGys+bLmMONQ==}
     hasBin: true
     peerDependencies:
       preact: '>=10'
@@ -3652,7 +3652,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@kamod-ch/brand@0.1.12(preact@10.29.8)':
+  '@kamod-ch/brand@0.2.0(preact@10.29.8)':
     dependencies:
       preact: 10.29.8(preact-render-to-string@6.7.0)
 

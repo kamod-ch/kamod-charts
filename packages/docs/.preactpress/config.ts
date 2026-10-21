@@ -1,5 +1,6 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { docsFaviconHeadLinks } from "@kamod-ch/brand";
 import { defineConfig } from "@kamod-ch/preactpress/config";
 import { getThemeInitScript } from "@kamod-ch/themes";
 import tailwindcss from "@tailwindcss/vite";
@@ -8,26 +9,6 @@ const configDir = dirname(fileURLToPath(import.meta.url));
 const chartsSrc = resolve(configDir, "../../core/src");
 const chartsRoot = resolve(configDir, "../../core");
 const base = "/kamod-charts/";
-
-function publicUrl(assetPath: string): string {
-  const prefix = base.endsWith("/") ? base.slice(0, -1) : base;
-  return `${prefix}/${assetPath.replace(/^\//, "")}`;
-}
-
-const faviconInitScript = `(() => {
-  const root = document.documentElement;
-  const favicon = document.querySelector('link[data-theme-favicon]');
-  if (!favicon) return;
-
-  const update = () => {
-    const attribute = root.classList.contains('dark') ? 'data-dark-href' : 'data-light-href';
-    const href = favicon.getAttribute(attribute);
-    if (href && favicon.getAttribute('href') !== href) favicon.setAttribute('href', href);
-  };
-
-  update();
-  new MutationObserver(update).observe(root, { attributes: true, attributeFilter: ['class'] });
-})();`;
 
 export default defineConfig({
   theme: "./theme/Layout.tsx",
@@ -53,19 +34,7 @@ export default defineConfig({
     typographer: true,
   },
   head: [
-    [
-      "link",
-      {
-        rel: "icon",
-        href: publicUrl("favicon-light.svg"),
-        type: "image/svg+xml",
-        "data-theme-favicon": "",
-        "data-light-href": publicUrl("favicon-light.svg"),
-        "data-dark-href": publicUrl("favicon-dark.svg"),
-      },
-    ],
-    ["link", { rel: "apple-touch-icon", href: publicUrl("favicon.png") }],
-    ["link", { rel: "stylesheet", href: publicUrl("styles/logo.css") }],
+    ...docsFaviconHeadLinks(base),
     [
       "link",
       {
@@ -74,7 +43,6 @@ export default defineConfig({
       },
     ],
     ["script", { type: "text/javascript" }, getThemeInitScript({ defaultScheme: "system" })],
-    ["script", { type: "text/javascript" }, faviconInitScript],
   ],
   vite: {
     plugins: [tailwindcss()],

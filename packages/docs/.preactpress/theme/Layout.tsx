@@ -1,3 +1,4 @@
+import { FaviconSync, KamodProductLogo } from "@kamod-ch/brand";
 import type { LayoutProps } from "@kamod-ch/preactpress/client";
 import { ExternalLinkIcon, GithubIcon, MenuIcon, XIcon } from "@kamod-ch/icons/shadcn";
 import { syncThemeFromStorage } from "@kamod-ch/themes";
@@ -15,7 +16,6 @@ import type { ComponentChildren, FunctionalComponent, JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { ChartLab } from "../../components/playground/ChartLab";
 import { GalleryPage } from "../../components/gallery/GalleryPage";
-import { BrandLogo } from "../../components/shared/BrandLogo";
 import Footer from "./Footer.js";
 import "../../styles/index.css";
 
@@ -198,6 +198,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
   return (
     <div class="min-h-screen bg-background text-foreground">
       <title>{title}</title>
+      <FaviconSync base={site.base} />
       <a class="docs-skip-link" href="#content">
         Skip to content
       </a>
@@ -205,7 +206,7 @@ const Layout: FunctionalComponent<LayoutProps> = ({ site, themeConfig, routePath
       <header class="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
         <div class="mx-auto flex h-[var(--docs-header-height)] max-w-[90rem] items-center gap-3 px-4 sm:px-6 lg:px-8">
           <a href={withBase(site.base, "/")} class="shrink-0" aria-label={site.title}>
-            <BrandLogo label={site.title} base={site.base} />
+            <KamodProductLogo label={site.title} base={site.base} suffix="Charts" />
           </a>
           <nav class="ml-4 hidden items-center gap-1 lg:flex" aria-label="Primary">
             {nav.map((item) => {
