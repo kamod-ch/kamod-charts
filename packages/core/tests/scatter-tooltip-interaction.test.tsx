@@ -1,6 +1,6 @@
 import { fireEvent, render } from "./testing-library";
 import renderToString from "preact-render-to-string";
-import type { JSX } from "preact";
+import type { TargetedKeyboardEvent } from "preact";
 import { describe, expect, it, vi } from "vitest";
 import { getScalePosition } from "../src/axes";
 import { resolvePlotAreaFromSize } from "../src/charts/cartesian-interaction";
@@ -344,7 +344,7 @@ describe("scatter keyboard navigation", () => {
       activeIndex: 0,
       activeSeriesIndex: 0,
       onChange: (state) => downChanges.push(state),
-    })(downEvent as unknown as JSX.TargetedKeyboardEvent<SVGSVGElement>);
+    })(downEvent as unknown as TargetedKeyboardEvent<SVGSVGElement>);
     expect(downChanges).toEqual([{ activeIndex: 0, activeSeriesIndex: 1 }]);
 
     const rightChanges: Array<{ activeIndex: number; activeSeriesIndex: number }> = [];
@@ -354,7 +354,7 @@ describe("scatter keyboard navigation", () => {
       activeIndex: 0,
       activeSeriesIndex: 1,
       onChange: (state) => rightChanges.push(state),
-    })(rightEvent as unknown as JSX.TargetedKeyboardEvent<SVGSVGElement>);
+    })(rightEvent as unknown as TargetedKeyboardEvent<SVGSVGElement>);
     expect(rightChanges).toEqual([{ activeIndex: 2, activeSeriesIndex: 0 }]);
   });
 });

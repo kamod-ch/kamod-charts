@@ -36,11 +36,12 @@
     "release:publish": "pnpm --filter @kamod-ch/charts publish --access public --provenance --no-git-checks"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.1",
-    "@types/node": "^25.9.2",
-    "oxfmt": "^0.54.0",
-    "oxlint": "^1.69.0",
-    "typescript": "^6.0.3"
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@typescript/typescript6": "^6.0.2",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "typescript": "^7.0.2"
   },
-  "packageManager": "pnpm@11.17.0"
+  "packageManager": "pnpm@12.14.0+sha512.c18ba6d87993d3d164cb5e8948f32b2c06ee854487e06cd8d86781342fb3e5bb4634367034711e86802baa9c37bea906ce1929ad08d70884c97d801df13389a6"
 }

@@ -2,5 +2,13 @@ packages:
   - "packages/*"
 allowBuilds:
   esbuild: false
+overrides:
+  "tsup>typescript": "npm:@typescript/typescript6@6.0.2"
+peerDependencyRules:
+  allowedVersions:
+    "@kamod-ch/motion>motion": "^14.4.0"
+    "@kamod-ch/motion>preact": "^11.0.1"
+    "@kamod-ch/themes>preact": "^11.0.1"
+    "@kamod-ch/ui>@kamod-ch/themes": "0.2.1"
 minimumReleaseAgeExclude:
   - "@kamod-ch/brand@0.1.11 || 0.1.12"

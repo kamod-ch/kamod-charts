@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import type { KeyboardEventHandler } from "preact";
 import type { ScatterInteractionTarget } from "./scatter-interaction";
 
 export interface ScatterKeyboardNavigationState {
@@ -42,7 +42,7 @@ export const createScatterKeyboardHandler =
     onChange,
     onSelect,
     onEscape,
-  }: ScatterKeyboardNavigationOptions): JSX.KeyboardEventHandler<SVGSVGElement> =>
+  }: ScatterKeyboardNavigationOptions): KeyboardEventHandler<SVGSVGElement> =>
   (event) => {
     if (targets.length === 0) {
       if (event.key === "Escape") {

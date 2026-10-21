@@ -948,18 +948,24 @@ describe("bar fill", () => {
 
     expect(contexts.some((context) => context.seriesId === "costs" && !context.stacked)).toBe(true);
     expect(
-      resolveBarGeometryFill(groupedBars.find((bar) => bar.seriesId === "revenue")!, {
-        orientation: "vertical",
-        stacked: false,
-        active: false,
-      }),
+      resolveBarGeometryFill(
+        groupedBars.find((bar) => bar.seriesId === "revenue")!,
+        {
+          orientation: "vertical",
+          stacked: false,
+          active: false,
+        },
+      ),
     ).toBe("#positive");
     expect(
-      resolveBarGeometryFill(stackedBars.find((bar) => bar.seriesId === "costs")!, {
-        orientation: "vertical",
-        stacked: true,
-        active: false,
-      }),
+      resolveBarGeometryFill(
+        stackedBars.find((bar) => bar.seriesId === "costs")!,
+        {
+          orientation: "vertical",
+          stacked: true,
+          active: false,
+        },
+      ),
     ).toBe("#costs");
     expect(
       resolveBarGeometryFill(negativeBar!, {

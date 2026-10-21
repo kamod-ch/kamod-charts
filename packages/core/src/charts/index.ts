@@ -39,6 +39,7 @@ export type {
   CartesianReferenceSegmentPoint,
   CartesianActiveSelection,
   CartesianSeriesConfig,
+  CartesianXBrushOptions,
   ChartFormatOptions,
   CartesianTooltipContext,
   CartesianTooltipMode,
@@ -67,5 +68,6 @@ export type {
   ScatterSeriesConfig,
   ScatterSizeScale,
   TooltipPlacement,
+  XViewportChangeReason,
 } from "./types";
 export type { ChartAnimate, ChartAnimateOptions } from "../animation";

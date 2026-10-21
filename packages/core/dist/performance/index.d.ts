@@ -49,4 +49,5 @@ interface SegmentedMinMaxDownsampleResult<TDatum> {
  */
 declare const downsampleMinMaxSegmented: <TDatum>(data: readonly TDatum[], readX: (datum: TDatum, index: number) => number | Date | null | undefined, readY: (datum: TDatum, index: number) => number | null | undefined, { budget, gapThreshold }: SegmentedMinMaxDownsampleOptions) => SegmentedMinMaxDownsampleResult<TDatum>;
 
-export { type DownsampleOptions, type MinMaxDownsampleOptions, type MinMaxDownsamplePoint, type SegmentedMinMaxDownsampleOptions, type SegmentedMinMaxDownsampleResult, type SegmentedMinMaxDownsampleSegment, bisectDate, downsampleByStride, downsampleMinMax, downsampleMinMaxSegmented, getLargeDatasetWarning, shouldReduceMarkers };
+export { bisectDate, downsampleByStride, downsampleMinMax, downsampleMinMaxSegmented, getLargeDatasetWarning, shouldReduceMarkers };
+export type { DownsampleOptions, MinMaxDownsampleOptions, MinMaxDownsamplePoint, SegmentedMinMaxDownsampleOptions, SegmentedMinMaxDownsampleResult, SegmentedMinMaxDownsampleSegment };

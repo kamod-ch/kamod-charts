@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import type { TargetedPointerEvent } from "preact";
 import { useCallback, useState } from "preact/hooks";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import type { NumericDomain } from "../scales";
@@ -73,7 +73,7 @@ export const useCartesianPointerState = <TDatum>({
 
   const schedulePointerMove = useCartesianPointerFrame(applyPointer);
   const onPointerMove = useCallback(
-    (event: JSX.TargetedPointerEvent<Element>) => {
+    (event: TargetedPointerEvent<Element>) => {
       // Preact clears currentTarget after dispatch. Resolve all event- and DOM-dependent
       // geometry synchronously before handing the latest sample to requestAnimationFrame.
       schedulePointerMove(resolvePointerPlot(event, fallbackWidth, height));

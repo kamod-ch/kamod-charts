@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import type { KeyboardEventHandler } from "preact";
 
 export interface KeyboardNavigationState {
   activeIndex: number;
@@ -27,7 +27,7 @@ export const createChartKeyboardHandler =
     onChange,
     onSelect,
     onEscape,
-  }: KeyboardNavigationOptions): JSX.KeyboardEventHandler<SVGSVGElement> =>
+  }: KeyboardNavigationOptions): KeyboardEventHandler<SVGSVGElement> =>
   (event) => {
     if (pointCount <= 0 || seriesCount <= 0) {
       return;

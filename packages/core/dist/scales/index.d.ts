@@ -1,7 +1,7 @@
 import { ScaleBand, ScaleLinear, ScalePoint, ScaleTime } from 'd3-scale';
-import { N as NumericDomain, T as TimeDomain } from '../domain-C6g4S_9B.js';
-export { C as CategoricalDomain, a as ContinuousDomain, b as ContinuousDomainOptions, c as ContinuousDomainValue, D as DomainPadding, S as ScaleKind, e as ensureNumericDomain, i as includeZero, d as inferCategoricalDomain, f as inferNumericDomain, g as inferTimeDomain, t as toNumber } from '../domain-C6g4S_9B.js';
-import '../types-rFU8suko.js';
+import { N as NumericDomain, T as TimeDomain } from '../domain-BWwIEiBj.js';
+export { C as CategoricalDomain, a as ContinuousDomain, b as ContinuousDomainOptions, c as ContinuousDomainValue, D as DomainPadding, S as ScaleKind, e as ensureNumericDomain, i as includeZero, d as inferCategoricalDomain, f as inferNumericDomain, g as inferTimeDomain, t as toNumber } from '../domain-BWwIEiBj.js';
+import '../types-B5951TWW.js';
 import 'preact';
 
 interface BandScaleOptions {
@@ -43,4 +43,5 @@ interface TimeScaleOptions {
 type TimeChartScale = ScaleTime<number, number, never>;
 declare const createTimeScale: ({ domain, range, nice, clamp, }: TimeScaleOptions) => TimeChartScale;
 
-export { type BandChartScale, type BandScaleOptions, type LinearChartScale, type LinearScaleOptions, NumericDomain, type PointChartScale, type PointScaleOptions, type TimeChartScale, TimeDomain, type TimeScaleOptions, createBandScale, createLinearScale, createPointScale, createTimeScale };
+export { NumericDomain, TimeDomain, createBandScale, createLinearScale, createPointScale, createTimeScale };
+export type { BandChartScale, BandScaleOptions, LinearChartScale, LinearScaleOptions, PointChartScale, PointScaleOptions, TimeChartScale, TimeScaleOptions };

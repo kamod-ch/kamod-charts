@@ -1,7 +1,7 @@
-import { D as DataAccessor, o as ChartSize, g as ChartMargin, l as ChartRect, c as ChartContextValue, a as ChartAccessibilityOptions, p as ChartSurfaceSvgOptions, m as ChartRootProps } from '../types-rFU8suko.js';
-export { C as ChartCartesianScaleKind, b as ChartClippingOptions, d as ChartDefsSlotOptions, e as ChartDimensionsInput, f as ChartInteraction, h as ChartNullableValue, i as ChartOrientation, j as ChartPlotLayers, k as ChartPrimitiveValue, n as ChartSeries, q as ChartSvgProps, r as DomainDataAccessor, N as NumericDataAccessor } from '../types-rFU8suko.js';
+import { D as DataAccessor, o as ChartSize, g as ChartMargin, l as ChartRect, c as ChartContextValue, a as ChartAccessibilityOptions, p as ChartSurfaceSvgOptions, m as ChartRootProps } from '../types-B5951TWW.js';
+export { C as ChartCartesianScaleKind, b as ChartClippingOptions, d as ChartDefsSlotOptions, e as ChartDimensionsInput, f as ChartInteraction, h as ChartNullableValue, i as ChartOrientation, j as ChartPlotLayers, k as ChartPrimitiveValue, n as ChartSeries, q as ChartSvgProps, r as DomainDataAccessor, N as NumericDataAccessor } from '../types-B5951TWW.js';
 import * as preact from 'preact';
-import { ComponentChildren, JSX } from 'preact';
+import { ComponentChildren, CSSProperties, KeyboardEventHandler, PointerEventHandler } from 'preact';
 
 type NormalizedAccessor<TDatum, TValue> = (datum: TDatum, index: number) => TValue;
 declare const normalizeAccessor: <TDatum, TValue>(accessor: DataAccessor<TDatum, TValue>) => NormalizedAccessor<TDatum, TValue>;
@@ -27,19 +27,19 @@ declare const useChartContext: <TDatum>() => ChartContextValue<TDatum>;
 interface ChartSurfaceProps extends ChartAccessibilityOptions, ChartSize, ChartSurfaceSvgOptions {
     children?: ComponentChildren;
     class?: string;
-    style?: JSX.CSSProperties | string;
+    style?: CSSProperties | string;
     tabIndex?: number;
-    onKeyDown?: JSX.KeyboardEventHandler<SVGSVGElement>;
-    onPointerMove?: JSX.PointerEventHandler<SVGSVGElement>;
-    onPointerLeave?: JSX.PointerEventHandler<SVGSVGElement>;
+    onKeyDown?: KeyboardEventHandler<SVGSVGElement>;
+    onPointerMove?: PointerEventHandler<SVGSVGElement>;
+    onPointerLeave?: PointerEventHandler<SVGSVGElement>;
 }
-declare const ChartSurface: ({ id, title, description, labelledBy, describedBy, role, width, height, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, svgRef, svgProps, children, }: ChartSurfaceProps) => JSX.Element;
+declare const ChartSurface: ({ id, title, description, labelledBy, describedBy, role, width, height, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, svgRef, svgProps, children, }: ChartSurfaceProps) => preact.JSX.Element;
 
 declare const createPlotClipPathId: (rootId: string) => string;
 
-declare const defaultEmptyState: JSX.Element;
-declare const ChartRoot: <TDatum>({ data, width, height, initialWidth, responsive, aspectRatio, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, plotLayers, defs, clipPlotArea, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, svgRef, svgProps, overlay, emptyState, }: ChartRootProps<TDatum>) => JSX.Element;
-declare const Chart: <TDatum>({ data, width, height, initialWidth, responsive, aspectRatio, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, plotLayers, defs, clipPlotArea, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, svgRef, svgProps, overlay, emptyState, }: ChartRootProps<TDatum>) => JSX.Element;
+declare const defaultEmptyState: preact.JSX.Element;
+declare const ChartRoot: <TDatum>({ data, width, height, initialWidth, responsive, aspectRatio, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, plotLayers, defs, clipPlotArea, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, svgRef, svgProps, overlay, emptyState, }: ChartRootProps<TDatum>) => preact.JSX.Element;
+declare const Chart: <TDatum>({ data, width, height, initialWidth, responsive, aspectRatio, margin, xKey, xScale, id, title, description, labelledBy, describedBy, role, children, plotLayers, defs, clipPlotArea, class: className, style, tabIndex, onKeyDown, onPointerMove, onPointerLeave, svgRef, svgProps, overlay, emptyState, }: ChartRootProps<TDatum>) => preact.JSX.Element;
 
 interface PlotAreaProps {
     children?: ComponentChildren;
@@ -60,4 +60,5 @@ interface ResponsiveContainerProps {
 }
 declare const ResponsiveContainer: ({ width, initialWidth, responsive, class: className, children, }: ResponsiveContainerProps) => preact.JSX.Element;
 
-export { Chart, ChartAccessibilityOptions, ChartContextValue, ChartMargin, ChartProvider, ChartRect, ChartRoot, ChartRootProps, ChartSize, ChartSurface, type ChartSurfaceProps, ChartSurfaceSvgOptions, DataAccessor, type NormalizedAccessor, PlotArea, type PlotAreaProps, ResponsiveContainer, type ResponsiveContainerProps, type ResponsiveContainerRenderState, calculatePlotArea, clampDimension, createPlotClipPathId, defaultChartMargin, defaultEmptyState, normalizeAccessor, normalizeMargin, readAccessor, resolveChartSize, useChartContext };
+export { Chart, ChartAccessibilityOptions, ChartContextValue, ChartMargin, ChartProvider, ChartRect, ChartRoot, ChartRootProps, ChartSize, ChartSurface, ChartSurfaceSvgOptions, DataAccessor, PlotArea, ResponsiveContainer, calculatePlotArea, clampDimension, createPlotClipPathId, defaultChartMargin, defaultEmptyState, normalizeAccessor, normalizeMargin, readAccessor, resolveChartSize, useChartContext };
+export type { ChartSurfaceProps, NormalizedAccessor, PlotAreaProps, ResponsiveContainerProps, ResponsiveContainerRenderState };

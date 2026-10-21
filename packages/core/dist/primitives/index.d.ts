@@ -1,9 +1,10 @@
 import * as preact from 'preact';
-import { JSX, ComponentChildren } from 'preact';
-import { D as DataAccessor, C as ChartCartesianScaleKind, f as ChartInteraction } from '../types-rFU8suko.js';
-import { C as ChartXViewportDomain, T as TooltipPlacement } from '../x-viewport-PV7LAEVO.js';
-export { R as ResolvedTooltipPlacement, b as TooltipPlacementInput, c as TooltipPlacementResult, d as calculateTooltipPlacement, e as clampTooltipPosition, v as viewBoxToContainerPixels } from '../x-viewport-PV7LAEVO.js';
-import { S as ScaleKind, D as DomainPadding } from '../domain-C6g4S_9B.js';
+import { ComponentChildren } from 'preact';
+import { DataAccessor, ChartCartesianScaleKind, ChartInteraction } from '../core/index.js';
+import { T as TooltipPlacement } from '../x-viewport-DnjNKMMu.js';
+import { ChartXViewportDomain } from '../index.js';
+export { R as ResolvedTooltipPlacement, b as TooltipPlacementInput, c as TooltipPlacementResult, d as calculateTooltipPlacement, e as clampTooltipPosition, v as viewBoxToContainerPixels } from '../x-viewport-DnjNKMMu.js';
+import { ScaleKind, DomainPadding } from '../index.js';
 
 type CartesianXBrushChangeReason = "brush" | "keyboard";
 interface CartesianXBrushProps<TDatum> {
@@ -14,7 +15,7 @@ interface CartesianXBrushProps<TDatum> {
     minSpan?: number;
     onSelectionChange: (domain: ChartXViewportDomain, reason: CartesianXBrushChangeReason) => void;
 }
-declare const CartesianXBrush: <TDatum>({ selection, extents, xKey, xScale, minSpan, onSelectionChange, }: CartesianXBrushProps<TDatum>) => JSX.Element | null;
+declare const CartesianXBrush: <TDatum>({ selection, extents, xKey, xScale, minSpan, onSelectionChange, }: CartesianXBrushProps<TDatum>) => preact.JSX.Element | null;
 
 interface CrosshairProps<TDatum> {
     interaction?: ChartInteraction<TDatum> | null;
@@ -161,4 +162,5 @@ interface TooltipProps<TDatum> {
 }
 declare const Tooltip: <TDatum>({ interaction, visible, children, placement, offset, }: TooltipProps<TDatum>) => preact.JSX.Element | null;
 
-export { CartesianXBrush, type CartesianXBrushChangeReason, type CartesianXBrushProps, Crosshair, type CrosshairProps, Grid, type GridProps, Legend, type LegendItem, type LegendProps, LiveRegion, type LiveRegionProps, ReferenceArea, type ReferenceAreaProps, ReferenceLine, type ReferenceLineProps, ReferencePoint, type ReferencePointLabelPosition, type ReferencePointProps, type ReferencePointShape, ReferenceSegment, type ReferenceSegmentEndpoint, type ReferenceSegmentLabelPosition, type ReferenceSegmentProps, Tooltip, TooltipPlacement, type TooltipProps };
+export { CartesianXBrush, Crosshair, Grid, Legend, LiveRegion, ReferenceArea, ReferenceLine, ReferencePoint, ReferenceSegment, Tooltip, TooltipPlacement };
+export type { CartesianXBrushChangeReason, CartesianXBrushProps, CrosshairProps, GridProps, LegendItem, LegendProps, LiveRegionProps, ReferenceAreaProps, ReferenceLineProps, ReferencePointLabelPosition, ReferencePointProps, ReferencePointShape, ReferenceSegmentEndpoint, ReferenceSegmentLabelPosition, ReferenceSegmentProps, TooltipProps };

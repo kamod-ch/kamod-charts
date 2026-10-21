@@ -12,7 +12,7 @@ import {
   ThemeToggle,
 } from "@kamod-ch/ui";
 import { cn } from "@kamod-ch/ui/lib/utils";
-import type { ComponentChildren, FunctionalComponent, JSX } from "preact";
+import type { ComponentChildren, ComponentProps, FunctionalComponent, JSX } from "preact";
 import { useEffect, useState } from "preact/hooks";
 import { ChartLab } from "../../components/playground/ChartLab";
 import { GalleryPage } from "../../components/gallery/GalleryPage";
@@ -70,7 +70,7 @@ function createMdxComponents(base: string) {
   const used = new Map<string, number>();
   const heading =
     (Tag: "h2" | "h3") =>
-    ({ children, ...props }: JSX.HTMLAttributes<HTMLHeadingElement>) => {
+    ({ children, ...props }: ComponentProps<"h2">) => {
       const base = slugify(childText(children));
       const count = used.get(base) ?? 0;
       used.set(base, count + 1);
@@ -83,12 +83,13 @@ function createMdxComponents(base: string) {
     };
 
   return {
-    a: ({ href, ...props }: JSX.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-      <a
-        href={typeof href === "string" && href.startsWith("/") ? withBase(base, href) : href}
-        {...props}
-      />
-    ),
+    a: ({ href, ...props }: ComponentProps<"a">) => {
+      const anchorProps = {
+        ...props,
+        href: typeof href === "string" && href.startsWith("/") ? withBase(base, href) : href,
+      } as ComponentProps<"a">;
+      return <a {...anchorProps} />;
+    },
     h2: heading("h2"),
     h3: heading("h3"),
   };

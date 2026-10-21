@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "./testing-library";
+import { act, fireEvent, render, waitFor } from "./testing-library";
 import renderToString from "preact-render-to-string";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CartesianTooltipOptions, LineChartProps } from "../src";
@@ -594,7 +594,7 @@ describe("tooltip API and accessibility", () => {
       expect(Number.parseFloat(tooltip.style.left)).toBeGreaterThanOrEqual(8);
     });
 
-    unmount();
+    act(() => unmount());
     expect(disconnect).toHaveBeenCalled();
   });
 

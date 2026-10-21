@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import type { TargetedKeyboardEvent, TargetedPointerEvent } from "preact";
 import { useCallback, useMemo, useRef, useState } from "preact/hooks";
 import { useChartContext, type ChartCartesianScaleKind, type DataAccessor } from "../core";
 import {
@@ -82,13 +82,13 @@ export const CartesianXBrush = <TDatum,>({
   );
 
   const plotXFromEvent = useCallback(
-    (event: JSX.TargetedPointerEvent<Element>, fallbackHeight: number) =>
+    (event: TargetedPointerEvent<Element>, fallbackHeight: number) =>
       resolvePointerPlot(event, plotWidth, fallbackHeight).position.plotX,
     [plotWidth],
   );
 
   const onPointerDown = (
-    event: JSX.TargetedPointerEvent<SVGElement>,
+    event: TargetedPointerEvent<SVGElement>,
     mode: "move" | "resize-start" | "resize-end",
   ) => {
     if (!selectionReady) {
@@ -106,7 +106,7 @@ export const CartesianXBrush = <TDatum,>({
     setIsDragging(true);
   };
 
-  const onPointerMove = (event: JSX.TargetedPointerEvent<SVGElement>) => {
+  const onPointerMove = (event: TargetedPointerEvent<SVGElement>) => {
     const drag = dragRef.current;
     if (!drag || drag.pointerId !== event.pointerId) {
       return;
@@ -141,7 +141,7 @@ export const CartesianXBrush = <TDatum,>({
     emit(fromComparable(startMs, pointerComparable, drag.startSelection), "brush");
   };
 
-  const endDrag = (event: JSX.TargetedPointerEvent<SVGElement>) => {
+  const endDrag = (event: TargetedPointerEvent<SVGElement>) => {
     if (dragRef.current?.pointerId === event.pointerId) {
       dragRef.current = null;
       setIsDragging(false);
@@ -149,7 +149,7 @@ export const CartesianXBrush = <TDatum,>({
     }
   };
 
-  const handleKeyDown = (event: JSX.TargetedKeyboardEvent<SVGElement>) => {
+  const handleKeyDown = (event: TargetedKeyboardEvent<SVGElement>) => {
     const step = event.shiftKey ? 0.05 : 0.01;
     const [start, end] = domainComparableBounds(selection);
     const span = end - start;

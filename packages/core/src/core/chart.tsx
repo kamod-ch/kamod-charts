@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import type { PointerEventHandler } from "preact";
 import { useId, useMemo } from "preact/hooks";
 import { createPlotClipPathId } from "./chart-clip";
 import { calculatePlotArea, normalizeMargin, resolveChartSize } from "./chart-layout";
@@ -23,8 +23,8 @@ const PlotPointerCapture = ({
 }: {
   plotArea: { width: number; height: number };
   enabled: boolean;
-  onPointerMove?: JSX.PointerEventHandler<SVGSVGElement>;
-  onPointerLeave?: JSX.PointerEventHandler<SVGSVGElement>;
+  onPointerMove?: PointerEventHandler<SVGSVGElement>;
+  onPointerLeave?: PointerEventHandler<SVGSVGElement>;
 }) => {
   if (!enabled || !onPointerMove) {
     return null;
@@ -39,10 +39,8 @@ const PlotPointerCapture = ({
       height={plotArea.height}
       fill="transparent"
       aria-hidden="true"
-      onPointerMove={onPointerMove as unknown as JSX.PointerEventHandler<SVGRectElement>}
-      onPointerLeave={
-        onPointerLeave as unknown as JSX.PointerEventHandler<SVGRectElement> | undefined
-      }
+      onPointerMove={onPointerMove as unknown as PointerEventHandler<SVGRectElement>}
+      onPointerLeave={onPointerLeave as unknown as PointerEventHandler<SVGRectElement> | undefined}
     />
   );
 };

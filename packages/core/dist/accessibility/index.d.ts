@@ -1,5 +1,5 @@
 import * as preact from 'preact';
-import { D as DataAccessor } from '../types-rFU8suko.js';
+import { DataAccessor } from '../core/index.js';
 
 interface ChartDescriptionInput {
     title?: string;
@@ -22,4 +22,5 @@ interface DataTableProps<TDatum> {
 }
 declare const DataTable: <TDatum>({ data, columns, caption, visuallyHidden, }: DataTableProps<TDatum>) => preact.JSX.Element;
 
-export { type ChartDescriptionInput, DataTable, type DataTableColumn, type DataTableProps, buildChartDescription };
+export { DataTable, buildChartDescription };
+export type { ChartDescriptionInput, DataTableColumn, DataTableProps };

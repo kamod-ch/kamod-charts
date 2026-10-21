@@ -22,4 +22,5 @@ interface TransitionOptions {
 }
 declare const shouldAnimate: ({ duration, disabled, reducedMotion, }?: TransitionOptions) => boolean;
 
-export { ChartAnimate, ChartAnimateOptions, ResolvedChartAnimate, type TransitionOptions, barKey, defaultChartAnimate, domainKey, interpolateValue, pointKey, prefersReducedMotion, resolveChartAnimate, shouldAnimate, sliceKey, uniquifyKeys, useReducedMotion };
+export { ChartAnimate, ChartAnimateOptions, ResolvedChartAnimate, barKey, defaultChartAnimate, domainKey, interpolateValue, pointKey, prefersReducedMotion, resolveChartAnimate, shouldAnimate, sliceKey, uniquifyKeys, useReducedMotion };
+export type { TransitionOptions };

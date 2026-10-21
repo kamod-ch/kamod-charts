@@ -1,4 +1,4 @@
-import type { JSX } from "preact";
+import type { TargetedEvent, TargetedPointerEvent, TargetedWheelEvent } from "preact";
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { ChartCartesianScaleKind, DataAccessor } from "../core";
 import {
@@ -21,7 +21,7 @@ export interface XViewportInteractionOptions {
 
 export type XViewportChangeReason = "pan" | "zoom" | "reset" | "keyboard";
 
-const composeHandlers = <T extends JSX.TargetedEvent<EventTarget>>(
+const composeHandlers = <T extends TargetedEvent<EventTarget>>(
   first?: (event: T) => void,
   second?: (event: T) => void,
 ): ((event: T) => void) | undefined => {
@@ -154,7 +154,7 @@ export const useCartesianXViewportGestures = <TDatum>({
   );
 
   const onPointerDown = useCallback(
-    (event: JSX.TargetedPointerEvent<SVGSVGElement>) => {
+    (event: TargetedPointerEvent<SVGSVGElement>) => {
       if (!enabled || !baseDomain || event.button !== 0 || plotWidth <= 0) {
         return;
       }
@@ -171,7 +171,7 @@ export const useCartesianXViewportGestures = <TDatum>({
   );
 
   const onPointerMove = useCallback(
-    (event: JSX.TargetedPointerEvent<SVGSVGElement>) => {
+    (event: TargetedPointerEvent<SVGSVGElement>) => {
       const pan = panRef.current;
       if (!pan || pan.pointerId !== event.pointerId) {
         return;
@@ -187,7 +187,7 @@ export const useCartesianXViewportGestures = <TDatum>({
   );
 
   const onPointerUp = useCallback(
-    (event: JSX.TargetedPointerEvent<SVGSVGElement>) => {
+    (event: TargetedPointerEvent<SVGSVGElement>) => {
       const pan = panRef.current;
       if (!pan || pan.pointerId !== event.pointerId) {
         return;
@@ -201,7 +201,7 @@ export const useCartesianXViewportGestures = <TDatum>({
   );
 
   const onPointerCancel = useCallback(
-    (event: JSX.TargetedPointerEvent<SVGSVGElement>) => {
+    (event: TargetedPointerEvent<SVGSVGElement>) => {
       if (panRef.current?.pointerId === event.pointerId) {
         cancelPan();
       }
@@ -220,7 +220,7 @@ export const useCartesianXViewportGestures = <TDatum>({
   }, [enabled, interaction.wheelZoom]);
 
   const onWheel = useCallback(
-    (event: JSX.TargetedWheelEvent<SVGSVGElement>) => {
+    (event: TargetedWheelEvent<SVGSVGElement>) => {
       if (!wheelMode || !baseDomain || !extents || plotWidth <= 0) {
         return;
       }

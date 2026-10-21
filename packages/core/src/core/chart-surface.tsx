@@ -1,4 +1,9 @@
-import type { ComponentChildren, JSX } from "preact";
+import type {
+  ComponentChildren,
+  CSSProperties,
+  KeyboardEventHandler,
+  PointerEventHandler,
+} from "preact";
 import {
   assignSvgRef,
   composeSvgEventHandlers,
@@ -11,11 +16,11 @@ export interface ChartSurfaceProps
   extends ChartAccessibilityOptions, ChartSize, ChartSurfaceSvgOptions {
   children?: ComponentChildren;
   class?: string;
-  style?: JSX.CSSProperties | string;
+  style?: CSSProperties | string;
   tabIndex?: number;
-  onKeyDown?: JSX.KeyboardEventHandler<SVGSVGElement>;
-  onPointerMove?: JSX.PointerEventHandler<SVGSVGElement>;
-  onPointerLeave?: JSX.PointerEventHandler<SVGSVGElement>;
+  onKeyDown?: KeyboardEventHandler<SVGSVGElement>;
+  onPointerMove?: PointerEventHandler<SVGSVGElement>;
+  onPointerLeave?: PointerEventHandler<SVGSVGElement>;
 }
 
 export const ChartSurface = ({

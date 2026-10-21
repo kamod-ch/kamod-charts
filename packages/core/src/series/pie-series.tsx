@@ -1,4 +1,4 @@
-import type { ComponentChildren, JSX } from "preact";
+import type { ComponentChildren, TargetedPointerEvent } from "preact";
 import { useMemo } from "preact/hooks";
 import type { ChartAnimate } from "../animation";
 import { useChartContext, type DataAccessor } from "../core";
@@ -83,7 +83,7 @@ export const createPieSlicePointerHandler =
     layout: ReturnType<typeof resolvePieSeriesLayout>["layout"],
     handler?: (event: PieSlicePointerEvent<TDatum>) => void,
   ) =>
-  (nativeEvent: JSX.TargetedPointerEvent<SVGPathElement>) => {
+  (nativeEvent: TargetedPointerEvent<SVGPathElement>) => {
     if (!handler) {
       return;
     }

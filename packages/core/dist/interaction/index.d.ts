@@ -1,7 +1,7 @@
-import { C as CartesianPoint } from '../cartesian-CGKNouK7.js';
-import { JSX } from 'preact';
-import { l as ChartRect } from '../types-rFU8suko.js';
-import '../domain-C6g4S_9B.js';
+import { CartesianPoint } from '../index.js';
+import { KeyboardEventHandler } from 'preact';
+import { ChartRect } from '../core/index.js';
+import '../domain-BWwIEiBj.js';
 
 type CartesianHitResult = {
     index: number;
@@ -38,7 +38,7 @@ interface KeyboardNavigationOptions {
     onSelect?: (state: KeyboardNavigationState) => void;
     onEscape?: () => void;
 }
-declare const createChartKeyboardHandler: ({ pointCount, seriesCount, activeIndex, activeSeriesIndex, onChange, onSelect, onEscape, }: KeyboardNavigationOptions) => JSX.KeyboardEventHandler<SVGSVGElement>;
+declare const createChartKeyboardHandler: ({ pointCount, seriesCount, activeIndex, activeSeriesIndex, onChange, onSelect, onEscape, }: KeyboardNavigationOptions) => KeyboardEventHandler<SVGSVGElement>;
 
 interface ChartPointerPosition {
     x: number;
@@ -60,4 +60,5 @@ declare const getPointerPosition: (event: ChartPointerClientEvent, plotArea: Cha
  */
 declare const getNearestIndexByX: (plotX: number, plotWidth: number, pointCount: number) => number;
 
-export { type CartesianHitResult, type ChartPointerClientEvent, type ChartPointerPosition, type KeyboardNavigationOptions, type KeyboardNavigationState, createChartKeyboardHandler, findNearestPoint, findNearestProjectedPoint, findNearestProjectedX, getNearestIndexByX, getPointerPosition };
+export { createChartKeyboardHandler, findNearestPoint, findNearestProjectedPoint, findNearestProjectedX, getNearestIndexByX, getPointerPosition };
+export type { CartesianHitResult, ChartPointerClientEvent, ChartPointerPosition, KeyboardNavigationOptions, KeyboardNavigationState };

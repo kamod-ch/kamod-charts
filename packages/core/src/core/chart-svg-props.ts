@@ -1,4 +1,11 @@
-import type { JSX, Ref } from "preact";
+import type {
+  FocusEventHandler,
+  KeyboardEventHandler,
+  MouseEventHandler,
+  PointerEventHandler,
+  Ref,
+  WheelEventHandler,
+} from "preact";
 
 /** Kamod-controlled keys may appear in `svgProps` but are ignored at runtime. */
 type ChartSvgIgnoredProps = {
@@ -17,16 +24,16 @@ export type ChartSvgProps = ChartSvgIgnoredProps & {
   "aria-label"?: string;
   preserveAspectRatio?: string;
   focusable?: "true" | "false" | "auto";
-  onClick?: JSX.MouseEventHandler<SVGSVGElement>;
-  onPointerDown?: JSX.PointerEventHandler<SVGSVGElement>;
-  onFocus?: JSX.FocusEventHandler<SVGSVGElement>;
-  onBlur?: JSX.FocusEventHandler<SVGSVGElement>;
-  onKeyDown?: JSX.KeyboardEventHandler<SVGSVGElement>;
-  onPointerMove?: JSX.PointerEventHandler<SVGSVGElement>;
-  onPointerUp?: JSX.PointerEventHandler<SVGSVGElement>;
-  onPointerCancel?: JSX.PointerEventHandler<SVGSVGElement>;
-  onPointerLeave?: JSX.PointerEventHandler<SVGSVGElement>;
-  onWheel?: JSX.WheelEventHandler<SVGSVGElement>;
+  onClick?: MouseEventHandler<SVGSVGElement>;
+  onPointerDown?: PointerEventHandler<SVGSVGElement>;
+  onFocus?: FocusEventHandler<SVGSVGElement>;
+  onBlur?: FocusEventHandler<SVGSVGElement>;
+  onKeyDown?: KeyboardEventHandler<SVGSVGElement>;
+  onPointerMove?: PointerEventHandler<SVGSVGElement>;
+  onPointerUp?: PointerEventHandler<SVGSVGElement>;
+  onPointerCancel?: PointerEventHandler<SVGSVGElement>;
+  onPointerLeave?: PointerEventHandler<SVGSVGElement>;
+  onWheel?: WheelEventHandler<SVGSVGElement>;
   [key: `data-${string}`]: string | number | boolean | undefined;
 };
 

@@ -38,7 +38,7 @@ const collectCustomProperties = (
   const collected: Record<string, string> = {};
   let current: Element | null = element;
   while (current) {
-    const computed = view.getComputedStyle(current);
+    const computed: CSSStyleDeclaration = view.getComputedStyle(current);
     for (let index = 0; index < computed.length; index += 1) {
       const name = computed.item(index);
       if (!name || !isStyleTokenName(name, mode)) {

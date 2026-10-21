@@ -1,4 +1,9 @@
-import type { ComponentChildren, JSX } from "preact";
+import type {
+  ComponentChildren,
+  CSSProperties,
+  KeyboardEventHandler,
+  PointerEventHandler,
+} from "preact";
 import type { ChartClippingOptions, ChartDefsSlotOptions, ChartPlotLayers } from "./chart-layers";
 import type { ChartSurfaceSvgOptions } from "./chart-svg-props";
 
@@ -92,11 +97,11 @@ export interface ChartRootProps<TDatum>
    */
   plotLayers?: ChartPlotLayers;
   class?: string;
-  style?: JSX.CSSProperties | string;
+  style?: CSSProperties | string;
   tabIndex?: number;
-  onKeyDown?: JSX.KeyboardEventHandler<SVGSVGElement>;
-  onPointerMove?: JSX.PointerEventHandler<SVGSVGElement>;
-  onPointerLeave?: JSX.PointerEventHandler<SVGSVGElement>;
+  onKeyDown?: KeyboardEventHandler<SVGSVGElement>;
+  onPointerMove?: PointerEventHandler<SVGSVGElement>;
+  onPointerLeave?: PointerEventHandler<SVGSVGElement>;
   overlay?: ComponentChildren;
   emptyState?: ComponentChildren;
 }

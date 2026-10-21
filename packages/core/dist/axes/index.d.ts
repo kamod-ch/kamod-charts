@@ -1,10 +1,10 @@
-import { D as DataAccessor } from '../types-rFU8suko.js';
-import { S as ScaleKind, D as DomainPadding } from '../domain-C6g4S_9B.js';
-import { A as AxisScale } from '../ticks-CmQrA2Ry.js';
-export { a as AxisTick, b as AxisTickValue, g as getScalePosition, c as getTicks } from '../ticks-CmQrA2Ry.js';
+import { DataAccessor } from '../core/index.js';
+import { ScaleKind, DomainPadding } from '../index.js';
+import { A as AxisScale } from '../ticks-BOjDQK87.js';
+export { a as AxisTick, b as AxisTickValue, g as getScalePosition, c as getTicks } from '../ticks-BOjDQK87.js';
 import * as preact from 'preact';
-import { T as TickCollisionOptions } from '../tick-collision-BZO-dBiF.js';
-export { P as PreparedAxisTick, a as TickCollisionStrategy, e as estimateTickLabelWidth, p as prepareAxisTicks, t as truncateTickLabel } from '../tick-collision-BZO-dBiF.js';
+import { T as TickCollisionOptions } from '../tick-collision-BnKxhH61.js';
+export { P as PreparedAxisTick, a as TickCollisionStrategy, e as estimateTickLabelWidth, p as prepareAxisTicks, t as truncateTickLabel } from '../tick-collision-BnKxhH61.js';
 import 'd3-scale';
 
 interface AxisScaleOptions<TDatum> {
@@ -57,4 +57,5 @@ interface YAxisProps<TDatum> extends TickCollisionOptions {
 }
 declare const YAxis: <TDatum>({ dataKey, scale, domain, padding, nice, tickCount, tickFormatter, formatSpecifier, label, tickCollision, maxTickLabelLength, maxTickLabelWidth, class: className, }: YAxisProps<TDatum>) => preact.JSX.Element;
 
-export { AxisScale, type AxisScaleOptions, TickCollisionOptions, type TickFormatOptions, type TickFormatter, type TickValue, XAxis, type XAxisProps, YAxis, type YAxisProps, formatTick, inferNumericTickFormatSpecifier, useAxisScale };
+export { AxisScale, TickCollisionOptions, XAxis, YAxis, formatTick, inferNumericTickFormatSpecifier, useAxisScale };
+export type { AxisScaleOptions, TickFormatOptions, TickFormatter, TickValue, XAxisProps, YAxisProps };
