@@ -318,8 +318,8 @@ importers:
         version: 11.0.1(preact-render-to-string@6.8.1)
     devDependencies:
       '@kamod-ch/preactpress':
-        specifier: file:../../../preactpress
-        version: file:../preactpress(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(rollup@4.64.12)(supports-color@7.2.0)
+        specifier: ^3.2.0
+        version: 3.2.0(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(rollup@4.64.12)(supports-color@7.2.0)
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0))
@@ -685,8 +685,8 @@ packages:
       motion: ^13.1.1
       preact: ^10.29.8
 
-  '@kamod-ch/preactpress@file:../preactpress':
-    resolution: {directory: ../preactpress, type: directory}
+  '@kamod-ch/preactpress@3.2.0':
+    resolution: {integrity: sha512-gRzn0Ye+a8a48kXsmFLC3ieY6/i9QypOq4gtUS140gZVJAB/A/q2Le9zEuhp5r7nMoXvTHllRUJq4B3vFEQuSA==}
     engines: {node: '>=20'}
     hasBin: true
 
@@ -3569,7 +3569,7 @@ snapshots:
       motion: 14.4.0
       preact: 11.0.1(preact-render-to-string@6.8.1)
 
-  '@kamod-ch/preactpress@file:../preactpress(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(rollup@4.64.12)(supports-color@7.2.0)':
+  '@kamod-ch/preactpress@3.2.0(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.6.5)(esbuild@0.28.2)(jiti@2.7.0)(rollup@4.64.12)(supports-color@7.2.0)':
     dependencies:
       '@docsearch/css': 5.1.2
       '@docsearch/js': 5.1.2

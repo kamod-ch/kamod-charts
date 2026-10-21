@@ -12,3 +12,4 @@ peerDependencyRules:
     "@kamod-ch/ui>@kamod-ch/themes": "0.2.1"
 minimumReleaseAgeExclude:
   - "@kamod-ch/brand@0.1.11 || 0.1.12"
+  - "@kamod-ch/preactpress@3.2.0"
