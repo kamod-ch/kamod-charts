@@ -11,6 +11,7 @@
   ],
   "type": "module",
   "scripts": {
+    "prepublishOnly": "node -e \"console.error('Do not publish the workspace root. Use: pnpm release:publish'); process.exit(1)\"",
     "build": "pnpm -r --filter !@kamod-ch/charts-docs build",
     "typecheck": "pnpm -r typecheck",
     "lint": "oxlint .",
@@ -33,7 +34,11 @@
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs",
     "release:check": "pnpm run ci",
     "release:auth": "npm whoami --registry=https://registry.npmjs.org || (echo 'Authenticate with: npm login (or set NODE_AUTH_TOKEN)' >&2; exit 1)",
-    "release:publish": "pnpm --filter @kamod-ch/charts publish --access public --provenance --no-git-checks"
+    "release:publish": "pnpm --filter @kamod-ch/charts publish --access public --provenance --no-git-checks",
+    "release": "node ./scripts/release.mjs patch",
+    "release:minor": "node ./scripts/release.mjs minor",
+    "release:major": "node ./scripts/release.mjs major",
+    "release:dry": "node ./scripts/release.mjs patch --dry"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.1",

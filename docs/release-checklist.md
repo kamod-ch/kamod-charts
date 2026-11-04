@@ -14,25 +14,26 @@ Do not publish until explicitly approved.
 
 ## Version and tag
 
-1. Ensure `packages/core/package.json` version matches the intended release (`0.2.0`).
-2. Update `CHANGELOG.md` with the release date and notes.
-3. Commit, then tag: `git tag v0.2.0` and push tags.
+1. Update `CHANGELOG.md` with the release date and notes.
+2. On `main` with a clean working tree, from the repo root:
+
+```sh
+pnpm release          # patch
+pnpm release:minor    # or minor / major
+pnpm release:dry      # QA + pack check only, no bump or push
+```
+
+`scripts/release.mjs` (from [kamod-ch/.github](https://github.com/kamod-ch/.github)) bumps `packages/core`, commits, tags `v*`, and pushes. The tag version must match `@kamod-ch/charts` in `packages/core/package.json`.
 
 ## Publish
 
-Publishing requires explicit maintainer approval after all checks above pass.
+Preferred flow: push the release tag — `.github/workflows/publish.yml` runs `release:check` then `release:publish` via npm Trusted Publishing (OIDC), with optional `NPM_TOKEN` fallback.
+
+Manual recovery only after explicit maintainer approval:
 
 ```sh
 pnpm release:auth
 pnpm release:publish
-```
-
-Or push a version tag — `.github/workflows/publish.yml` runs `release:check` then publishes when `NPM_TOKEN` is configured.
-
-Manual publish from the package directory:
-
-```sh
-pnpm --filter @kamod-ch/charts publish --access public
 ```
 
 ## After publish

@@ -209,6 +209,8 @@ Useful commands:
 | `pnpm docs:build`    | Build the documentation site                |
 | `pnpm size:report`   | Regenerate the bundle-size report           |
 | `pnpm release:check` | Run all release gates                       |
+| `pnpm release:dry`   | Release QA + pack check, no version bump    |
+| `pnpm release`       | Patch release (bump, tag, push — see checklist) |
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [`release checklist`](docs/release-checklist.md) before opening a release PR.
 
