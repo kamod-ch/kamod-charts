@@ -201,15 +201,15 @@ pnpm docs:dev
 
 Useful commands:
 
-| Command              | Purpose                                     |
-| -------------------- | ------------------------------------------- |
-| `pnpm test`          | Run package tests                           |
-| `pnpm typecheck`     | Check TypeScript types across the workspace |
-| `pnpm build`         | Build publishable packages                  |
-| `pnpm docs:build`    | Build the documentation site                |
-| `pnpm size:report`   | Regenerate the bundle-size report           |
-| `pnpm release:check` | Run all release gates                       |
-| `pnpm release:dry`   | Release QA + pack check, no version bump    |
+| Command              | Purpose                                         |
+| -------------------- | ----------------------------------------------- |
+| `pnpm test`          | Run package tests                               |
+| `pnpm typecheck`     | Check TypeScript types across the workspace     |
+| `pnpm build`         | Build publishable packages                      |
+| `pnpm docs:build`    | Build the documentation site                    |
+| `pnpm size:report`   | Regenerate the bundle-size report               |
+| `pnpm release:check` | Run all release gates                           |
+| `pnpm release:dry`   | Release QA + pack check, no version bump        |
 | `pnpm release`       | Patch release (bump, tag, push — see checklist) |
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [`release checklist`](docs/release-checklist.md) before opening a release PR.
