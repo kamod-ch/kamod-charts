@@ -144,7 +144,7 @@
     "preact": "^11.2.0",
     "preact-render-to-string": "^6.8.3",
     "tsup": "^9.0.0",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   },
   "peerDependencies": {
     "@kamod-ch/motion": "^0.1.0",

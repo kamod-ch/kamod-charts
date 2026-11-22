@@ -24,7 +24,7 @@
     "@kamod-ch/icons": "^2.0.0",
     "@kamod-ch/motion": "^0.1.0",
     "@kamod-ch/themes": "^0.2.2",
-    "@kamod-ch/ui": "^2.1.0",
+    "@kamod-ch/ui": "^2.2.0",
     "@preact/signals": "^2.11.4",
     "motion": "^14.14.0",
     "preact": "^11.2.0"
