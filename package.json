@@ -32,6 +32,8 @@
     "docs:preview": "pnpm --filter @kamod-ch/charts-docs preview",
     "ci": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs && pnpm docs:build && pnpm size:report && git diff --exit-code -- docs/bundle-size.md",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && node scripts/test-package-exports.mjs",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
     "release:check": "pnpm run ci",
     "release:auth": "npm whoami --registry=https://registry.npmjs.org || (echo 'Authenticate with: npm login (or set NODE_AUTH_TOKEN)' >&2; exit 1)",
     "release:publish": "pnpm --filter @kamod-ch/charts publish --access public --provenance --no-git-checks",
@@ -41,6 +43,7 @@
     "release:dry": "node ./scripts/release.mjs patch --dry"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.3",
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "@typescript/typescript6": "^6.0.2",
